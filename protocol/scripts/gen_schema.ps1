@@ -489,4 +489,4 @@ Set-Content -Path $OutputPath -Value $finalOutput -Encoding UTF8 -NoNewline
 $finalOutput | Out-Null  # Write with newline handled above
 Add-Content -Path $OutputPath -Value "" -Encoding UTF8
 
-Write-Host "  ✓ Generated C# models at $OutputPath" -ForegroundColor Gray
+Write-Host "  [OK] Generated C# models at $OutputPath" -ForegroundColor Gray

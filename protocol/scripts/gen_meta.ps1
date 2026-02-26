@@ -105,4 +105,4 @@ if (-not $finalOutput.EndsWith("`n")) {
 }
 
 Set-Content -Path $OutputPath -Value $finalOutput -Encoding UTF8
-Write-Host "  ✓ Generated meta definitions at $OutputPath" -ForegroundColor Gray
+Write-Host "  [OK] Generated meta definitions at $OutputPath" -ForegroundColor Gray

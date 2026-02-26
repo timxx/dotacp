@@ -96,6 +96,10 @@
       Overwrite="true" />
 
     <ItemGroup>
+      <FileWrites Include="$(SchemaHashFile)" Condition="Exists('$(SchemaHashFile)')" />
+    </ItemGroup>
+
+    <ItemGroup>
       <Compile Include="@(_GeneratedFiles)" Condition="Exists('%(Identity)')" />
     </ItemGroup>
   </Target>

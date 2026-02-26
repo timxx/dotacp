@@ -95,7 +95,7 @@ function Download-Schema {
         [System.IO.File]::WriteAllText($MetaJsonPath, $metaJson, [System.Text.Encoding]::UTF8)
         [System.IO.File]::WriteAllText($VersionFile, $Ref, [System.Text.Encoding]::UTF8)
 
-        Write-Host "  ✓ Schema and meta files downloaded" -ForegroundColor Gray
+        Write-Host "  [OK] Schema and meta files downloaded" -ForegroundColor Gray
     }
     catch {
         Write-Error "Failed to fetch schema from $Repository@$Ref : $_" -ErrorAction Stop
@@ -115,7 +115,7 @@ $SchemaJsonPath = Join-Path $SchemaDir "schema.json"
 $MetaJsonPath = Join-Path $SchemaDir "meta.json"
 $VersionFile = Join-Path $SchemaDir "VERSION"
 
-Write-Host "🚀 ACP Code Generation" -ForegroundColor Cyan
+Write-Host "[*] ACP Code Generation" -ForegroundColor Cyan
 Write-Host "Repository root: $RepoRoot" -ForegroundColor Gray
 Write-Host "Schema directory: $SchemaDir" -ForegroundColor Gray
 
@@ -142,11 +142,11 @@ if ($NoDownload) {
 
 # Download schema files if needed
 if ($shouldDownload) {
-    Write-Host "📥 Downloading schema files..." -ForegroundColor Blue
+    Write-Host "[Download] Downloading schema files..." -ForegroundColor Blue
     $ref = Resolve-Ref $Version
     Download-Schema $Repo $ref
 } else {
-    Write-Host "📚 Using existing schema files" -ForegroundColor Blue
+    Write-Host "[Cached] Using existing schema files" -ForegroundColor Blue
 }
 
 # Validate schema files exist
@@ -158,14 +158,14 @@ if (-not (Test-Path $MetaJsonPath)) {
 }
 
 # Generate schema models
-Write-Host "⚙️  Generating C# models from schema..." -ForegroundColor Blue
+Write-Host "[Generate] Generating C# models from schema..." -ForegroundColor Blue
 & (Join-Path $ScriptRoot "gen_schema.ps1")
 
 # Generate meta definitions
-Write-Host "⚙️  Generating meta definitions..." -ForegroundColor Blue
+Write-Host "[Generate] Generating meta definitions..." -ForegroundColor Blue
 & (Join-Path $ScriptRoot "gen_meta.ps1")
 
-Write-Host "✅ Code generation completed successfully!" -ForegroundColor Green
+Write-Host "[DONE] Code generation completed successfully!" -ForegroundColor Green
 
 if ($shouldDownload) {
     $ref = Get-CachedRef
