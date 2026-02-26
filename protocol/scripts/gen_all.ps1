@@ -34,7 +34,7 @@
 
 param(
     [string]$Version = $env:ACP_SCHEMA_VERSION,
-    [string]$Repo = $env:ACP_SCHEMA_REPO ?? "agentclientprotocol/agent-client-protocol",
+    [string]$Repo = $(if ($env:ACP_SCHEMA_REPO) { $env:ACP_SCHEMA_REPO } else { "agentclientprotocol/agent-client-protocol" }),
     [switch]$NoDownload,
     [switch]$Force
 )

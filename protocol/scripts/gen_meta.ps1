@@ -56,7 +56,7 @@ $output += "    public static class ProtocolMeta"
 $output += "    {"
 
 # Add protocol version
-$version = $meta.version ?? 1
+$version = $(if ($meta.version) { $meta.version } else { 1 })
 $output += "        /// <summary>"
 $output += "        /// ACP Protocol Version"
 $output += "        /// </summary>"

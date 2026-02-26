@@ -186,11 +186,11 @@ function New-ModelClass {
 
     # Handle oneOf/anyOf at root level (union types or enums)
     if ($Definition.oneOf -or $Definition.anyOf) {
-        $items = $Definition.oneOf ?? $Definition.anyOf
-        
+        $items = $(if ($Definition.oneOf) { $Definition.oneOf } else { $Definition.anyOf })
+
         # Check if this is an enum-like oneOf (all items have const)
         $isEnumLike = $items | Where-Object { $_.type -eq "string" -and $_.const } | Measure-Object | Select-Object -ExpandProperty Count
-        
+
         if ($isEnumLike -eq $items.Count) {
             # This is an enum-like type, create a proper enum
             $xmlDocs = @()
@@ -208,18 +208,18 @@ function New-ModelClass {
                 }
                 $xmlDocs += "/// </summary>"
             }
-            
+
             $result = $xmlDocs -join "`n"
             if ($xmlDocs.Count -gt 0) { $result += "`n" }
             $result += "[JsonConverter(typeof(JsonStringEnumConverter))]`n"
             $result += "public enum $className`n{"
-            
+
             # Generate enum values
             $enumValues = @()
             foreach ($item in $items) {
                 $constValue = $item.const
                 $enumName = Convert-PropertyName $constValue
-                
+
                 # Build enum value with description
                 $enumValueDocs = @()
                 if ($item.description) {
@@ -234,16 +234,16 @@ function New-ModelClass {
                     }
                     $enumValueDocs += "    /// </summary>"
                 }
-                
+
                 $enumEntry = ""
                 if ($enumValueDocs.Count -gt 0) {
                     $enumEntry += ($enumValueDocs -join "`n") + "`n"
                 }
                 $enumEntry += "    $enumName"
-                
+
                 $enumValues += $enumEntry
             }
-            
+
             $result += "`n"
             $result += ($enumValues -join ",`n") + "`n"
             $result += "}"
@@ -260,7 +260,7 @@ function New-ModelClass {
                     }
                 }
             }
-            
+
             # If we found properties in the union items, use them
             if ($mergedProperties.Count -gt 0) {
                 # Inject the merged properties into Definition for property processing below
@@ -283,7 +283,7 @@ function New-ModelClass {
                     }
                     $xmlDocs += "/// </summary>"
                 }
-                
+
                 $result = $xmlDocs -join "`n"
                 if ($xmlDocs.Count -gt 0) { $result += "`n" }
                 $result += "public class $className { }"
@@ -347,7 +347,7 @@ function New-ModelClass {
             if (-not $needsJsonPropertyName -and $propName -ne (Convert-PropertyName $propName)) {
                 $needsJsonPropertyName = $true
             }
-            
+
             if ($needsJsonPropertyName) {
                 $propLine = "    [JsonPropertyName(`"$propName`")]`n"
             }
@@ -404,7 +404,7 @@ if (-not (Test-Path $SchemaJsonPath)) {
 
 Write-Host "  Parsing schema.json..." -ForegroundColor Gray
 $schemaJson = Get-Content $SchemaJsonPath -Raw
-$schemaContent = ConvertFrom-Json -InputObject $schemaJson -Depth 100
+$schemaContent = ConvertFrom-Json -InputObject $schemaJson
 
 # Generate header
 $headerLines = @()
@@ -439,11 +439,11 @@ $defs = $schemaContent.'$defs'
 if ($null -ne $defs) {
     $enumDefinitions = @()
     $recordClasses = @()
-    
+
     foreach ($defName in ($defs.PSObject.Properties.Name | Sort-Object)) {
         $def = $defs.$defName
         $classCode = New-ModelClass $defName $def $defs
-        
+
         # Check if this is an enum definition
         # Enums can have XML docs before the enum statement
         if ($classCode -match 'public\s+enum\s+\w+') {
@@ -452,7 +452,7 @@ if ($null -ne $defs) {
             $recordClasses += $classCode
         }
     }
-    
+
     # Add enums first
     if ($enumDefinitions.Count -gt 0) {
         $output += "    // Enums for string-based enum-like types"
@@ -464,7 +464,7 @@ if ($null -ne $defs) {
             $output += ""
         }
     }
-    
+
     # Then add class definitions
     $output += "    // Generated model classes from ACP schema"
     $output += ""

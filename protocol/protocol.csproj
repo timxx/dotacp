@@ -42,5 +42,62 @@
     <None Include="scripts\gen_schema.ps1" />
     <None Include="scripts\README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+  <PropertyGroup>
+    <SchemaHashFile>$(ProjectDir)obj\$(Configuration)\schema.hash</SchemaHashFile>
+  </PropertyGroup>
+  <Target Name="GenerateProtocolCode" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <_SchemaFiles Include="schema\schema.json" />
+      <_SchemaFiles Include="schema\meta.json" />
+      <_SchemaFiles Include="schema\VERSION" />
+      <_GeneratedFiles Include="Schema.cs" />
+      <_GeneratedFiles Include="Meta.cs" />
+    </ItemGroup>
+
+    <GetFileHash Files="@(_SchemaFiles)" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="_SchemaFileHashes" />
+    </GetFileHash>
+
+    <PropertyGroup>
+      <_SchemaHash>@(_SchemaFileHashes->'%(FileHash)', '|')</_SchemaHash>
+    </PropertyGroup>
+
+    <ReadLinesFromFile File="$(SchemaHashFile)" Condition="Exists('$(SchemaHashFile)')">
+      <Output TaskParameter="Lines" ItemName="_ExistingSchemaHashLines" />
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <_ExistingSchemaHash>$([System.String]::Join("", %(_ExistingSchemaHashLines.Identity)))</_ExistingSchemaHash>
+      <_NeedGen>false</_NeedGen>
+      <_NeedGen Condition="!Exists('$(SchemaHashFile)')">true</_NeedGen>
+      <_NeedGen Condition="'$(_ExistingSchemaHash)' != '$(_SchemaHash)'">true</_NeedGen>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_MissingGeneratedFiles Include="@(_GeneratedFiles)" Condition="!Exists('%(Identity)')" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <_NeedGen Condition="'@(_MissingGeneratedFiles)' != ''">true</_NeedGen>
+    </PropertyGroup>
+
+    <Exec
+      Condition="'$(_NeedGen)' == 'true'"
+      WorkingDirectory="$(ProjectDir)"
+      Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(ProjectDir)scripts\gen_all.ps1&quot; -NoDownload" />
+
+    <WriteLinesToFile
+      Condition="'$(_NeedGen)' == 'true'"
+      File="$(SchemaHashFile)"
+      Lines="$(_SchemaHash)"
+      Overwrite="true" />
+
+    <ItemGroup>
+      <Compile Include="@(_GeneratedFiles)" Condition="Exists('%(Identity)')" />
+    </ItemGroup>
+  </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
