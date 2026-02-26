@@ -47,54 +47,55 @@ $output += $header
 $output += ""
 $output += "using System.Collections.Generic;"
 $output += ""
-$output += "namespace dotacp.protocol;"
-$output += ""
-$output += "/// <summary>"
-$output += "/// Protocol metadata and method mappings"
-$output += "/// </summary>"
-$output += "public static class ProtocolMeta"
+$output += "namespace dotacp.protocol"
 $output += "{"
+$output += "    /// <summary>"
+$output += "    /// Protocol metadata and method mappings"
+$output += "    /// </summary>"
+$output += "    public static class ProtocolMeta"
+$output += "    {"
 
 # Add protocol version
 $version = $meta.version ?? 1
-$output += "    /// <summary>"
-$output += "    /// ACP Protocol Version"
-$output += "    /// </summary>"
-$output += "    public const int ProtocolVersion = $version;"
+$output += "        /// <summary>"
+$output += "        /// ACP Protocol Version"
+$output += "        /// </summary>"
+$output += "        public const int ProtocolVersion = $version;"
 $output += ""
 
 # Add agent methods
-$output += "    /// <summary>"
-$output += "    /// Methods that agents handle"
-$output += "    /// </summary>"
-$output += "    public static readonly Dictionary<string, string> AgentMethods = new()"
-$output += "    {"
+$output += "        /// <summary>"
+$output += "        /// Methods that agents handle"
+$output += "        /// </summary>"
+$output += "        public static readonly Dictionary<string, string> AgentMethods = new Dictionary<string, string>()"
+$output += "        {"
 
 if ($meta.agentMethods) {
     foreach ($methodName in ($meta.agentMethods.PSObject.Properties.Name | Sort-Object)) {
         $methodPath = $meta.agentMethods.$methodName
-        $output += "        { `"$methodName`", `"$methodPath`" },"
+        $output += "            { `"$methodName`", `"$methodPath`" },"
     }
 }
 
-$output += "    };"
+$output += "        };"
 $output += ""
 
 # Add client methods
-$output += "    /// <summary>"
-$output += "    /// Methods that clients handle"
-$output += "    /// </summary>"
-$output += "    public static readonly Dictionary<string, string> ClientMethods = new()"
-$output += "    {"
+$output += "        /// <summary>"
+$output += "        /// Methods that clients handle"
+$output += "        /// </summary>"
+$output += "        public static readonly Dictionary<string, string> ClientMethods = new Dictionary<string, string>()"
+$output += "        {"
 
 if ($meta.clientMethods) {
     foreach ($methodName in ($meta.clientMethods.PSObject.Properties.Name | Sort-Object)) {
         $methodPath = $meta.clientMethods.$methodName
-        $output += "        { `"$methodName`", `"$methodPath`" },"
+        $output += "            { `"$methodName`", `"$methodPath`" },"
     }
 }
 
-$output += "    };"
+$output += "        };"
+$output += "    }"
 $output += "}"
 
 # Write output with proper formatting

@@ -71,24 +71,27 @@ function Get-PropertyType {
     # Handle typed values
     if ($type -is [string]) {
         $mappedType = Get-TypeName $type
+        # Only add ? for value types (int, bool, double), not reference types
         if ($isNullable -and -not $mappedType.EndsWith('?')) {
-            return "$mappedType?"
+            if ($mappedType -in @('int', 'bool', 'double')) {
+                return "$mappedType?"
+            }
         }
         return $mappedType
     }
 
-    # Handle anyOf (union types)
+    # Handle anyOf (union types) - return object without nullable annotation
     if ($Property.anyOf) {
-        return "object?"
+        return "object"
     }
 
-    # Handle oneOf (discriminated unions)
+    # Handle oneOf (discriminated unions) - return object without nullable annotation
     if ($Property.oneOf) {
-        return "object?"
+        return "object"
     }
 
-    # Default to nullable object
-    return "object?"
+    # Default to object (no nullable annotation)
+    return "object"
 }
 
 function Get-TypeName {
@@ -141,7 +144,7 @@ function Convert-DefaultValue {
         [string]$Type
     )
 
-    if ($Value -eq $null) {
+    if ($null -eq $Value) {
         return $null
     }
 
@@ -159,10 +162,12 @@ function Convert-DefaultValue {
             return "`"$Value`""
         }
         { $_ -match '^List<' } {
-            return "new()"
+            # C# 8.0 compatible: use full type syntax instead of new()
+            return "new $Type()"
         }
         { $_ -match '^Dictionary<' } {
-            return "new()"
+            # C# 8.0 compatible: use full type syntax instead of new()
+            return "new $Type()"
         }
         default { 
             return $null 
@@ -281,7 +286,7 @@ function New-ModelClass {
                 
                 $result = $xmlDocs -join "`n"
                 if ($xmlDocs.Count -gt 0) { $result += "`n" }
-                $result += "public record $className;"
+                $result += "public class $className { }"
                 return $result
             }
         }
@@ -306,8 +311,8 @@ function New-ModelClass {
         $xmlDocs += "/// </summary>"
     }
 
-    # Determine record type
-    $classDeclaration = "public record $className"
+    # Determine class type
+    $classDeclaration = "public class $className"
 
     # Build properties
     $properties = @()
@@ -327,9 +332,12 @@ function New-ModelClass {
                 $needsJsonPropertyName = $true
             }
 
-            # If not required and not nullable, make it nullable
+            # If not required and not nullable, make it nullable (only for value types)
             if (-not $propIsRequired -and -not $csType.EndsWith('?')) {
-                $csType = "{0}?" -f $csType
+                # Only add ? for value types (int, bool, double), not reference types
+                if ($csType -in @('int', 'bool', 'double')) {
+                    $csType = "{0}?" -f $csType
+                }
             }
 
             $propLine = ""
@@ -345,11 +353,11 @@ function New-ModelClass {
             }
 
             # Build property declaration - use -f formatting instead of interpolation
-            $propDeclaration = "    public {0} {1} {{ get; init; }}" -f $csType, $csPropName
+            $propDeclaration = "    public {0} {1} {{ get; set; }}" -f $csType, $csPropName
             $propLine += $propDeclaration
 
             # Add default if specified
-            if ($prop.default -ne $null) {
+            if ($null -ne $prop.default) {
                 $defaultValue = Convert-DefaultValue $prop.default $csType
                 if ($defaultValue) {
                     $propLine = "{0} = {1};" -f $propLine, $defaultValue
@@ -371,7 +379,8 @@ function New-ModelClass {
         $result += ($properties -join "`n") + "`n"
         $result += "}"
     } else {
-        $result += "$classDeclaration;"
+        # Empty class - use traditional syntax for C# 8.0 compatibility
+        $result += "$classDeclaration`n{`n}"
     }
 
     return $result
@@ -422,8 +431,8 @@ $output += $header
 $output += ""
 $output += $usings -join "`n"
 $output += ""
-$output += "namespace dotacp.protocol;"
-$output += ""
+$output += "namespace dotacp.protocol"
+$output += "{"
 
 # Generate classes from schema definitions
 $defs = $schemaContent.'$defs'
@@ -446,22 +455,29 @@ if ($null -ne $defs) {
     
     # Add enums first
     if ($enumDefinitions.Count -gt 0) {
-        $output += "// Enums for string-based enum-like types"
+        $output += "    // Enums for string-based enum-like types"
         $output += ""
         foreach ($enum in $enumDefinitions) {
-            $output += $enum
+            # Indent enum definitions
+            $indentedEnum = $enum -split "`n" | ForEach-Object { "    $_" }
+            $output += $indentedEnum -join "`n"
             $output += ""
         }
     }
     
-    # Then add record classes
-    $output += "// Generated model classes from ACP schema"
+    # Then add class definitions
+    $output += "    // Generated model classes from ACP schema"
     $output += ""
     foreach ($recordClass in $recordClasses) {
-        $output += $recordClass
+        # Indent class definitions
+        $indentedClass = $recordClass -split "`n" | ForEach-Object { "    $_" }
+        $output += $indentedClass -join "`n"
         $output += ""
     }
 }
+
+# Close namespace
+$output += "}"
 
 # Write output
 $finalOutput = $output -join "`n"
