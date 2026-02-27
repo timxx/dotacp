@@ -86,6 +86,10 @@ function Get-PropertyType {
             $mappedType = Get-TypeName $type
         }
 
+        if ($isNullable -and $type -eq "object") {
+            return "object"
+        }
+
         # Add ? for nullable value types only
         if ($isNullable -and -not $mappedType.EndsWith('?')) {
             # Only add ? for value types (int, bool, double, uint, ushort, ulong, short, long, byte, sbyte, float, decimal), not reference types
@@ -142,7 +146,7 @@ function Get-TypeName {
         "number" { return "double" }
         "integer" { return "int" }
         "boolean" { return "bool" }
-        "object" { return "Dictionary<string, object>" }
+        "object" { return "object" }
         "array" { return "List<object>" }
         "null" { return "object" }
         default { return "object" }

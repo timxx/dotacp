@@ -81,9 +81,9 @@ Describe "Get-TypeName" {
         ($result -ceq "bool") | Should Be $true
     }
 
-    It "converts object to Dictionary" {
+    It "converts object to object" {
         $result = Get-TypeName "object"
-        ($result -ceq "Dictionary<string, object>") | Should Be $true
+        ($result -ceq "object") | Should Be $true
     }
 
     It "converts array to List" {
@@ -575,12 +575,12 @@ Describe "Get-PropertyType - Nullable Reference Types" {
         $result | Should Not Be "string?"
     }
 
-    It "converts ['object', 'null'] to Dictionary (NOT Dictionary?)" {
+    It "converts ['object', 'null'] to object" {
         $property = @{
             type = @("object", "null")
         }
         $result = Get-PropertyType $property $null
-        $result | Should Be "Dictionary<string, object>"
+        $result | Should Be "object"
     }
 
     It "converts ['array', 'null'] to List (NOT List?)" {
