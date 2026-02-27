@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace dotacp.protocol
 {
@@ -11,26 +10,22 @@ namespace dotacp.protocol
     /// </summary>
     /// <typeparam name="TAlias">The type alias struct type</typeparam>
     /// <typeparam name="TValue">The underlying value type</typeparam>
-    public class TypeAliasConverter<TAlias, TValue> : JsonConverter<TAlias>
+    public class TypeAliasConverter<TAlias, TValue> : JsonConverter
     {
         private static readonly FieldInfo _valueField = typeof(TAlias).GetField("_value", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        public override TAlias Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            // Deserialize as the underlying type
-            var value = JsonSerializer.Deserialize<TValue>(ref reader, options);
+        public override bool CanConvert(Type objectType) => objectType == typeof(TAlias);
 
-            // Use Activator to create the struct with the value
-            return (TAlias)Activator.CreateInstance(typeof(TAlias), value);
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            var value = serializer.Deserialize<TValue>(reader);
+            return Activator.CreateInstance(typeof(TAlias), value);
         }
 
-        public override void Write(Utf8JsonWriter writer, TAlias value, JsonSerializerOptions options)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            // Extract the underlying value using reflection
             var underlyingValue = (TValue)_valueField.GetValue(value);
-
-            // Serialize as the underlying type
-            JsonSerializer.Serialize(writer, underlyingValue, options);
+            serializer.Serialize(writer, underlyingValue);
         }
     }
 }

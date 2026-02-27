@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace dotacp.protocol
 {
@@ -12,7 +11,7 @@ namespace dotacp.protocol
     /// Falls back to the enum member name if no attribute is present.
     /// </summary>
     /// <typeparam name="TEnum">The enum type to convert.</typeparam>
-    public class JsonEnumMemberConverter<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
+    public class JsonEnumMemberConverter<TEnum> : JsonConverter where TEnum : struct, Enum
     {
         private readonly Dictionary<TEnum, string> _enumToString;
         private readonly Dictionary<string, TEnum> _stringToEnum;
@@ -36,12 +35,14 @@ namespace dotacp.protocol
             }
         }
 
-        public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override bool CanConvert(Type objectType) => objectType == typeof(TEnum);
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var value = reader.GetString();
+            var value = reader.Value as string;
             if (value == null)
             {
-                throw new JsonException($"Cannot convert null to {typeof(TEnum).Name}");
+                throw new JsonSerializationException($"Cannot convert null to {typeof(TEnum).Name}");
             }
 
             if (_stringToEnum.TryGetValue(value, out var enumValue))
@@ -49,18 +50,18 @@ namespace dotacp.protocol
                 return enumValue;
             }
 
-            throw new JsonException($"Unknown value '{value}' for enum {typeof(TEnum).Name}");
+            throw new JsonSerializationException($"Unknown value '{value}' for enum {typeof(TEnum).Name}");
         }
 
-        public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (_enumToString.TryGetValue(value, out var stringValue))
+            if (value is TEnum enumValue && _enumToString.TryGetValue(enumValue, out var stringValue))
             {
-                writer.WriteStringValue(stringValue);
+                writer.WriteValue(stringValue);
             }
             else
             {
-                throw new JsonException($"Unknown enum value '{value}' for {typeof(TEnum).Name}");
+                throw new JsonSerializationException($"Unknown enum value '{value}' for {typeof(TEnum).Name}");
             }
         }
     }

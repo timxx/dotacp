@@ -11,7 +11,7 @@ namespace dotacp.protocol
         /// <summary>
         /// ACP Protocol Version
         /// </summary>
-        public const int Version = 1;
+        public const ushort Version = 1;
     }
 
     /// <summary>

@@ -7,7 +7,7 @@
     Generates strongly-typed C# models from the ACP JSON schema using Pydantic-style records.
     This script:
     1. Parses schema.json
-    2. Generates C# records with System.Text.Json serialization
+    2. Generates C# records with Newtonsoft.Json serialization
     3. Applies naming conventions (snake_case -> PascalCase)
     4. Handles type conversions and schema references
     5. Writes output to protocol/Schema.cs
@@ -905,7 +905,7 @@ function New-ModelClass {
             }
 
             if ($needsJsonPropertyName) {
-                $propLine += "    [JsonPropertyName(`"$propName`")]`n"
+                $propLine += "    [JsonProperty(`"$propName`")]`n"
             }
 
             # Build property declaration - use -f formatting instead of interpolation
@@ -999,7 +999,7 @@ $header = $headerLines -join "`n"
 $usings = @(
     "using System;"
     "using System.Collections.Generic;"
-    "using System.Text.Json.Serialization;"
+    "using Newtonsoft.Json;"
 )
 
 $output = @()

@@ -57,7 +57,7 @@ Generates C# record types from `schema/schema.json`.
 - Supports schema references ($ref) and nested types
 - Generates XML documentation comments
 - Handles nullable types and defaults
-- Uses System.Text.Json attributes for serialization
+- Uses Newtonsoft.Json attributes for serialization
 
 **Type Mapping:**
 | JSON Schema | C# |
@@ -66,7 +66,7 @@ Generates C# record types from `schema/schema.json`.
 | `integer` | `int` |
 | `number` | `double` |
 | `boolean` | `bool` |
-| `object` | `Dictionary<string, object>` |
+| `object` | `object` |
 | `array` | `List<T>` |
 | `null` | `object?` |
 

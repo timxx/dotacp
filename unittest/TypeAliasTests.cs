@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
+using Newtonsoft.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using dotacp.protocol;
 
@@ -44,7 +44,7 @@ namespace dotacp.unittest
         public void SessionId_SerializesAsString()
         {
             SessionId sessionId = new SessionId("test-session-id");
-            string json = JsonSerializer.Serialize(sessionId);
+            string json = JsonConvert.SerializeObject(sessionId);
 
             Assert.AreEqual("\"test-session-id\"", json);
         }
@@ -53,7 +53,7 @@ namespace dotacp.unittest
         public void SessionId_DeserializesFromString()
         {
             string json = "\"test-session-id\"";
-            SessionId sessionId = JsonSerializer.Deserialize<SessionId>(json);
+            SessionId sessionId = JsonConvert.DeserializeObject<SessionId>(json);
 
             string result = sessionId;
             Assert.AreEqual("test-session-id", result);
@@ -63,8 +63,8 @@ namespace dotacp.unittest
         public void SessionId_RoundTripSerialization()
         {
             SessionId original = new SessionId("test-session-id");
-            string json = JsonSerializer.Serialize(original);
-            SessionId deserialized = JsonSerializer.Deserialize<SessionId>(json);
+            string json = JsonConvert.SerializeObject(original);
+            SessionId deserialized = JsonConvert.DeserializeObject<SessionId>(json);
 
             Assert.AreEqual(original, deserialized);
         }
@@ -123,7 +123,7 @@ namespace dotacp.unittest
         public void ProtocolVersion_SerializesAsNumber()
         {
             ProtocolVersion version = new ProtocolVersion(42);
-            string json = JsonSerializer.Serialize(version);
+            string json = JsonConvert.SerializeObject(version);
 
             Assert.AreEqual("42", json);
         }
@@ -132,7 +132,7 @@ namespace dotacp.unittest
         public void ProtocolVersion_DeserializesFromNumber()
         {
             string json = "42";
-            ProtocolVersion version = JsonSerializer.Deserialize<ProtocolVersion>(json);
+            ProtocolVersion version = JsonConvert.DeserializeObject<ProtocolVersion>(json);
 
             ushort result = version;
             Assert.AreEqual((ushort)42, result);
@@ -142,8 +142,8 @@ namespace dotacp.unittest
         public void ProtocolVersion_RoundTripSerialization()
         {
             ProtocolVersion original = new ProtocolVersion(42);
-            string json = JsonSerializer.Serialize(original);
-            ProtocolVersion deserialized = JsonSerializer.Deserialize<ProtocolVersion>(json);
+            string json = JsonConvert.SerializeObject(original);
+            ProtocolVersion deserialized = JsonConvert.DeserializeObject<ProtocolVersion>(json);
 
             Assert.AreEqual(original, deserialized);
         }
@@ -184,11 +184,11 @@ namespace dotacp.unittest
                 var instance = Activator.CreateInstance(aliasType, testValue);
 
                 // Serialize
-                var json = JsonSerializer.Serialize(instance, aliasType);
+                var json = JsonConvert.SerializeObject(instance);
                 Assert.AreEqual($"\"{testValue}\"", json, $"{aliasType.Name} should serialize as string");
 
                 // Deserialize
-                var deserialized = JsonSerializer.Deserialize(json, aliasType);
+                var deserialized = JsonConvert.DeserializeObject(json, aliasType);
                 Assert.AreEqual(instance, deserialized, $"{aliasType.Name} round-trip should work");
             }
         }
@@ -226,10 +226,10 @@ namespace dotacp.unittest
                 Prompt = new List<ContentBlock>()
             };
 
-            var json = JsonSerializer.Serialize(request);
+            var json = JsonConvert.SerializeObject(request);
             Assert.Contains("\"sessionId\":\"test-session-456\"", json, "SessionId should serialize as string in JSON");
 
-            var deserialized = JsonSerializer.Deserialize<PromptRequest>(json);
+            var deserialized = JsonConvert.DeserializeObject<PromptRequest>(json);
             Assert.IsNotNull(deserialized);
             string deserializedId = deserialized.SessionId;
             Assert.AreEqual("test-session-456", (string)sessionId);

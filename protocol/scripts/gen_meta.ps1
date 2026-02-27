@@ -72,7 +72,7 @@ $version = $(if ($meta.version) { $meta.version } else { 1 })
 $output += "        /// <summary>"
 $output += "        /// ACP Protocol Version"
 $output += "        /// </summary>"
-$output += "        public const int Version = $version;"
+$output += "        public const ushort Version = $version;"
 $output += "    }"
 $output += ""
 

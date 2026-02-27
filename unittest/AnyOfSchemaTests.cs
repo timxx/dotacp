@@ -1,5 +1,5 @@
-using System.Collections.Generic;
-using System.Text.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using dotacp.protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -39,7 +39,7 @@ namespace dotacp.unittest
             };
 
             // Act
-            string json = JsonSerializer.Serialize(error);
+            string json = JsonConvert.SerializeObject(error);
 
             // Assert
             // Integer enums serialize as numbers, not strings
@@ -54,7 +54,7 @@ namespace dotacp.unittest
             string json = "{\"code\":-32601,\"message\":\"Method not found\"}";
 
             // Act
-            var error = JsonSerializer.Deserialize<Error>(json);
+            var error = JsonConvert.DeserializeObject<Error>(json);
 
             // Assert
             Assert.IsNotNull(error);
@@ -98,7 +98,7 @@ namespace dotacp.unittest
             // Act & Assert
             for (int i = 0; i < categories.Length; i++)
             {
-                string json = JsonSerializer.Serialize(categories[i]);
+                string json = JsonConvert.SerializeObject(categories[i]);
                 Assert.Contains(expectedValues[i], json, $"Expected {expectedValues[i]} but got {json}");
             }
         }
@@ -110,7 +110,7 @@ namespace dotacp.unittest
             string json = "\"thought_level\"";
 
             // Act
-            var category = JsonSerializer.Deserialize<SessionConfigOptionCategory>(json);
+            var category = JsonConvert.DeserializeObject<SessionConfigOptionCategory>(json);
 
             // Assert
             Assert.AreEqual(SessionConfigOptionCategory.ThoughtLevel, category);
@@ -181,7 +181,7 @@ namespace dotacp.unittest
             };
 
             // Act
-            string json = JsonSerializer.Serialize(request);
+            string json = JsonConvert.SerializeObject(request);
 
             // Assert
             Assert.Contains("\"id\":42", json, $"Expected id:42 but got {json}");
@@ -198,7 +198,7 @@ namespace dotacp.unittest
             };
 
             // Act
-            string json = JsonSerializer.Serialize(request);
+            string json = JsonConvert.SerializeObject(request);
 
             // Assert
             Assert.Contains("\"id\":\"request-123\"",
@@ -216,7 +216,7 @@ namespace dotacp.unittest
             };
 
             // Act
-            string json = JsonSerializer.Serialize(request);
+            string json = JsonConvert.SerializeObject(request);
 
             // Assert
             Assert.Contains("\"id\":null",
@@ -230,7 +230,7 @@ namespace dotacp.unittest
             string json = "{\"id\":100,\"method\":\"test\"}";
 
             // Act
-            var request = JsonSerializer.Deserialize<ClientRequest>(json);
+            var request = JsonConvert.DeserializeObject<ClientRequest>(json);
 
             // Assert
             Assert.IsNotNull(request);
@@ -245,7 +245,7 @@ namespace dotacp.unittest
             string json = "{\"id\":\"test-id\",\"method\":\"test\"}";
 
             // Act
-            var request = JsonSerializer.Deserialize<ClientRequest>(json);
+            var request = JsonConvert.DeserializeObject<ClientRequest>(json);
 
             // Assert
             Assert.IsNotNull(request);
@@ -260,7 +260,7 @@ namespace dotacp.unittest
             string json = "{\"id\":null,\"method\":\"test\"}";
 
             // Act
-            var request = JsonSerializer.Deserialize<ClientRequest>(json);
+            var request = JsonConvert.DeserializeObject<ClientRequest>(json);
 
             // Assert
             Assert.IsNotNull(request);
@@ -330,8 +330,8 @@ namespace dotacp.unittest
             };
 
             // Act
-            string json = JsonSerializer.Serialize(originalError);
-            var deserializedError = JsonSerializer.Deserialize<Error>(json);
+            string json = JsonConvert.SerializeObject(originalError);
+            var deserializedError = JsonConvert.DeserializeObject<Error>(json);
 
             // Assert
             Assert.IsNotNull(deserializedError);
@@ -353,8 +353,8 @@ namespace dotacp.unittest
             foreach (var originalRequest in requests)
             {
                 // Act
-                string json = JsonSerializer.Serialize(originalRequest);
-                var deserializedRequest = JsonSerializer.Deserialize<ClientRequest>(json);
+                string json = JsonConvert.SerializeObject(originalRequest);
+                var deserializedRequest = JsonConvert.DeserializeObject<ClientRequest>(json);
 
                 // Assert
                 Assert.IsNotNull(deserializedRequest);
