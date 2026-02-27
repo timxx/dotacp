@@ -51,13 +51,14 @@ function Get-PropertyType {
         return "List<$itemType>"
     }
 
-    # Handle type arrays (e.g., ["string", "null"])
+    # Handle type arrays (e.g., ["string", "null"], ["integer", "null"])
     $type = $Property.type
     $isNullable = $false
 
     if ($type -is [array]) {
-        $isNullable = $null -in $type
-        $type = @($type | Where-Object { $_ -ne $null })
+        # Check for "null" string (as parsed by ConvertFrom-Json)
+        $isNullable = "null" -in $type
+        $type = @($type | Where-Object { $_ -ne "null" })
         if ($type.Count -eq 1) {
             $type = $type[0]
         }
@@ -70,18 +71,57 @@ function Get-PropertyType {
 
     # Handle typed values
     if ($type -is [string]) {
-        $mappedType = Get-TypeName $type
-        # Only add ? for value types (int, bool, double), not reference types
+        # Check for format hints on integer types
+        if ($type -eq "integer" -and $Property.format) {
+            $mappedType = switch ($Property.format) {
+                "uint16" { "ushort" }
+                "uint32" { "uint" }
+                "uint64" { "ulong" }
+                "int16" { "short" }
+                "int32" { "int" }
+                "int64" { "long" }
+                default { "int" }
+            }
+        } else {
+            $mappedType = Get-TypeName $type
+        }
+
+        # Add ? for nullable value types only
         if ($isNullable -and -not $mappedType.EndsWith('?')) {
-            if ($mappedType -in @('int', 'bool', 'double')) {
-                return "$mappedType?"
+            # Only add ? for value types (int, bool, double, uint, ushort, ulong, short, long, byte, sbyte, float, decimal), not reference types
+            if ($mappedType -in @('int', 'bool', 'double', 'uint', 'ushort', 'ulong', 'short', 'long', 'byte', 'sbyte', 'float', 'decimal')) {
+                return $mappedType + "?"
             }
         }
         return $mappedType
     }
 
-    # Handle anyOf (union types) - return object without nullable annotation
+    # Handle anyOf (union types)
     if ($Property.anyOf) {
+        # Check if this is just a nullable reference pattern: anyOf: [{ $ref }, { type: null }]
+        if ($Property.anyOf.Count -eq 2) {
+            $hasRef = $false
+            $hasNull = $false
+            $refType = $null
+
+            foreach ($item in $Property.anyOf) {
+                if ($item.'$ref') {
+                    $hasRef = $true
+                    $refName = $item.'$ref'.Split('/')[-1]
+                    $refType = Convert-NameToClass $refName
+                }
+                elseif ($item.type -eq "null") {
+                    $hasNull = $true
+                }
+            }
+
+            # If it's a ref + null pattern, return the nullable reference type
+            if ($hasRef -and $hasNull -and $refType) {
+                return $refType
+            }
+        }
+
+        # Otherwise, return object for complex union types
         return "object"
     }
 
@@ -465,9 +505,10 @@ function New-ModelClass {
             }
 
             # If not required and not nullable, make it nullable (only for value types)
-            if (-not $propIsRequired -and -not $csType.EndsWith('?')) {
-                # Only add ? for value types (int, bool, double), not reference types
-                if ($csType -in @('int', 'bool', 'double')) {
+            # Don't add ? if there's a default value (means it's initialized and not null)
+            if (-not $propIsRequired -and -not $csType.EndsWith('?') -and $null -eq $prop.default) {
+                # Only add ? for value types, not reference types
+                if ($csType -in @('int', 'bool', 'double', 'uint', 'ushort', 'ulong', 'short', 'long', 'byte', 'sbyte', 'float', 'decimal')) {
                     $csType = "{0}?" -f $csType
                 }
             }
@@ -504,6 +545,24 @@ function New-ModelClass {
 
             # Build property declaration - use -f formatting instead of interpolation
             $propDeclaration = "    public {0} {1} {{ get; set; }}" -f $csType, $csPropName
+
+            if ($propIsRequired -and -not $csType.EndsWith('?')) {
+                # Only add = null! for reference types, not value types
+                # Value types: primitive types and enums (no ?)
+                # Type aliases are structs so they're value types
+                # Reference types: string, object, List, Dictionary, and custom classes
+                $valueTypes = @('int', 'bool', 'double', 'uint', 'ushort', 'ulong', 'short', 'long', 'byte', 'sbyte', 'float', 'decimal', 'char')
+                $typeAliases = @('PermissionOptionId', 'ProtocolVersion', 'SessionConfigGroupId', 'SessionConfigId', 'SessionConfigValueId', 'SessionId', 'SessionModeId', 'ToolCallId', 'RequestId')
+                $enumTypes = @('PermissionOptionKind', 'PlanEntryPriority', 'PlanEntryStatus', 'StopReason', 'ToolCallStatus', 'ToolKind')
+
+                $isValueType = ($csType -in $valueTypes) -or ($csType -in $typeAliases) -or ($csType -in $enumTypes)
+                $isReferenceType = -not $isValueType
+
+                if ($isReferenceType) {
+                    $propDeclaration += " = null!;"
+                }
+            }
+
             $propLine += $propDeclaration
 
             # Add default if specified
@@ -569,7 +628,7 @@ if (Test-Path $VersionFile) {
 
 $header = $headerLines -join "`n"
 
-# Generate using statement and namespace
+# Generate using statements
 $usings = @(
     "using System;"
     "using System.Collections.Generic;"
@@ -653,7 +712,5 @@ if (-not $finalOutput.EndsWith("`n")) {
 }
 
 Set-Content -Path $OutputPath -Value $finalOutput -Encoding UTF8 -NoNewline
-$finalOutput | Out-Null  # Write with newline handled above
-Add-Content -Path $OutputPath -Value "" -Encoding UTF8
 
 Write-Host "  [OK] Generated C# models at $OutputPath" -ForegroundColor Gray

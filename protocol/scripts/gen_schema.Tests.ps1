@@ -166,14 +166,8 @@ Describe "Get-PropertyType" {
         ($result -ceq "List<object>") | Should Be $true
     }
 
-    It "handles type arrays with null correctly" {
-        $property = @{ type = @("string", $null) }
-        $result = Get-PropertyType $property @{}
-        ($result -ceq "string") | Should Be $true
-    }
-
     It "does not add question mark to string when nullable" {
-        $property = @{ type = @("string", $null) }
+        $property = @{ type = @("string", "null") }
         $result = Get-PropertyType $property @{}
         ($result -ceq "string") | Should Be $true
     }
@@ -341,7 +335,7 @@ Describe "Test-IsSimpleTypeAlias" {
 
     It "returns false for type array (nullable)" {
         $definition = @{ 
-            type = @("string", $null)
+            type = @("string", "null")
         }
         $result = Test-IsSimpleTypeAlias $definition
         $result | Should Be $false
@@ -474,5 +468,205 @@ Describe "New-TypeAliasStruct" {
         $result = New-TypeAliasStruct "TestId" $definition "string"
         
         $result | Should Match "\[JsonConverter\(typeof\(TypeAliasConverter<TestId, string>\)\)\]"
+    }
+}
+
+Describe "Get-PropertyType - Nullable Value Types with Format Hints" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    Context "uint format hints" {
+        It "converts ['integer', 'null'] with format uint32 to uint?" {
+            $property = @{
+                type = @("integer", "null")
+                format = "uint32"
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "uint?"
+        }
+
+        It "converts ['integer', 'null'] with format uint64 to ulong?" {
+            $property = @{
+                type = @("integer", "null")
+                format = "uint64"
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "ulong?"
+        }
+
+        It "converts ['integer', 'null'] with format uint16 to ushort?" {
+            $property = @{
+                type = @("integer", "null")
+                format = "uint16"
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "ushort?"
+        }
+    }
+
+    Context "int format hints" {
+        It "converts ['integer', 'null'] with format int32 to int?" {
+            $property = @{
+                type = @("integer", "null")
+                format = "int32"
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "int?"
+        }
+
+        It "converts ['integer', 'null'] with format int64 to long?" {
+            $property = @{
+                type = @("integer", "null")
+                format = "int64"
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "long?"
+        }
+
+        It "converts ['integer', 'null'] with format int16 to short?" {
+            $property = @{
+                type = @("integer", "null")
+                format = "int16"
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "short?"
+        }
+    }
+
+    Context "other nullable value types" {
+        It "converts ['integer', 'null'] without format to int?" {
+            $property = @{
+                type = @("integer", "null")
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "int?"
+        }
+
+        It "converts ['boolean', 'null'] to bool?" {
+            $property = @{
+                type = @("boolean", "null")
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "bool?"
+        }
+
+        It "converts ['number', 'null'] to double?" {
+            $property = @{
+                type = @("number", "null")
+            }
+            $result = Get-PropertyType $property $null
+            $result | Should Be "double?"
+        }
+    }
+}
+
+Describe "Get-PropertyType - Nullable Reference Types" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    It "converts ['string', 'null'] to string (NOT string?)" {
+        $property = @{
+            type = @("string", "null")
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "string"
+        $result | Should Not Be "string?"
+    }
+
+    It "converts ['object', 'null'] to Dictionary (NOT Dictionary?)" {
+        $property = @{
+            type = @("object", "null")
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "Dictionary<string, object>"
+    }
+
+    It "converts ['array', 'null'] to List (NOT List?)" {
+        $property = @{
+            type = @("array", "null")
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "List<object>"
+    }
+}
+
+Describe "Get-PropertyType - anyOf with Reference + null Pattern" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    It "converts anyOf with ref to Annotations and type null to Annotations" {
+        $property = @{
+            anyOf = @(
+                @{ '$ref' = '#/$defs/Annotations' },
+                @{ type = "null" }
+            )
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "Annotations"
+    }
+
+    It "converts anyOf with type null and ref to Implementation (reverse order)" {
+        $property = @{
+            anyOf = @(
+                @{ type = "null" },
+                @{ '$ref' = '#/$defs/Implementation' }
+            )
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "Implementation"
+    }
+
+    It "converts anyOf with ref to SessionModeState and type null" {
+        $property = @{
+            anyOf = @(
+                @{ '$ref' = '#/$defs/SessionModeState' },
+                @{ type = "null" }
+            )
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "SessionModeState"
+    }
+
+    It "converts anyOf with ref to TerminalExitStatus and type null" {
+        $property = @{
+            anyOf = @(
+                @{ '$ref' = '#/$defs/TerminalExitStatus' },
+                @{ type = "null" }
+            )
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "TerminalExitStatus"
+    }
+}
+
+Describe "Get-PropertyType - Complex anyOf Patterns" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    It "converts complex anyOf (3+ items) to object" {
+        $property = @{
+            anyOf = @(
+                @{ '$ref' = '#/$defs/TypeA' },
+                @{ '$ref' = '#/$defs/TypeB' },
+                @{ '$ref' = '#/$defs/TypeC' }
+            )
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "object"
+    }
+
+    It "converts anyOf with allOf and refs to object" {
+        $property = @{
+            anyOf = @(
+                @{ allOf = @(@{ '$ref' = '#/$defs/ResponseA' }) },
+                @{ allOf = @(@{ '$ref' = '#/$defs/ResponseB' }) }
+            )
+        }
+        $result = Get-PropertyType $property $null
+        $result | Should Be "object"
     }
 }
