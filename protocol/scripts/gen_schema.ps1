@@ -175,6 +175,124 @@ function Convert-DefaultValue {
     }
 }
 
+function Test-IsSimpleTypeAlias {
+    param(
+        [PSObject]$Definition
+    )
+
+    # A simple type alias is a definition that:
+    # 1. Has a 'type' property that is a simple string (not an array)
+    # 2. Has no properties, allOf, oneOf, anyOf, enum, etc.
+    # 3. May have description, format, minimum, maximum (these are just documentation/validation)
+
+    if (-not $Definition.type) {
+        return $false
+    }
+
+    # type must be a simple string, not an array
+    if ($Definition.type -is [array]) {
+        return $false
+    }
+
+    # Must not have any complex schema properties
+    $complexProperties = @('properties', 'allOf', 'oneOf', 'anyOf', 'enum', 'items', 'additionalProperties', 'required', 'discriminator')
+    foreach ($prop in $complexProperties) {
+        if ($null -ne $Definition.$prop) {
+            return $false
+        }
+    }
+
+    return $true
+}
+
+function Get-TypeAliasTarget {
+    param(
+        [PSObject]$Definition
+    )
+
+    $baseType = Get-TypeName $Definition.type
+
+    # Check for format hints on integer types
+    if ($Definition.type -eq "integer" -and $Definition.format) {
+        switch ($Definition.format) {
+            "uint16" { return "ushort" }
+            "uint32" { return "uint" }
+            "uint64" { return "ulong" }
+            "int16" { return "short" }
+            "int32" { return "int" }
+            "int64" { return "long" }
+            default { return "int" }
+        }
+    }
+
+    return $baseType
+}
+
+function New-TypeAliasStruct {
+    param(
+        [string]$Name,
+        [PSObject]$Definition,
+        [string]$UnderlyingType
+    )
+
+    $className = Convert-NameToClass $Name
+
+    # Build XML documentation
+    $xmlDocs = @()
+    if ($Definition.description) {
+        $xmlDocs += "/// <summary>"
+        $description = $Definition.description -replace "`r`n", "`n"
+        $descLines = $description -split "`n"
+        foreach ($descLine in $descLines) {
+            $trimmedLine = $descLine.Trim()
+            if ($trimmedLine.Length -gt 0) {
+                $xmlDocs += "/// $trimmedLine"
+            } else {
+                $xmlDocs += "///"
+            }
+        }
+        $xmlDocs += "/// </summary>"
+    }
+
+    # For C# 8.0 compatibility, generate a readonly struct with value property
+    # and implicit conversions to/from the underlying type
+    $result = $xmlDocs -join "`n"
+    if ($xmlDocs.Count -gt 0) { $result += "`n" }
+
+    $result += "[JsonConverter(typeof(TypeAliasConverter<$className, $UnderlyingType>))]`n"
+    $result += "public readonly struct $className : IEquatable<$className>`n"
+    $result += "{`n"
+    $result += "    private readonly $UnderlyingType _value;`n"
+    $result += "`n"
+    $result += "    public $className($UnderlyingType value)`n"
+    $result += "    {`n"
+    $result += "        _value = value;`n"
+    $result += "    }`n"
+    $result += "`n"
+    $result += "    public static implicit operator $className($UnderlyingType value) => new $className(value);`n"
+    $result += "    public static implicit operator $UnderlyingType($className alias) => alias._value;`n"
+    $result += "`n"
+
+    # Handle GetHashCode and ToString differently for value types vs reference types
+    $isValueType = $UnderlyingType -in @('ushort', 'uint', 'ulong', 'short', 'int', 'long', 'byte', 'sbyte', 'bool', 'double', 'float', 'decimal')
+
+    if ($isValueType) {
+        $result += "    public bool Equals($className other) => _value == other._value;`n"
+        $result += "    public override bool Equals(object obj) => obj is $className other && Equals(other);`n"
+        $result += "    public override int GetHashCode() => _value.GetHashCode();`n"
+        $result += "    public override string ToString() => _value.ToString();`n"
+    } else {
+        $result += "    public bool Equals($className other) => _value == other._value;`n"
+        $result += "    public override bool Equals(object obj) => obj is $className other && Equals(other);`n"
+        $result += "    public override int GetHashCode() => _value?.GetHashCode() ?? 0;`n"
+        $result += "    public override string ToString() => _value?.ToString() ?? string.Empty;`n"
+    }
+
+    $result += "}"
+
+    return $result
+}
+
 function New-ModelClass {
     param(
         [string]$Name,
@@ -183,6 +301,13 @@ function New-ModelClass {
     )
 
     $className = Convert-NameToClass $Name
+
+    # Check if this is a simple type alias
+    if (Test-IsSimpleTypeAlias $Definition) {
+        # Generate a type alias struct
+        $targetType = Get-TypeAliasTarget $Definition
+        return New-TypeAliasStruct $Name $Definition $targetType
+    }
 
     # Handle oneOf/anyOf at root level (union types or enums)
     if ($Definition.oneOf -or $Definition.anyOf) {
@@ -462,6 +587,7 @@ $output += "{"
 # Generate classes from schema definitions
 $defs = $schemaContent.'$defs'
 if ($null -ne $defs) {
+    $typeAliases = @()
     $enumDefinitions = @()
     $recordClasses = @()
 
@@ -469,16 +595,32 @@ if ($null -ne $defs) {
         $def = $defs.$defName
         $classCode = New-ModelClass $defName $def $defs
 
+        # Check if this is a type alias struct (has IEquatable)
+        if ($classCode -match 'IEquatable<\w+>') {
+            $typeAliases += $classCode
+        }
         # Check if this is an enum definition
         # Enums can have XML docs before the enum statement
-        if ($classCode -match 'public\s+enum\s+\w+') {
+        elseif ($classCode -match 'public\s+enum\s+\w+') {
             $enumDefinitions += $classCode
         } else {
             $recordClasses += $classCode
         }
     }
 
-    # Add enums first
+    # Add type aliases first
+    if ($typeAliases.Count -gt 0) {
+        $output += "    // Type aliases"
+        $output += ""
+        foreach ($alias in $typeAliases) {
+            # Indent type alias definitions
+            $indentedAlias = $alias -split "`n" | ForEach-Object { "    $_" }
+            $output += $indentedAlias -join "`n"
+            $output += ""
+        }
+    }
+
+    # Add enums next
     if ($enumDefinitions.Count -gt 0) {
         $output += "    // Enums for string-based enum-like types"
         $output += ""

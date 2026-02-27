@@ -34,6 +34,7 @@
     <Compile Include="JsonEnumMemberConverter.cs" />
     <Compile Include="JsonEnumValueAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeAliasConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="schema\meta.json" />

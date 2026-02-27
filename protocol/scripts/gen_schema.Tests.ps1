@@ -276,3 +276,203 @@ Describe "Enum Schema Value Mapping" {
         ($result -match 'JsonEnumValue.*allow_once') | Should Be $true
     }
 }
+
+Describe "Test-IsSimpleTypeAlias" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    It "returns true for simple string type" {
+        $definition = @{ 
+            type = "string"
+            description = "A simple string type alias"
+        }
+        $result = Test-IsSimpleTypeAlias $definition
+        $result | Should Be $true
+    }
+
+    It "returns true for integer type with format" {
+        $definition = @{ 
+            type = "integer"
+            format = "uint16"
+            description = "Protocol version"
+        }
+        $result = Test-IsSimpleTypeAlias $definition
+        $result | Should Be $true
+    }
+
+    It "returns false for type with properties" {
+        $definition = @{ 
+            type = "object"
+            properties = @{ name = @{ type = "string" } }
+        }
+        $result = Test-IsSimpleTypeAlias $definition
+        $result | Should Be $false
+    }
+
+    It "returns false for type with oneOf" {
+        $definition = @{ 
+            oneOf = @(
+                @{ type = "string"; const = "value1" },
+                @{ type = "string"; const = "value2" }
+            )
+        }
+        $result = Test-IsSimpleTypeAlias $definition
+        $result | Should Be $false
+    }
+
+    It "returns false for type with enum" {
+        $definition = @{ 
+            type = "string"
+            enum = @("value1", "value2")
+        }
+        $result = Test-IsSimpleTypeAlias $definition
+        $result | Should Be $false
+    }
+
+    It "returns false for array type" {
+        $definition = @{ 
+            type = "array"
+            items = @{ type = "string" }
+        }
+        $result = Test-IsSimpleTypeAlias $definition
+        $result | Should Be $false
+    }
+
+    It "returns false for type array (nullable)" {
+        $definition = @{ 
+            type = @("string", $null)
+        }
+        $result = Test-IsSimpleTypeAlias $definition
+        $result | Should Be $false
+    }
+
+    It "returns false when type is missing" {
+        $definition = @{ 
+            description = "No type specified"
+        }
+        $result = Test-IsSimpleTypeAlias $definition
+        $result | Should Be $false
+    }
+}
+
+Describe "Get-TypeAliasTarget" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    It "returns string for string type" {
+        $definition = @{ type = "string" }
+        $result = Get-TypeAliasTarget $definition
+        ($result -ceq "string") | Should Be $true
+    }
+
+    It "returns int for integer type without format" {
+        $definition = @{ type = "integer" }
+        $result = Get-TypeAliasTarget $definition
+        ($result -ceq "int") | Should Be $true
+    }
+
+    It "returns ushort for uint16 format" {
+        $definition = @{ type = "integer"; format = "uint16" }
+        $result = Get-TypeAliasTarget $definition
+        ($result -ceq "ushort") | Should Be $true
+    }
+
+    It "returns uint for uint32 format" {
+        $definition = @{ type = "integer"; format = "uint32" }
+        $result = Get-TypeAliasTarget $definition
+        ($result -ceq "uint") | Should Be $true
+    }
+
+    It "returns ulong for uint64 format" {
+        $definition = @{ type = "integer"; format = "uint64" }
+        $result = Get-TypeAliasTarget $definition
+        ($result -ceq "ulong") | Should Be $true
+    }
+
+    It "returns long for int64 format" {
+        $definition = @{ type = "integer"; format = "int64" }
+        $result = Get-TypeAliasTarget $definition
+        ($result -ceq "long") | Should Be $true
+    }
+
+    It "returns bool for boolean type" {
+        $definition = @{ type = "boolean" }
+        $result = Get-TypeAliasTarget $definition
+        ($result -ceq "bool") | Should Be $true
+    }
+}
+
+Describe "New-TypeAliasStruct" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    It "generates struct for string type alias" {
+        $definition = @{ 
+            type = "string"
+            description = "Test string alias"
+        }
+        $result = New-TypeAliasStruct "TestId" $definition "string"
+        
+        $result | Should Match "public readonly struct TestId"
+        $result | Should Match "IEquatable<TestId>"
+        $result | Should Match "private readonly string _value"
+        $result | Should Match "Test string alias"
+    }
+
+    It "generates struct for ushort type alias" {
+        $definition = @{ 
+            type = "integer"
+            format = "uint16"
+            description = "Test version number"
+        }
+        $result = New-TypeAliasStruct "TestVersion" $definition "ushort"
+        
+        $result | Should Match "public readonly struct TestVersion"
+        $result | Should Match "IEquatable<TestVersion>"
+        $result | Should Match "private readonly ushort _value"
+        $result | Should Match "Test version number"
+    }
+
+    It "includes implicit conversion operators" {
+        $definition = @{ type = "string" }
+        $result = New-TypeAliasStruct "TestId" $definition "string"
+        
+        $result | Should Match "public static implicit operator TestId\(string value\)"
+        $result | Should Match "public static implicit operator string\(TestId alias\)"
+    }
+
+    It "includes Equals, GetHashCode, and ToString methods" {
+        $definition = @{ type = "string" }
+        $result = New-TypeAliasStruct "TestId" $definition "string"
+        
+        $result | Should Match "public bool Equals\(TestId other\)"
+        $result | Should Match "public override bool Equals\(object obj\)"
+        $result | Should Match "public override int GetHashCode\(\)"
+        $result | Should Match "public override string ToString\(\)"
+    }
+
+    It "handles null for string types in GetHashCode" {
+        $definition = @{ type = "string" }
+        $result = New-TypeAliasStruct "TestId" $definition "string"
+        
+        $result | Should Match "_value\?\.GetHashCode\(\) \?\? 0"
+    }
+
+    It "does not handle null for value types in GetHashCode" {
+        $definition = @{ type = "integer"; format = "uint16" }
+        $result = New-TypeAliasStruct "TestVersion" $definition "ushort"
+        
+        $result | Should Not Match "_value\?\.GetHashCode"
+        $result | Should Match "_value\.GetHashCode\(\)"
+    }
+
+    It "includes JsonConverter attribute" {
+        $definition = @{ type = "string" }
+        $result = New-TypeAliasStruct "TestId" $definition "string"
+        
+        $result | Should Match "\[JsonConverter\(typeof\(TypeAliasConverter<TestId, string>\)\)\]"
+    }
+}
