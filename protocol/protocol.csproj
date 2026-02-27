@@ -48,7 +48,8 @@
     <None Include="scripts\README.md" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <Reference Include="System" />
   </ItemGroup>
   <PropertyGroup>
     <SchemaHashFile>$(ProjectDir)obj\$(Configuration)\schema.hash</SchemaHashFile>
