@@ -37,6 +37,7 @@
     <Compile Include="TypeAliasConverter.cs" />
     <Compile Include="Schema.cs" />
     <Compile Include="Meta.cs" />
+    <Compile Include="UnionTypeConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="schema\meta.json" />

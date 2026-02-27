@@ -337,6 +337,156 @@ function New-TypeAliasStruct {
     return $result
 }
 
+function New-UnionTypeStruct {
+    param(
+        [string]$Name,
+        [PSObject]$Definition,
+        [array]$UnionTypes,
+        [bool]$HasNullType = $false
+    )
+
+    $className = Convert-NameToClass $Name
+
+    # Remove duplicate types (keep unique types only)
+    $uniqueUnionTypes = $UnionTypes | Select-Object -Unique
+
+    # Build XML documentation
+    $xmlDocs = @()
+    if ($Definition.description) {
+        $xmlDocs += "/// <summary>"
+        $description = $Definition.description -replace "`r`n", "`n"
+        $descLines = $description -split "`n"
+        foreach ($descLine in $descLines) {
+            $trimmedLine = $descLine.Trim()
+            if ($trimmedLine.Length -gt 0) {
+                $xmlDocs += "/// $trimmedLine"
+            } else {
+                $xmlDocs += "///"
+            }
+        }
+        $xmlDocs += "/// </summary>"
+    }
+
+    # Generate a readonly struct that can hold any of the union types
+    $result = $xmlDocs -join "`n"
+    if ($xmlDocs.Count -gt 0) { $result += "`n" }
+
+    $result += "[JsonConverter(typeof(UnionTypeConverter<$className>))]`n"
+    $result += "public readonly struct $className : IEquatable<$className>`n"
+    $result += "{`n"
+    $result += "    private readonly object _value;`n"
+    $result += "    private readonly int _typeIndex;`n"
+
+    if ($HasNullType) {
+        $result += "    private readonly bool _isNull;`n"
+    }
+
+    $result += "`n"
+
+    # Generate constructors for each unique type
+    $ctorIndex = 0
+    foreach ($unionType in $uniqueUnionTypes) {
+        $result += "    public $className($unionType value)`n"
+        $result += "    {`n"
+        $result += "        _value = value;`n"
+        $result += "        _typeIndex = $ctorIndex;`n"
+        if ($HasNullType) {
+            $result += "        _isNull = false;`n"
+        }
+        $result += "    }`n"
+        $result += "`n"
+        $ctorIndex++
+    }
+
+    # Add null constructor if needed
+    if ($HasNullType) {
+        $result += "    private $className(bool isNull)`n"
+        $result += "    {`n"
+        $result += "        _value = null;`n"
+        $result += "        _typeIndex = -1;`n"
+        $result += "        _isNull = isNull;`n"
+        $result += "    }`n"
+        $result += "`n"
+        $result += "    public static $className Null => new $className(true);`n"
+        $result += "`n"
+    }
+
+    # Generate implicit conversions from each unique type
+    foreach ($unionType in $uniqueUnionTypes) {
+        $result += "    public static implicit operator $className($unionType value) => new $className(value);`n"
+    }
+    $result += "`n"
+
+    # Add null check property if needed
+    if ($HasNullType) {
+        $result += "    public bool IsNull => _isNull;`n"
+        $result += "`n"
+    }
+
+    # Generate TryGet methods for each unique type
+    foreach ($unionType in $uniqueUnionTypes) {
+        # Handle generic types like List<T> - extract the type name properly
+        $cleanTypeName = $unionType -replace '[<>,\s]', ''
+        $methodName = "TryGet" + $cleanTypeName.Substring(0,1).ToUpper() + $cleanTypeName.Substring(1)
+
+        $result += "    public bool $methodName(out $unionType value)`n"
+        $result += "    {`n"
+        if ($HasNullType) {
+            $result += "        if (_isNull)`n"
+            $result += "        {`n"
+            $result += "            value = default;`n"
+            $result += "            return false;`n"
+            $result += "        }`n"
+        }
+        $result += "        if (_value is $unionType v)`n"
+        $result += "        {`n"
+        $result += "            value = v;`n"
+        $result += "            return true;`n"
+        $result += "        }`n"
+        $result += "        value = default;`n"
+        $result += "        return false;`n"
+        $result += "    }`n"
+        $result += "`n"
+    }
+
+    # Generate Equals, GetHashCode, ToString
+    # Use manual hash code combination for .NET Framework 4.7.2 compatibility
+    if ($HasNullType) {
+        $result += "    public bool Equals($className other) => _isNull == other._isNull && (_isNull || (Equals(_value, other._value) && _typeIndex == other._typeIndex));`n"
+        $result += "    public override bool Equals(object obj) => obj is $className other && Equals(other);`n"
+        $result += "    public override int GetHashCode()`n"
+        $result += "    {`n"
+        $result += "        if (_isNull) return 0;`n"
+        $result += "        unchecked`n"
+        $result += "        {`n"
+        $result += "            int hash = 17;`n"
+        $result += "            hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);`n"
+        $result += "            hash = hash * 31 + _typeIndex;`n"
+        $result += "            return hash;`n"
+        $result += "        }`n"
+        $result += "    }`n"
+        $result += "    public override string ToString() => _isNull ? string.Empty : (_value?.ToString() ?? string.Empty);`n"
+    } else {
+        $result += "    public bool Equals($className other) => Equals(_value, other._value) && _typeIndex == other._typeIndex;`n"
+        $result += "    public override bool Equals(object obj) => obj is $className other && Equals(other);`n"
+        $result += "    public override int GetHashCode()`n"
+        $result += "    {`n"
+        $result += "        unchecked`n"
+        $result += "        {`n"
+        $result += "            int hash = 17;`n"
+        $result += "            hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);`n"
+        $result += "            hash = hash * 31 + _typeIndex;`n"
+        $result += "            return hash;`n"
+        $result += "        }`n"
+        $result += "    }`n"
+        $result += "    public override string ToString() => _value?.ToString() ?? string.Empty;`n"
+    }
+
+    $result += "}"
+
+    return $result
+}
+
 function New-ModelClass {
     param(
         [string]$Name,
@@ -357,10 +507,35 @@ function New-ModelClass {
     if ($Definition.oneOf -or $Definition.anyOf) {
         $items = @(if ($Definition.oneOf) { $Definition.oneOf } else { $Definition.anyOf })
 
-        # Check if this is an enum-like oneOf (all items have const)
-        $isEnumLike = $items | Where-Object { $_.type -eq "string" -and $_.const } | Measure-Object | Select-Object -ExpandProperty Count
+        # Check if this is an enum-like pattern (all items have same type with const or title)
+        $allHaveConstOrTitle = $true
+        $allSameType = $true
+        $firstType = $null
 
-        if ($isEnumLike -eq $items.Count) {
+        foreach ($item in $items) {
+            $itemType = $item.type
+            if ($itemType -is [array]) {
+                $itemType = ($itemType | Where-Object { $_ -ne "null" })[0]
+            }
+
+            # Track if all items have the same type
+            if ($null -eq $firstType) {
+                $firstType = $itemType
+            } elseif ($firstType -ne $itemType) {
+                $allSameType = $false
+                break
+            }
+
+            # An item can be treated as enum if it has const OR if it has title (as a fallback const)
+            if (-not $item.const -and -not $item.title) {
+                $allHaveConstOrTitle = $false
+                break
+            }
+        }
+
+        # If all items have same type and const/title, it's an enum
+        # Support both string and integer enums
+        if ($allHaveConstOrTitle -and $allSameType -and ($firstType -eq "string" -or $firstType -eq "integer")) {
             # This is an enum-like type, create a proper enum
             $xmlDocs = @()
             if ($Definition.description) {
@@ -381,14 +556,62 @@ function New-ModelClass {
             $result = $xmlDocs -join "`n"
             if ($xmlDocs.Count -gt 0) { $result += "`n" }
 
-            $result += "[JsonConverter(typeof(JsonEnumMemberConverter<$className>))]`n"
-            $result += "public enum $className`n{"
+            # For integer enums, specify the backing type (no JsonConverter needed - use default serialization)
+            # For string enums, use JsonEnumMemberConverter with JsonEnumValue attributes
+            if ($firstType -eq "integer") {
+                # Check format for backing type
+                $backingType = "int"
+                if ($items[0].format) {
+                    switch ($items[0].format) {
+                        "int64" { $backingType = "long" }
+                        "uint16" { $backingType = "ushort" }
+                        "uint32" { $backingType = "uint" }
+                        "uint64" { $backingType = "ulong" }
+                        "int16" { $backingType = "short" }
+                        "int32" { $backingType = "int" }
+                        default { $backingType = "int" }
+                    }
+                }
+                # Integer enums don't need JsonConverter - they serialize naturally as numbers
+                $result += "public enum $className : $backingType`n{"
+            } else {
+                # String enums need JsonEnumMemberConverter to handle JsonEnumValue attributes
+                $result += "[JsonConverter(typeof(JsonEnumMemberConverter<$className>))]`n"
+                $result += "public enum $className`n{"
+            }
 
             # Generate enum values
             $enumValues = @()
             foreach ($item in $items) {
-                $constValue = $item.const
-                $enumName = Convert-PropertyName $constValue
+                # Use const if available, otherwise use title
+                $constValue = if ($item.const -ne $null) { $item.const } else { $item.title }
+
+                # Generate enum name
+                if ($item.title) {
+                    # Use title and convert to PascalCase
+                    $enumName = Convert-PropertyName $item.title
+                } else {
+                    # Convert const value to string and use it
+                    $enumName = Convert-PropertyName $constValue.ToString()
+                }
+
+                # For multi-word titles with spaces, convert to PascalCase properly
+                if ($enumName -match '\s') {
+                    $words = $enumName -split '\s+'
+                    $enumName = ($words | ForEach-Object { 
+                        if ($_.Length -gt 0) {
+                            $_.Substring(0, 1).ToUpper() + $_.Substring(1).ToLower()
+                        }
+                    }) -join ''
+                }
+
+                # Remove any remaining invalid characters
+                $enumName = $enumName -replace '[^a-zA-Z0-9_]', ''
+
+                # Ensure it starts with a letter or underscore
+                if ($enumName -match '^\d') {
+                    $enumName = "_" + $enumName
+                }
 
                 # Build enum value with description
                 $enumValueDocs = @()
@@ -410,12 +633,23 @@ function New-ModelClass {
                     $enumEntry += ($enumValueDocs -join "`n") + "`n"
                 }
 
-                # Add JsonEnumValue attribute if the enum name differs from the const value
-                if ($enumName -cne $constValue) {
-                    $enumEntry += "    [JsonEnumValue(`"$constValue`")]`n"
+                # For integer enums, always include the value (but skip if const is null)
+                # For string enums, add JsonEnumValue attribute if the enum name differs from the const value
+                if ($firstType -eq "integer") {
+                    if ($item.const -ne $null) {
+                        $enumEntry += "    $enumName = $constValue"
+                    } else {
+                        # This item has no const value, it's a catch-all - use a safe default value
+                        # Find a value that doesn't conflict
+                        $enumEntry += "    $enumName = 0"
+                    }
+                } else {
+                    if ($enumName -cne $constValue) {
+                        $enumEntry += "    [JsonEnumValue(`"$constValue`")]`n"
+                    }
+                    $enumEntry += "    $enumName"
                 }
 
-                $enumEntry += "    $enumName"
                 $enumValues += $enumEntry
             }
 
@@ -424,8 +658,63 @@ function New-ModelClass {
             $result += "}"
 
             return $result
-        } else {
-            # This is a union type - try to extract properties from union items
+        } 
+
+        # Check if this is a union type (different types, no properties)
+        $hasProperties = $false
+        $unionTypes = @()
+        $hasNullType = $false
+
+        foreach ($item in $items) {
+            if ($item.properties) {
+                $hasProperties = $true
+                break
+            }
+
+            $itemType = $item.type
+            if ($itemType -is [array]) {
+                # Check if array contains null
+                if ("null" -in $itemType) {
+                    $hasNullType = $true
+                }
+                # Skip null types for union type list
+                $itemType = $itemType | Where-Object { $_ -ne "null" }
+                if ($itemType.Count -gt 0) {
+                    $itemType = $itemType[0]
+                } else {
+                    continue
+                }
+            } elseif ($itemType -eq "null") {
+                $hasNullType = $true
+                continue
+            }
+
+            if ($itemType) {
+                # Map JSON type to C# type with format consideration
+                $csType = if ($itemType -eq "integer" -and $item.format) {
+                    switch ($item.format) {
+                        "int64" { "long" }
+                        "uint16" { "ushort" }
+                        "uint32" { "uint" }
+                        "uint64" { "ulong" }
+                        "int16" { "short" }
+                        "int32" { "int" }
+                        default { "int" }
+                    }
+                } else {
+                    Get-TypeName $itemType
+                }
+                $unionTypes += $csType
+            }
+        }
+
+        # If we have multiple types and no properties, it's a union type
+        if ($unionTypes.Count -gt 1 -and -not $hasProperties) {
+            return New-UnionTypeStruct $Name $Definition $unionTypes $hasNullType
+        }
+
+        # Otherwise it's a discriminated union - try to extract properties from union items
+        if ($hasProperties) {
             $mergedProperties = @{}
             foreach ($item in $items) {
                 if ($item.properties) {
@@ -519,6 +808,7 @@ function New-ModelClass {
 
             $propLine = ""
 
+
             # Add XML documentation for property if description exists
             if ($prop.description) {
                 $propDocs = @()
@@ -552,12 +842,11 @@ function New-ModelClass {
 
             if ($propIsRequired -and -not $csType.EndsWith('?')) {
                 # Only add = null! for reference types, not value types
-                # Value types: primitive types and enums (no ?)
-                # Type aliases are structs so they're value types
+                # Value types: primitive types, enums, type aliases, and union types (all structs)
                 # Reference types: string, object, List, Dictionary, and custom classes
                 $valueTypes = @('int', 'bool', 'double', 'uint', 'ushort', 'ulong', 'short', 'long', 'byte', 'sbyte', 'float', 'decimal', 'char')
-                $typeAliases = @('PermissionOptionId', 'ProtocolVersion', 'SessionConfigGroupId', 'SessionConfigId', 'SessionConfigValueId', 'SessionId', 'SessionModeId', 'ToolCallId', 'RequestId')
-                $enumTypes = @('PermissionOptionKind', 'PlanEntryPriority', 'PlanEntryStatus', 'StopReason', 'ToolCallStatus', 'ToolKind')
+                $typeAliases = @('PermissionOptionId', 'ProtocolVersion', 'SessionConfigGroupId', 'SessionConfigId', 'SessionConfigValueId', 'SessionId', 'SessionModeId', 'ToolCallId', 'RequestId', 'SessionConfigSelectOptions')
+                $enumTypes = @('PermissionOptionKind', 'PlanEntryPriority', 'PlanEntryStatus', 'StopReason', 'ToolCallStatus', 'ToolKind', 'SessionConfigOptionCategory', 'ErrorCode')
 
                 $isValueType = ($csType -in $valueTypes) -or ($csType -in $typeAliases) -or ($csType -in $enumTypes)
                 $isReferenceType = -not $isValueType
