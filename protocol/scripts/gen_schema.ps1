@@ -342,14 +342,32 @@ function New-ModelClass {
 
             $propLine = ""
 
+            # Add XML documentation for property if description exists
+            if ($prop.description) {
+                $propDocs = @()
+                $propDocs += "    /// <summary>"
+                $propDescription = $prop.description -replace "`r`n", "`n"
+                $propDescLines = $propDescription -split "`n"
+                foreach ($propDescLine in $propDescLines) {
+                    $trimmedPropDescLine = $propDescLine.Trim()
+                    if ($trimmedPropDescLine.Length -gt 0) {
+                        $propDocs += "    /// $trimmedPropDescLine"
+                    } else {
+                        $propDocs += "    ///"
+                    }
+                }
+                $propDocs += "    /// </summary>"
+                $propLine = ($propDocs -join "`n") + "`n"
+            }
+
             # Add JsonPropertyName attribute if name differs from property name
             # Or if we added a conflict suffix (renamed the property)
-            if (-not $needsJsonPropertyName -and $propName -ne (Convert-PropertyName $propName)) {
+            if (-not $needsJsonPropertyName -and $propName -cne (Convert-PropertyName $propName)) {
                 $needsJsonPropertyName = $true
             }
 
             if ($needsJsonPropertyName) {
-                $propLine = "    [JsonPropertyName(`"$propName`")]`n"
+                $propLine += "    [JsonPropertyName(`"$propName`")]`n"
             }
 
             # Build property declaration - use -f formatting instead of interpolation
