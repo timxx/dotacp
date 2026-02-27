@@ -654,7 +654,7 @@ function New-ModelClass {
             }
 
             $result += "`n"
-            $result += ($enumValues -join ",`n") + "`n"
+            $result += ($enumValues -join ",`n`n") + "`n"
             $result += "}"
 
             return $result
@@ -808,7 +808,6 @@ function New-ModelClass {
 
             $propLine = ""
 
-
             # Add XML documentation for property if description exists
             if ($prop.description) {
                 $propDocs = @()
@@ -878,7 +877,7 @@ function New-ModelClass {
 
     if ($properties.Count -gt 0) {
         $result += "$classDeclaration`n{`n"
-        $result += ($properties -join "`n") + "`n"
+        $result += ($properties -join "`n`n") + "`n"
         $result += "}"
     } else {
         # Empty class - use traditional syntax for C# 8.0 compatibility
@@ -966,7 +965,7 @@ if ($null -ne $defs) {
         $output += ""
         foreach ($alias in $typeAliases) {
             # Indent type alias definitions
-            $indentedAlias = $alias -split "`n" | ForEach-Object { "    $_" }
+            $indentedAlias = $alias -split "`n" | ForEach-Object { if ($_.Length -gt 0) { "    $_" } else { "" } }
             $output += $indentedAlias -join "`n"
             $output += ""
         }
@@ -978,7 +977,7 @@ if ($null -ne $defs) {
         $output += ""
         foreach ($enum in $enumDefinitions) {
             # Indent enum definitions
-            $indentedEnum = $enum -split "`n" | ForEach-Object { "    $_" }
+            $indentedEnum = $enum -split "`n" | ForEach-Object { if ($_.Length -gt 0) { "    $_" } else { "" } }
             $output += $indentedEnum -join "`n"
             $output += ""
         }
@@ -989,7 +988,7 @@ if ($null -ne $defs) {
     $output += ""
     foreach ($recordClass in $recordClasses) {
         # Indent class definitions
-        $indentedClass = $recordClass -split "`n" | ForEach-Object { "    $_" }
+        $indentedClass = $recordClass -split "`n" | ForEach-Object { if ($_.Length -gt 0) { "    $_" } else { "" } }
         $output += $indentedClass -join "`n"
         $output += ""
     }
