@@ -60,3 +60,4 @@ nunit-*.xml
 .vs
 .cache
 compile_commands.json
+*.user
