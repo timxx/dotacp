@@ -186,7 +186,7 @@ function New-ModelClass {
 
     # Handle oneOf/anyOf at root level (union types or enums)
     if ($Definition.oneOf -or $Definition.anyOf) {
-        $items = $(if ($Definition.oneOf) { $Definition.oneOf } else { $Definition.anyOf })
+        $items = @(if ($Definition.oneOf) { $Definition.oneOf } else { $Definition.anyOf })
 
         # Check if this is an enum-like oneOf (all items have const)
         $isEnumLike = $items | Where-Object { $_.type -eq "string" -and $_.const } | Measure-Object | Select-Object -ExpandProperty Count
@@ -211,7 +211,8 @@ function New-ModelClass {
 
             $result = $xmlDocs -join "`n"
             if ($xmlDocs.Count -gt 0) { $result += "`n" }
-            $result += "[JsonConverter(typeof(JsonStringEnumConverter))]`n"
+
+            $result += "[JsonConverter(typeof(JsonEnumMemberConverter<$className>))]`n"
             $result += "public enum $className`n{"
 
             # Generate enum values
@@ -239,14 +240,20 @@ function New-ModelClass {
                 if ($enumValueDocs.Count -gt 0) {
                     $enumEntry += ($enumValueDocs -join "`n") + "`n"
                 }
-                $enumEntry += "    $enumName"
 
+                # Add JsonEnumValue attribute if the enum name differs from the const value
+                if ($enumName -cne $constValue) {
+                    $enumEntry += "    [JsonEnumValue(`"$constValue`")]`n"
+                }
+
+                $enumEntry += "    $enumName"
                 $enumValues += $enumEntry
             }
 
             $result += "`n"
             $result += ($enumValues -join ",`n") + "`n"
             $result += "}"
+
             return $result
         } else {
             # This is a union type - try to extract properties from union items

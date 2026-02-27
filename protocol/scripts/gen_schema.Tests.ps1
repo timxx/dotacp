@@ -47,7 +47,6 @@ Describe "Convert-NameToClass" {
 
     It "capitalizes lowercase single letter" {
         $result = Convert-NameToClass "a"
-        # This will fail if function just returns input without capitalization
         ($result -ceq "A") | Should Be $true
     }
 
@@ -224,14 +223,14 @@ Describe "Case-sensitive property name detection" {
     It "detects case difference between JSON and C# names" {
         $jsonName = "sessionUpdate"
         $csharpName = "SessionUpdate"
-        
+
         ($jsonName -cne $csharpName) | Should Be $true
     }
 
     It "handles meta property correctly" {
         $jsonName = "_meta"
         $csharpName = Convert-PropertyName $jsonName
-        
+
         ($csharpName -ceq "Meta") | Should Be $true
         ($jsonName -cne $csharpName) | Should Be $true
     }
@@ -239,8 +238,41 @@ Describe "Case-sensitive property name detection" {
     It "case-sensitive comparison catches case differences" {
         $name1 = "test"
         $name2 = "TEST"
-        
+
         ($name1 -eq $name2) | Should Be $true
         ($name1 -ceq $name2) | Should Be $false
+    }
+}
+
+Describe "Enum Schema Value Mapping" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    It "uses generic JsonEnumMemberConverter" {
+        $definition = @{
+            oneOf = @(
+                @{ const = "value_one"; type = "string"; description = "Value one" }
+            )
+            description = "Test enum"
+        }
+
+        $result = New-ModelClass "MyEnum" $definition @{}
+
+        ($result -like "*JsonEnumMemberConverter<MyEnum>*") | Should Be $true
+    }
+
+    It "adds JsonEnumValue attribute when name differs" {
+        $definition = @{
+            oneOf = @(
+                @{ const = "allow_once"; type = "string"; description = "Allow once" }
+            )
+            description = "Test enum"
+        }
+
+        $result = New-ModelClass "TestEnum" $definition @{}
+
+        # Use match to avoid bracket parsing issues
+        ($result -match 'JsonEnumValue.*allow_once') | Should Be $true
     }
 }
