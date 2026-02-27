@@ -1,4 +1,5 @@
 ﻿using dotacp.client;
+using dotacp.protocol;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -38,11 +39,19 @@ namespace clientcli
             var connection = Connection.ConnectToAgent(
                 client,
                 process.StandardInput.BaseStream,
-                process.StandardOutput.BaseStream);
+                process.StandardOutput.BaseStream,
+                new TraceSource("JsonRpc", SourceLevels.Verbose));
 
             if (connection == null)
             {
                 Console.WriteLine("Failed to connect to agent.");
+                return;
+            }
+
+            if (!await InitiliazeAsync(connection))
+            {
+                Console.WriteLine("Failed to initialize connection.");
+                process.Close();
                 return;
             }
 
@@ -95,6 +104,58 @@ namespace clientcli
             process.BeginErrorReadLine();
 
             return process;
+        }
+
+        static async Task<bool> InitiliazeAsync(Connection connection)
+        {
+            try
+            {
+                var response = await connection.InitializeAsync(new InitializeRequest()
+                {
+                    ClientCapabilities = new ClientCapabilities()
+                    {
+                        Fs = new FileSystemCapability()
+                        {
+                            ReadTextFile = true,
+                            WriteTextFile = true,
+                        },
+                    },
+                    ClientInfo = new Implementation()
+                    {
+                        Name = "dotacp client",
+                        Version = "1.0.0"
+                    },
+                    ProtocolVersion = ProtocolMeta.Version,
+                });
+
+                PrintAgentCapabilities(response.AgentCapabilities);
+                PrintAgentInfo(response.AgentInfo);
+                Console.WriteLine($"Agent Protocol Version: {response.ProtocolVersion}");
+
+                if (response.AuthMethods != null)
+                {
+                    // TODO: Handle authentication
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return false;
+        }
+
+        static void PrintAgentCapabilities(AgentCapabilities caps)
+        {
+            Console.WriteLine("Agent Capabilities:");
+            Console.WriteLine($"  LoadSession: {caps.LoadSession}");
+        }
+
+        static void PrintAgentInfo(Implementation info)
+        {
+            Console.WriteLine($"Agent: {info.Name} {info.Version} ({info.Title})");
         }
     }
 }

@@ -41,16 +41,28 @@ if (Test-Path $VersionFile) {
 
 $header = $headerLines -join "`n"
 
+# Helper function to convert snake_case to PascalCase
+function ConvertTo-PascalCase {
+    param([string]$name)
+    
+    $parts = $name -split '_'
+    $pascalCase = ($parts | ForEach-Object { 
+        if ($_.Length -gt 0) {
+            $_.Substring(0, 1).ToUpper() + $_.Substring(1).ToLower()
+        }
+    }) -join ''
+    
+    return $pascalCase
+}
+
 # Build output
 $output = @()
 $output += $header
 $output += ""
-$output += "using System.Collections.Generic;"
-$output += ""
 $output += "namespace dotacp.protocol"
 $output += "{"
 $output += "    /// <summary>"
-$output += "    /// Protocol metadata and method mappings"
+$output += "    /// Protocol metadata"
 $output += "    /// </summary>"
 $output += "    public static class ProtocolMeta"
 $output += "    {"
@@ -60,41 +72,43 @@ $version = $(if ($meta.version) { $meta.version } else { 1 })
 $output += "        /// <summary>"
 $output += "        /// ACP Protocol Version"
 $output += "        /// </summary>"
-$output += "        public const int ProtocolVersion = $version;"
+$output += "        public const int Version = $version;"
+$output += "    }"
 $output += ""
 
-# Add agent methods
-$output += "        /// <summary>"
-$output += "        /// Methods that agents handle"
-$output += "        /// </summary>"
-$output += "        public static readonly Dictionary<string, string> AgentMethods = new Dictionary<string, string>()"
-$output += "        {"
+# Add agent methods as top-level static class
+$output += "    /// <summary>"
+$output += "    /// Methods that agents handle"
+$output += "    /// </summary>"
+$output += "    public static class AgentMethods"
+$output += "    {"
 
 if ($meta.agentMethods) {
     foreach ($methodName in ($meta.agentMethods.PSObject.Properties.Name | Sort-Object)) {
         $methodPath = $meta.agentMethods.$methodName
-        $output += "            { `"$methodName`", `"$methodPath`" },"
+        $constName = ConvertTo-PascalCase $methodName
+        $output += "        public const string $constName = `"$methodPath`";"
     }
 }
 
-$output += "        };"
+$output += "    }"
 $output += ""
 
-# Add client methods
-$output += "        /// <summary>"
-$output += "        /// Methods that clients handle"
-$output += "        /// </summary>"
-$output += "        public static readonly Dictionary<string, string> ClientMethods = new Dictionary<string, string>()"
-$output += "        {"
+# Add client methods as top-level static class
+$output += "    /// <summary>"
+$output += "    /// Methods that clients handle"
+$output += "    /// </summary>"
+$output += "    public static class ClientMethods"
+$output += "    {"
 
 if ($meta.clientMethods) {
     foreach ($methodName in ($meta.clientMethods.PSObject.Properties.Name | Sort-Object)) {
         $methodPath = $meta.clientMethods.$methodName
-        $output += "            { `"$methodName`", `"$methodPath`" },"
+        $constName = ConvertTo-PascalCase $methodName
+        $output += "        public const string $constName = `"$methodPath`";"
     }
 }
 
-$output += "        };"
 $output += "    }"
 $output += "}"
 
