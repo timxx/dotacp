@@ -503,6 +503,78 @@ function New-ModelClass {
         return New-TypeAliasStruct $Name $Definition $targetType
     }
 
+    # Handle simple enum definitions (e.g., { type: "string", enum: ["value1", "value2"] })
+    if ($Definition.enum) {
+        # Build XML documentation
+        $xmlDocs = @()
+        if ($Definition.description) {
+            $xmlDocs += "/// <summary>"
+            $description = $Definition.description -replace "`r`n", "`n"
+            $descLines = $description -split "`n"
+            foreach ($descLine in $descLines) {
+                $trimmedLine = $descLine.Trim()
+                if ($trimmedLine.Length -gt 0) {
+                    $xmlDocs += "/// $trimmedLine"
+                } else {
+                    $xmlDocs += "///"
+                }
+            }
+            $xmlDocs += "/// </summary>"
+        }
+
+        $result = $xmlDocs -join "`n"
+        if ($xmlDocs.Count -gt 0) { $result += "`n" }
+
+        # Determine enum backing type based on enum values
+        $enumType = $Definition.type
+        if ($enumType -is [array]) {
+            $enumType = ($enumType | Where-Object { $_ -ne "null" })[0]
+        }
+
+        if ($enumType -eq "integer") {
+            # Check format for backing type
+            $backingType = "int"
+            if ($Definition.format) {
+                switch ($Definition.format) {
+                    "int64" { $backingType = "long" }
+                    "uint16" { $backingType = "ushort" }
+                    "uint32" { $backingType = "uint" }
+                    "uint64" { $backingType = "ulong" }
+                    "int16" { $backingType = "short" }
+                    "int32" { $backingType = "int" }
+                    default { $backingType = "int" }
+                }
+            }
+            # Integer enums don't need JsonConverter
+            $result += "public enum $className : $backingType`n{"
+        } else {
+            # String enums need JsonEnumMemberConverter
+            $result += "[JsonConverter(typeof(JsonEnumMemberConverter<$className>))]`n"
+            $result += "public enum $className`n{"
+        }
+
+        # Generate enum values from the enum array
+        $enumValues = @()
+        foreach ($enumValue in $Definition.enum) {
+            # Convert enum value to valid C# identifier
+            $enumName = Convert-PropertyName $enumValue.ToString()
+
+            # Add JsonEnumValue attribute for string enums
+            if ($enumType -eq "string") {
+                $enumValues += "[JsonEnumValue(`"$enumValue`")]`n    $enumName"
+            } else {
+                # For integer enums, add the explicit value
+                $enumValues += "$enumName = $enumValue"
+            }
+        }
+
+        # Join enum values with commas
+        $result += "`n    " + ($enumValues -join ",`n`n    ") + "`n"
+        $result += "}"
+
+        return $result
+    }
+
     # Handle oneOf/anyOf at root level (union types or enums)
     if ($Definition.oneOf -or $Definition.anyOf) {
         $items = @(if ($Definition.oneOf) { $Definition.oneOf } else { $Definition.anyOf })

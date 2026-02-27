@@ -822,3 +822,40 @@ Describe "anyOf vs Discriminated Union" {
         ($result -notmatch "UnionTypeConverter") | Should Be $true
     }
 }
+
+Describe "simple enum" {
+    It "generates string enum from simple enum definition" {
+        $definition = @{
+            description = "The sender or recipient of messages and data in a conversation."
+            type = "string"
+            enum = @("assistant", "user")
+        }
+
+        $result = New-ModelClass "Role" $definition @{}
+
+        ($result -match "public enum Role") | Should Be $true
+        ($result -match "JsonEnumMemberConverter<Role>") | Should Be $true
+        ($result -match 'JsonEnumValue\("assistant"\)') | Should Be $true
+        ($result -match 'JsonEnumValue\("user"\)') | Should Be $true
+        ($result -match "Assistant") | Should Be $true
+        ($result -match "User") | Should Be $true
+        ($result -match "The sender or recipient") | Should Be $true
+    }
+
+    It "generates integer enum from simple enum definition" {
+        $definition = @{
+            description = "HTTP status codes"
+            type = "integer"
+            format = "uint32"
+            enum = @(200, 404, 500)
+        }
+
+        $result = New-ModelClass "HttpStatus" $definition @{}
+
+        ($result -match "public enum HttpStatus") | Should Be $true
+        ($result -match ": uint") | Should Be $true
+        ($result -match "200") | Should Be $true
+        ($result -match "404") | Should Be $true
+        ($result -match "500") | Should Be $true
+    }
+}
