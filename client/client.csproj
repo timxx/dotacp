@@ -4,6 +4,7 @@
     <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
     <AssemblyName>dotacp.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>dotacp.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

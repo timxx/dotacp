@@ -1,6 +1,7 @@
 ﻿using dotacp.client;
 using dotacp.protocol;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,6 +56,33 @@ namespace clientcli
                 return;
             }
 
+            NewSessionResponse? session = null;
+            try
+            {
+                session = await connection.NewSessionAsync(new NewSessionRequest()
+                {
+                    Cwd = Environment.CurrentDirectory,
+                    McpServers = new List<McpServer>()
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to create session: {ex.ToString()}");
+                process.Close();
+                return;
+            }
+
+            Console.WriteLine($"Session: {session.SessionId}");
+            // FIXME: models is in unstable schema
+            // Console.WriteLine("Available models:");
+
+            Console.WriteLine("Available modes:");
+            foreach (var mode in session.Modes.AvailableModes)
+            {
+                Console.WriteLine($"  {mode.Id}: {mode.Name} - {mode.Description}");
+            }
+            Console.WriteLine($"Current mode: {session.Modes.CurrentModeId}");
+
             while (true)
             {
                 Console.WriteLine("Press Enter to send a request, or type '/exit' to quit.");
@@ -62,7 +90,19 @@ namespace clientcli
                 if (input == "/exit")
                     break;
 
-                // TODO: ...
+                try
+                {
+                    var promptResp = await connection.PromptAsync(new PromptRequest()
+                    {
+                        SessionId = session.SessionId,
+                        // FIXME: update the script to generate TextContent based on ContentBlock
+                        Prompt = new List<ContentBlock>(),
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
 
             process.Close();
@@ -134,7 +174,21 @@ namespace clientcli
 
                 if (response.AuthMethods != null)
                 {
-                    // TODO: Handle authentication
+                    foreach (var method in response.AuthMethods)
+                    {
+                        try
+                        {
+                            var authResp = await connection.AuthenticateAsync(
+                                new AuthenticateRequest()
+                                {
+                                    MethodId = method.Id,
+                                });
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Auth with method `{method.Name}` failed: {ex.Message}");
+                        }
+                    }
                 }
 
                 return true;
