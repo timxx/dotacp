@@ -1,5 +1,6 @@
 ﻿using dotacp.client;
 using dotacp.protocol;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +16,9 @@ namespace clientcli
 
         public Task SessionUpdateAsync(SessionNotification notification, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            // TODO: fix `Update` to real type
+            Console.WriteLine($"Session update: {notification.SessionId} {notification.Update.SessionUpdateValue}");
+            return Task.CompletedTask;
         }
 
         public Task<WriteTextFileResponse> WriteTextFileAsync(

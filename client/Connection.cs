@@ -10,22 +10,21 @@ namespace dotacp.client
     public class Connection
     {
         private JsonRpc _rpc;
-        private IAcpClient _client;
 
         private Connection(IAcpClient client, Stream inputStream, Stream outputStream,
             TraceSource? traceSource = null)
         {
-            _client = client;
-
             var handler = new NewLineDelimitedMessageHandler(
                 inputStream, outputStream, new JsonMessageFormatter());
             _rpc = new JsonRpc(handler);
             if (traceSource != null)
                 _rpc.TraceSource = traceSource;
 
+            // TODO: handle ext methods and notifications
+            // don't known what acp agents will need yet
+            _rpc.AddLocalRpcTarget(new ClientRpcTarget(client));
             _rpc.StartListening();
         }
-
         private Task<TResponse> SendRequestAsync<TRequest, TResponse>(
             string method, TRequest request, CancellationToken cancellationToken)
         {
