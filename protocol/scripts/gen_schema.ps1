@@ -963,6 +963,9 @@ function New-ModelClass {
 # Main Script
 # ============================================================================
 
+# Only run main execution if this script is invoked directly, not when dot-sourced
+if ($MyInvocation.InvocationName -ne ".") {
+
 $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProtocolDir = Split-Path -Parent $ScriptRoot
 $RepoRoot = Split-Path -Parent $ProtocolDir
@@ -1078,3 +1081,5 @@ if (-not $finalOutput.EndsWith("`n")) {
 Set-Content -Path $OutputPath -Value $finalOutput -Encoding UTF8 -NoNewline
 
 Write-Host "  [OK] Generated C# models at $OutputPath" -ForegroundColor Gray
+
+} # End of "if ($MyInvocation.InvocationName -ne ".")" block
