@@ -95,9 +95,15 @@ namespace clientcli
                     var promptResp = await connection.PromptAsync(new PromptRequest()
                     {
                         SessionId = session.SessionId,
-                        // FIXME: update the script to generate TextContent based on ContentBlock
-                        Prompt = new List<ContentBlock>(),
+                        Prompt = new List<ContentBlock>
+                        {
+                            new TextContent()
+                            {
+                                Text = input,
+                            }
+                        }
                     });
+                    Console.WriteLine($"Stop reason: {promptResp.StopReason}");
                 }
                 catch (Exception ex)
                 {

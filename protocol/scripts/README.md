@@ -46,18 +46,19 @@ $env:ACP_SCHEMA_VERSION = "v0.10.8"
 - `ACP_SCHEMA_DOWNLOAD`: Force download (set to "1", "true", or "yes")
 
 ### `gen_schema.ps1`
-Generates C# record types from `schema/schema.json`.
+Generates C# model classes from `schema/schema.json`.
 
 **Produces:** `protocol/Schema.cs`
 
 **Features:**
-- Converts JSON Schema definitions to C# records
+- Converts JSON Schema definitions to C# classes
 - Snake_case property names → PascalCase
 - Handles type conversions (JSON types → C# types)
 - Supports schema references ($ref) and nested types
+- Handles discriminator-based unions as abstract base classes with concrete variants
 - Generates XML documentation comments
 - Handles nullable types and defaults
-- Uses Newtonsoft.Json attributes for serialization
+- Uses Newtonsoft.Json attributes and converters for serialization
 
 **Type Mapping:**
 | JSON Schema | C# |
@@ -68,7 +69,7 @@ Generates C# record types from `schema/schema.json`.
 | `boolean` | `bool` |
 | `object` | `object` |
 | `array` | `List<T>` |
-| `null` | `object?` |
+| `null` | `object` |
 
 ### `gen_meta.ps1`
 Generates protocol metadata from `schema/meta.json`.
@@ -162,10 +163,10 @@ After running `gen_all.ps1`, the following files are generated:
    - `SessionUpdateNotification`
 
 2. **Content Blocks**: Different types of content (text, images, audio, resources)
-   - `TextContentBlock`
-   - `ImageContentBlock`
-   - `AudioContentBlock`
-   - `EmbeddedResourceContentBlock`
+  - `TextContent`
+  - `ImageContent`
+  - `AudioContent`
+  - `EmbeddedResource`
 
 3. **Tools**: Actions agents can perform
    - File operations (read, write)

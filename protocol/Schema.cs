@@ -792,8 +792,11 @@ namespace dotacp.protocol
     /// <summary>
     /// Audio provided to or from an LLM.
     /// </summary>
-    public class AudioContent
+    public class AudioContent : ContentBlock
     {
+        [JsonProperty("type")]
+        public override string Type => "audio";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -933,8 +936,11 @@ namespace dotacp.protocol
     /// <summary>
     /// Available commands are ready or have changed
     /// </summary>
-    public class AvailableCommandsUpdate
+    public class AvailableCommandsUpdate : SessionUpdate
     {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "available_commands_update";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1079,8 +1085,11 @@ namespace dotacp.protocol
     /// <summary>
     /// Session configuration options have been updated.
     /// </summary>
-    public class ConfigOptionUpdate
+    public class ConfigOptionUpdate : SessionUpdate
     {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "config_option_update";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1101,8 +1110,11 @@ namespace dotacp.protocol
     /// <summary>
     /// Standard content block (text, images, resources).
     /// </summary>
-    public class Content
+    public class Content : ToolCallContent
     {
+        [JsonProperty("type")]
+        public override string Type => "content";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1136,10 +1148,21 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [Content](https://agentclientprotocol.com/protocol/content)
     /// </summary>
-    public class ContentBlock
+    [JsonConverter(typeof(DiscriminatorConverter<ContentBlock>))]
+    public abstract class ContentBlock
     {
+        internal const string DiscriminatorPropertyName = "type";
+        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            { "audio", typeof(AudioContent) },
+            { "image", typeof(ImageContent) },
+            { "resource", typeof(EmbeddedResource) },
+            { "resource_link", typeof(ResourceLink) },
+            { "text", typeof(TextContent) }
+        };
+
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public abstract string Type { get; }
     }
 
     /// <summary>
@@ -1250,8 +1273,11 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [Session Modes](https://agentclientprotocol.com/protocol/session-modes)
     /// </summary>
-    public class CurrentModeUpdate
+    public class CurrentModeUpdate : SessionUpdate
     {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "current_mode_update";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1276,8 +1302,11 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [Content](https://agentclientprotocol.com/protocol/tool-calls#content)
     /// </summary>
-    public class Diff
+    public class Diff : ToolCallContent
     {
+        [JsonProperty("type")]
+        public override string Type => "diff";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1310,8 +1339,11 @@ namespace dotacp.protocol
     /// <summary>
     /// The contents of a resource, embedded into a prompt or tool call result.
     /// </summary>
-    public class EmbeddedResource
+    public class EmbeddedResource : ContentBlock
     {
+        [JsonProperty("type")]
+        public override string Type => "resource";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1491,8 +1523,11 @@ namespace dotacp.protocol
     /// <summary>
     /// An image provided to or from an LLM.
     /// </summary>
-    public class ImageContent
+    public class ImageContent : ContentBlock
     {
+        [JsonProperty("type")]
+        public override string Type => "image";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2021,8 +2056,11 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [Agent Plan](https://agentclientprotocol.com/protocol/agent-plan)
     /// </summary>
-    public class Plan
+    public class Plan : SessionUpdate
     {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "plan";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2306,10 +2344,33 @@ namespace dotacp.protocol
     /// <summary>
     /// The outcome of a permission request.
     /// </summary>
-    public class RequestPermissionOutcome
+    [JsonConverter(typeof(DiscriminatorConverter<RequestPermissionOutcome>))]
+    public abstract class RequestPermissionOutcome
+    {
+        internal const string DiscriminatorPropertyName = "outcome";
+        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            { "cancelled", typeof(RequestPermissionOutcomeCancelled) },
+            { "selected", typeof(SelectedPermissionOutcome) }
+        };
+
+        [JsonProperty("outcome")]
+        public abstract string Outcome { get; }
+    }
+
+    /// <summary>
+    /// The prompt turn was cancelled before the user responded.
+    ///
+    /// When a client sends a `session/cancel` notification to cancel an ongoing
+    /// prompt turn, it MUST respond to all pending `session/request_permission`
+    /// requests with this `Cancelled` outcome.
+    ///
+    /// See protocol docs: [Cancellation](https://agentclientprotocol.com/protocol/prompt-turn#cancellation)
+    /// </summary>
+    public class RequestPermissionOutcomeCancelled : RequestPermissionOutcome
     {
         [JsonProperty("outcome")]
-        public string Outcome { get; set; }
+        public override string Outcome => "cancelled";
     }
 
     /// <summary>
@@ -2375,8 +2436,11 @@ namespace dotacp.protocol
     /// <summary>
     /// A resource that the server is capable of reading, included in a prompt or tool call result.
     /// </summary>
-    public class ResourceLink
+    public class ResourceLink : ContentBlock
     {
+        [JsonProperty("type")]
+        public override string Type => "resource_link";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2412,8 +2476,11 @@ namespace dotacp.protocol
     /// <summary>
     /// The user selected one of the provided options.
     /// </summary>
-    public class SelectedPermissionOutcome
+    public class SelectedPermissionOutcome : RequestPermissionOutcome
     {
+        [JsonProperty("outcome")]
+        public override string Outcome => "selected";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2458,17 +2525,61 @@ namespace dotacp.protocol
     /// <summary>
     /// A session configuration option selector and its current state.
     /// </summary>
-    public class SessionConfigOption
+    [JsonConverter(typeof(DiscriminatorConverter<SessionConfigOption>))]
+    public abstract class SessionConfigOption
     {
+        internal const string DiscriminatorPropertyName = "type";
+        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            { "select", typeof(SessionConfigSelect) }
+        };
+
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public abstract string Type { get; }
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public object Meta { get; set; }
+
+        /// <summary>
+        /// Optional semantic category for this option (UX only).
+        /// </summary>
+        [JsonProperty("category")]
+        public SessionConfigOptionCategory Category { get; set; }
+
+        /// <summary>
+        /// Optional description for the Client to display to the user.
+        /// </summary>
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Unique identifier for the configuration option.
+        /// </summary>
+        [JsonProperty("id")]
+        public SessionConfigId Id { get; set; }
+
+        /// <summary>
+        /// Human-readable label for the option.
+        /// </summary>
+        [JsonProperty("name")]
+        public string Name { get; set; } = null!;
     }
 
     /// <summary>
     /// A single-value selector (dropdown) session configuration option payload.
     /// </summary>
-    public class SessionConfigSelect
+    public class SessionConfigSelect : SessionConfigOption
     {
+        [JsonProperty("type")]
+        public override string Type => "select";
+
         /// <summary>
         /// The currently selected value.
         /// </summary>
@@ -2644,10 +2755,167 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protocol/prompt-turn#3-agent-reports-output)
     /// </summary>
-    public class SessionUpdate
+    [JsonConverter(typeof(DiscriminatorConverter<SessionUpdate>))]
+    public abstract class SessionUpdate
+    {
+        internal const string DiscriminatorPropertyName = "sessionUpdate";
+        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            { "agent_message_chunk", typeof(SessionUpdateAgentMessageChunk) },
+            { "agent_thought_chunk", typeof(SessionUpdateAgentThoughtChunk) },
+            { "available_commands_update", typeof(AvailableCommandsUpdate) },
+            { "config_option_update", typeof(ConfigOptionUpdate) },
+            { "current_mode_update", typeof(CurrentModeUpdate) },
+            { "plan", typeof(Plan) },
+            { "tool_call", typeof(ToolCall) },
+            { "tool_call_update", typeof(SessionUpdateToolCallUpdate) },
+            { "user_message_chunk", typeof(SessionUpdateUserMessageChunk) }
+        };
+
+        [JsonProperty("sessionUpdate")]
+        public abstract string SessionUpdateValue { get; }
+    }
+
+    /// <summary>
+    /// A chunk of the user's message being streamed.
+    /// </summary>
+    public class SessionUpdateUserMessageChunk : SessionUpdate
     {
         [JsonProperty("sessionUpdate")]
-        public string SessionUpdateValue { get; set; }
+        public override string SessionUpdateValue => "user_message_chunk";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public object Meta { get; set; }
+
+        /// <summary>
+        /// A single item of content
+        /// </summary>
+        [JsonProperty("content")]
+        public ContentBlock Content { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// A chunk of the agent's response being streamed.
+    /// </summary>
+    public class SessionUpdateAgentMessageChunk : SessionUpdate
+    {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "agent_message_chunk";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public object Meta { get; set; }
+
+        /// <summary>
+        /// A single item of content
+        /// </summary>
+        [JsonProperty("content")]
+        public ContentBlock Content { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// A chunk of the agent's internal reasoning being streamed.
+    /// </summary>
+    public class SessionUpdateAgentThoughtChunk : SessionUpdate
+    {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "agent_thought_chunk";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public object Meta { get; set; }
+
+        /// <summary>
+        /// A single item of content
+        /// </summary>
+        [JsonProperty("content")]
+        public ContentBlock Content { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// Update on the status or results of a tool call.
+    /// </summary>
+    public class SessionUpdateToolCallUpdate : SessionUpdate
+    {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "tool_call_update";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public object Meta { get; set; }
+
+        /// <summary>
+        /// Replace the content collection.
+        /// </summary>
+        [JsonProperty("content")]
+        public List<ToolCallContent> Content { get; set; }
+
+        /// <summary>
+        /// Update the tool kind.
+        /// </summary>
+        [JsonProperty("kind")]
+        public ToolKind Kind { get; set; }
+
+        /// <summary>
+        /// Replace the locations collection.
+        /// </summary>
+        [JsonProperty("locations")]
+        public List<ToolCallLocation> Locations { get; set; }
+
+        /// <summary>
+        /// Update the raw input.
+        /// </summary>
+        [JsonProperty("rawInput")]
+        public object RawInput { get; set; }
+
+        /// <summary>
+        /// Update the raw output.
+        /// </summary>
+        [JsonProperty("rawOutput")]
+        public object RawOutput { get; set; }
+
+        /// <summary>
+        /// Update the execution status.
+        /// </summary>
+        [JsonProperty("status")]
+        public ToolCallStatus Status { get; set; }
+
+        /// <summary>
+        /// Update the human-readable title.
+        /// </summary>
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
+        /// <summary>
+        /// The ID of the tool call being updated.
+        /// </summary>
+        [JsonProperty("toolCallId")]
+        public ToolCallId ToolCallId { get; set; }
     }
 
     /// <summary>
@@ -2750,8 +3018,11 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [Terminal](https://agentclientprotocol.com/protocol/terminals)
     /// </summary>
-    public class Terminal
+    public class Terminal : ToolCallContent
     {
+        [JsonProperty("type")]
+        public override string Type => "terminal";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2859,8 +3130,11 @@ namespace dotacp.protocol
     /// <summary>
     /// Text provided to or from an LLM.
     /// </summary>
-    public class TextContent
+    public class TextContent : ContentBlock
     {
+        [JsonProperty("type")]
+        public override string Type => "text";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2911,8 +3185,11 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [Tool Calls](https://agentclientprotocol.com/protocol/tool-calls)
     /// </summary>
-    public class ToolCall
+    public class ToolCall : SessionUpdate
     {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "tool_call";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2982,10 +3259,19 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [Content](https://agentclientprotocol.com/protocol/tool-calls#content)
     /// </summary>
-    public class ToolCallContent
+    [JsonConverter(typeof(DiscriminatorConverter<ToolCallContent>))]
+    public abstract class ToolCallContent
     {
+        internal const string DiscriminatorPropertyName = "type";
+        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            { "content", typeof(Content) },
+            { "diff", typeof(Diff) },
+            { "terminal", typeof(Terminal) }
+        };
+
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public abstract string Type { get; }
     }
 
     /// <summary>

@@ -397,6 +397,104 @@ Describe "Get-TypeAliasTarget" {
     }
 }
 
+Describe "Discriminator Handling" {
+    BeforeAll {
+        . "$PSScriptRoot\gen_schema.ps1"
+    }
+
+    It "generates abstract base class and mapping for discriminator" {
+        $defs = @{
+            TextContent = @{
+                type = "object"
+                properties = @{ text = @{ type = "string" } }
+                required = @("text")
+            }
+            ContentBlock = @{
+                discriminator = @{ propertyName = "type" }
+                oneOf = @(
+                    @{
+                        allOf = @(@{ '$ref' = "#/$defs/TextContent" })
+                        properties = @{ type = @{ const = "text"; type = "string" } }
+                        required = @("type")
+                        type = "object"
+                    }
+                )
+            }
+        }
+
+        Initialize-DiscriminatorMaps $defs
+        $result = New-ModelClass "ContentBlock" $defs.ContentBlock $defs
+
+        ($result -match "abstract class ContentBlock") | Should Be $true
+        ($result -match "DiscriminatorPropertyName = `"type`"") | Should Be $true
+        ($result -match "typeof\(TextContent\)") | Should Be $true
+    }
+
+    It "adds discriminator override for derived types" {
+        $defs = @{
+            TextContent = @{
+                type = "object"
+                properties = @{ text = @{ type = "string" } }
+                required = @("text")
+            }
+            ContentBlock = @{
+                discriminator = @{ propertyName = "type" }
+                oneOf = @(
+                    @{
+                        allOf = @(@{ '$ref' = "#/$defs/TextContent" })
+                        properties = @{ type = @{ const = "text"; type = "string" } }
+                        required = @("type")
+                        type = "object"
+                    }
+                )
+            }
+        }
+
+        Initialize-DiscriminatorMaps $defs
+        $result = New-ModelClass "TextContent" $defs.TextContent $defs
+
+        ($result -match "class TextContent : ContentBlock") | Should Be $true
+        ($result -match "override string Type") | Should Be $true
+        ($result -match "=> `"text`"") | Should Be $true
+    }
+
+    It "uses wrapper variants when refs repeat" {
+        $defs = @{
+            Chunk = @{
+                type = "object"
+                properties = @{ content = @{ type = "string" } }
+                required = @("content")
+            }
+            Update = @{
+                discriminator = @{ propertyName = "kind" }
+                oneOf = @(
+                    @{
+                        allOf = @(@{ '$ref' = "#/$defs/Chunk" })
+                        properties = @{ kind = @{ const = "first"; type = "string" } }
+                        required = @("kind")
+                        type = "object"
+                    }
+                    @{
+                        allOf = @(@{ '$ref' = "#/$defs/Chunk" })
+                        properties = @{ kind = @{ const = "second"; type = "string" } }
+                        required = @("kind")
+                        type = "object"
+                    }
+                )
+            }
+        }
+
+        Initialize-DiscriminatorMaps $defs
+        $updateResult = New-ModelClass "Update" $defs.Update $defs
+        $chunkResult = New-ModelClass "Chunk" $defs.Chunk $defs
+
+        ($updateResult -match "class UpdateFirst") | Should Be $true
+        ($updateResult -match "class UpdateSecond") | Should Be $true
+        ($updateResult -match "override string Kind") | Should Be $true
+        ($chunkResult -match "class Chunk : Update") | Should Be $false
+    }
+}
+
 Describe "New-TypeAliasStruct" {
     BeforeAll {
         . "$PSScriptRoot\gen_schema.ps1"

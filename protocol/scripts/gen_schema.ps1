@@ -219,6 +219,372 @@ function Convert-DefaultValue {
     }
 }
 
+function Get-DefinitionRefCounts {
+    param(
+        [PSObject]$Definitions
+    )
+
+    $refCounts = @{}
+
+    function Add-RefCounts {
+        param(
+            $Node,
+            [hashtable]$Counts
+        )
+
+        if ($null -eq $Node) {
+            return
+        }
+
+        if ($Node -is [string]) {
+            return
+        }
+
+        if ($Node -is [System.Collections.IDictionary]) {
+            if ($Node.Contains('$ref') -and $Node['$ref']) {
+                $refName = $Node['$ref'].Split('/')[-1]
+                if (-not $Counts.ContainsKey($refName)) {
+                    $Counts[$refName] = 0
+                }
+                $Counts[$refName]++
+            }
+
+            foreach ($value in $Node.Values) {
+                Add-RefCounts $value $Counts
+            }
+            return
+        }
+
+        if ($Node -is [System.Collections.IEnumerable]) {
+            foreach ($item in $Node) {
+                Add-RefCounts $item $Counts
+            }
+            return
+        }
+
+        if ($Node.PSObject -and $Node.PSObject.Properties) {
+            foreach ($prop in $Node.PSObject.Properties) {
+                if ($prop.Name -eq '$ref' -and $prop.Value) {
+                    $refName = $prop.Value.Split('/')[-1]
+                    if (-not $Counts.ContainsKey($refName)) {
+                        $Counts[$refName] = 0
+                    }
+                    $Counts[$refName]++
+                } else {
+                    Add-RefCounts $prop.Value $Counts
+                }
+            }
+        }
+    }
+
+    foreach ($def in (Get-DefinitionEntries $Definitions)) {
+        Add-RefCounts $def.Value $refCounts
+    }
+
+    return $refCounts
+}
+
+function Get-DefinitionEntries {
+    param(
+        $Definitions
+    )
+
+    if ($Definitions -is [System.Collections.IDictionary]) {
+        $entries = @()
+        foreach ($key in $Definitions.Keys) {
+            $entries += [PSCustomObject]@{
+                Name = $key
+                Value = $Definitions[$key]
+            }
+        }
+        return $entries | Sort-Object Name
+    }
+
+    return $Definitions.PSObject.Properties | Sort-Object Name
+}
+
+function Get-DefinitionValue {
+    param(
+        $Definitions,
+        [string]$Name
+    )
+
+    if ($Definitions -is [System.Collections.IDictionary]) {
+        if ($Definitions.Contains($Name)) {
+            return $Definitions[$Name]
+        }
+        return $null
+    }
+
+    return $Definitions.$Name
+}
+
+function Get-DiscriminatorPropertyInfo {
+    param(
+        [string]$ClassName,
+        [string]$PropertyName
+    )
+
+    $csPropName = Convert-PropertyName $PropertyName
+
+    if ($csPropName -eq $ClassName) {
+        $csPropName = "{0}Value" -f $csPropName
+    }
+
+    return @{
+        CsName = $csPropName
+        JsonName = $PropertyName
+    }
+}
+
+function Initialize-DiscriminatorMaps {
+    param(
+        [PSObject]$Definitions
+    )
+
+    $script:DiscriminatorBaseInfo = @{}
+    $script:DiscriminatorDerivedInfo = @{}
+    $script:DiscriminatorVariantClasses = @{}
+
+    $refCounts = Get-DefinitionRefCounts $Definitions
+
+    foreach ($defEntry in (Get-DefinitionEntries $Definitions)) {
+        $defName = $defEntry.Name
+        $def = $defEntry.Value
+
+        if (-not $def.discriminator -or -not $def.oneOf) {
+            continue
+        }
+
+        $propertyName = $def.discriminator.propertyName
+        if (-not $propertyName) {
+            continue
+        }
+
+        $baseClassName = Convert-NameToClass $defName
+        $discInfo = Get-DiscriminatorPropertyInfo $baseClassName $propertyName
+
+        $variants = @()
+        foreach ($item in $def.oneOf) {
+            $refName = $null
+
+            if ($item.'$ref') {
+                $refName = $item.'$ref'.Split('/')[-1]
+            } elseif ($item.allOf) {
+                foreach ($allOfItem in $item.allOf) {
+                    if ($allOfItem.'$ref') {
+                        $refName = $allOfItem.'$ref'.Split('/')[-1]
+                        break
+                    }
+                }
+            }
+
+            $constValue = $null
+            if ($item.properties -and $item.properties.$propertyName) {
+                $discProp = $item.properties.$propertyName
+                if ($discProp.const -ne $null) {
+                    $constValue = $discProp.const
+                }
+            }
+
+            if ($constValue -eq $null) {
+                continue
+            }
+
+            $variants += [PSCustomObject]@{
+                RefName = $refName
+                ConstValue = $constValue
+                Item = $item
+            }
+        }
+
+        if ($variants.Count -eq 0) {
+            continue
+        }
+
+        $refCountsInBase = @{}
+        foreach ($variant in $variants) {
+            if ($variant.RefName) {
+                if (-not $refCountsInBase.ContainsKey($variant.RefName)) {
+                    $refCountsInBase[$variant.RefName] = 0
+                }
+                $refCountsInBase[$variant.RefName]++
+            }
+        }
+
+        $mapping = @{}
+        foreach ($variant in $variants) {
+            $refName = $variant.RefName
+            $constValue = $variant.ConstValue
+            $variantItem = $variant.Item
+
+            $globalRefCount = 0
+            $localRefCount = 0
+            if ($refName) {
+                if ($refCounts.ContainsKey($refName)) {
+                    $globalRefCount = $refCounts[$refName]
+                }
+                if ($refCountsInBase.ContainsKey($refName)) {
+                    $localRefCount = $refCountsInBase[$refName]
+                }
+            }
+
+            $useDirectInheritance = $false
+            if ($refName -and $globalRefCount -eq 1 -and $localRefCount -eq 1) {
+                $useDirectInheritance = $true
+            }
+
+            if ($useDirectInheritance) {
+                $script:DiscriminatorDerivedInfo[$refName] = @{
+                    BaseName = $defName
+                    PropertyName = $propertyName
+                    PropertyCsName = $discInfo.CsName
+                    PropertyJsonName = $discInfo.JsonName
+                    DiscriminatorValue = $constValue
+                    IsAbstract = $false
+                }
+
+                $mapping[$constValue] = Convert-NameToClass $refName
+            } else {
+                $variantClassName = (Convert-NameToClass $defName) + (Convert-PropertyName $constValue.ToString())
+                if (-not $script:DiscriminatorVariantClasses.ContainsKey($defName)) {
+                    $script:DiscriminatorVariantClasses[$defName] = @()
+                }
+
+                $variantDefinition = $variantItem
+                $referencedDefinition = Get-DefinitionValue $Definitions $refName
+                if ($refName -and $referencedDefinition) {
+                    $variantDefinition = $referencedDefinition
+                }
+
+                $script:DiscriminatorVariantClasses[$defName] += [PSCustomObject]@{
+                    ClassName = $variantClassName
+                    BaseClassName = Convert-NameToClass $defName
+                    DiscriminatorPropertyName = $propertyName
+                    DiscriminatorPropertyCsName = $discInfo.CsName
+                    DiscriminatorPropertyJsonName = $discInfo.JsonName
+                    DiscriminatorValue = $constValue
+                    Definition = $variantDefinition
+                    Description = $variantItem.description
+                }
+
+                $mapping[$constValue] = $variantClassName
+            }
+        }
+
+        $script:DiscriminatorBaseInfo[$defName] = @{
+            PropertyName = $propertyName
+            PropertyCsName = $discInfo.CsName
+            PropertyJsonName = $discInfo.JsonName
+            Mapping = $mapping
+        }
+    }
+}
+
+function Get-PropertyLines {
+    param(
+        [PSObject]$Definition,
+        [PSObject]$AllDefinitions,
+        [string]$ClassName,
+        [string[]]$SkipProperties = @()
+    )
+
+    $properties = @()
+    $props = $Definition.properties
+
+    if ($null -ne $props -and $props.PSObject.Properties.Count -gt 0) {
+        foreach ($propName in ($props.PSObject.Properties.Name | Sort-Object)) {
+            if ($SkipProperties -contains $propName) {
+                continue
+            }
+
+            $prop = $props.$propName
+            $csType = Get-PropertyType $prop $AllDefinitions
+            $csPropName = Convert-PropertyName $propName
+            $propIsRequired = ($null -ne $Definition.required) -and ($Definition.required -contains $propName)
+            $needsJsonPropertyName = $false
+
+            # Handle naming conflicts: if property name matches class name, add suffix
+            if ($csPropName -eq $ClassName) {
+                $csPropName = "{0}Value" -f $csPropName
+                $needsJsonPropertyName = $true
+            }
+
+            # If not required and not nullable, make it nullable (only for value types)
+            # Don't add ? if there's a default value (means it's initialized and not null)
+            if (-not $propIsRequired -and -not $csType.EndsWith('?') -and $null -eq $prop.default) {
+                # Only add ? for value types, not reference types
+                if ($csType -in @('int', 'bool', 'double', 'uint', 'ushort', 'ulong', 'short', 'long', 'byte', 'sbyte', 'float', 'decimal')) {
+                    $csType = "{0}?" -f $csType
+                }
+            }
+
+            $propLine = ""
+
+            # Add XML documentation for property if description exists
+            if ($prop.description) {
+                $propDocs = @()
+                $propDocs += "    /// <summary>"
+                $propDescription = $prop.description -replace "`r`n", "`n"
+                $propDescLines = $propDescription -split "`n"
+                foreach ($propDescLine in $propDescLines) {
+                    $trimmedPropDescLine = $propDescLine.Trim()
+                    if ($trimmedPropDescLine.Length -gt 0) {
+                        $propDocs += "    /// $trimmedPropDescLine"
+                    } else {
+                        $propDocs += "    ///"
+                    }
+                }
+                $propDocs += "    /// </summary>"
+                $propLine = ($propDocs -join "`n") + "`n"
+            }
+
+            # Add JsonPropertyName attribute if name differs from property name
+            # Or if we added a conflict suffix (renamed the property)
+            if (-not $needsJsonPropertyName -and $propName -cne (Convert-PropertyName $propName)) {
+                $needsJsonPropertyName = $true
+            }
+
+            if ($needsJsonPropertyName) {
+                $propLine += "    [JsonProperty(`"$propName`")]`n"
+            }
+
+            # Build property declaration - use -f formatting instead of interpolation
+            $propDeclaration = "    public {0} {1} {{ get; set; }}" -f $csType, $csPropName
+
+            if ($propIsRequired -and -not $csType.EndsWith('?')) {
+                # Only add = null! for reference types, not value types
+                # Value types: primitive types, enums, type aliases, and union types (all structs)
+                # Reference types: string, object, List, Dictionary, and custom classes
+                $valueTypes = @('int', 'bool', 'double', 'uint', 'ushort', 'ulong', 'short', 'long', 'byte', 'sbyte', 'float', 'decimal', 'char')
+                $typeAliases = @('PermissionOptionId', 'ProtocolVersion', 'SessionConfigGroupId', 'SessionConfigId', 'SessionConfigValueId', 'SessionId', 'SessionModeId', 'ToolCallId', 'RequestId', 'SessionConfigSelectOptions')
+                $enumTypes = @('PermissionOptionKind', 'PlanEntryPriority', 'PlanEntryStatus', 'StopReason', 'ToolCallStatus', 'ToolKind', 'SessionConfigOptionCategory', 'ErrorCode')
+
+                $isValueType = ($csType -in $valueTypes) -or ($csType -in $typeAliases) -or ($csType -in $enumTypes)
+                $isReferenceType = -not $isValueType
+
+                if ($isReferenceType) {
+                    $propDeclaration += " = null!;"
+                }
+            }
+
+            $propLine += $propDeclaration
+
+            # Add default if specified
+            if ($null -ne $prop.default) {
+                $defaultValue = Convert-DefaultValue $prop.default $csType
+                if ($defaultValue) {
+                    $propLine = "{0} = {1};" -f $propLine, $defaultValue
+                }
+            }
+
+            $properties += $propLine
+        }
+    }
+
+    return $properties
+}
+
 function Test-IsSimpleTypeAlias {
     param(
         [PSObject]$Definition
@@ -575,6 +941,97 @@ function New-ModelClass {
         return $result
     }
 
+    # Handle discriminated unions with discriminator
+    if ($script:DiscriminatorBaseInfo -and $script:DiscriminatorBaseInfo.ContainsKey($Name)) {
+        $baseInfo = $script:DiscriminatorBaseInfo[$Name]
+
+        $xmlDocs = @()
+        if ($Definition.description) {
+            $xmlDocs += "/// <summary>"
+            $description = $Definition.description -replace "`r`n", "`n"
+            $descLines = $description -split "`n"
+            foreach ($descLine in $descLines) {
+                $trimmedLine = $descLine.Trim()
+                if ($trimmedLine.Length -gt 0) {
+                    $xmlDocs += "/// $trimmedLine"
+                } else {
+                    $xmlDocs += "///"
+                }
+            }
+            $xmlDocs += "/// </summary>"
+        }
+
+        $result = $xmlDocs -join "`n"
+        if ($xmlDocs.Count -gt 0) { $result += "`n" }
+
+        $result += "[JsonConverter(typeof(DiscriminatorConverter<$className>))]`n"
+        $result += "public abstract class $className`n{`n"
+
+        $mappingLines = @()
+        $mappingLines += "    internal const string DiscriminatorPropertyName = `"$($baseInfo.PropertyName)`";"
+        $mappingLines += "    internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)"
+        $mappingLines += "    {"
+        foreach ($entry in ($baseInfo.Mapping.GetEnumerator() | Sort-Object Name)) {
+            $mappingLines += "        { `"$($entry.Name)`", typeof($($entry.Value)) },"
+        }
+        if ($mappingLines[-1] -match ',$') {
+            $mappingLines[-1] = $mappingLines[-1].TrimEnd(',')
+        }
+        $mappingLines += "    };"
+
+        $result += ($mappingLines -join "`n") + "`n`n"
+
+        $properties = @()
+        $properties += "    [JsonProperty(`"$($baseInfo.PropertyJsonName)`")]`n    public abstract string $($baseInfo.PropertyCsName) { get; }"
+        $properties += Get-PropertyLines $Definition $AllDefinitions $className
+
+        if ($properties.Count -gt 0) {
+            $result += ($properties -join "`n`n") + "`n"
+        }
+
+        $result += "}"
+
+        if ($script:DiscriminatorVariantClasses -and $script:DiscriminatorVariantClasses.ContainsKey($Name)) {
+            foreach ($variant in $script:DiscriminatorVariantClasses[$Name]) {
+                $variantDocs = @()
+                $variantDescription = if ($variant.Description) { $variant.Description } else { $variant.Definition.description }
+                if ($variantDescription) {
+                    $variantDocs += "/// <summary>"
+                    $variantDesc = $variantDescription -replace "`r`n", "`n"
+                    $variantDescLines = $variantDesc -split "`n"
+                    foreach ($variantDescLine in $variantDescLines) {
+                        $trimmedVariantLine = $variantDescLine.Trim()
+                        if ($trimmedVariantLine.Length -gt 0) {
+                            $variantDocs += "/// $trimmedVariantLine"
+                        } else {
+                            $variantDocs += "///"
+                        }
+                    }
+                    $variantDocs += "/// </summary>"
+                }
+
+                $variantClassName = $variant.ClassName
+                $variantProperties = @()
+                $variantProperties += "    [JsonProperty(`"$($variant.DiscriminatorPropertyJsonName)`")]`n    public override string $($variant.DiscriminatorPropertyCsName) => `"$($variant.DiscriminatorValue)`";"
+                $variantProperties += Get-PropertyLines $variant.Definition $AllDefinitions $variantClassName @($variant.DiscriminatorPropertyName)
+
+                $variantResult = ""
+                if ($variantDocs.Count -gt 0) {
+                    $variantResult += ($variantDocs -join "`n") + "`n"
+                }
+                $variantResult += "public class $variantClassName : $className`n{`n"
+                if ($variantProperties.Count -gt 0) {
+                    $variantResult += ($variantProperties -join "`n`n") + "`n"
+                }
+                $variantResult += "}"
+
+                $result += "`n`n" + $variantResult
+            }
+        }
+
+        return $result
+    }
+
     # Handle oneOf/anyOf at root level (union types or enums)
     if ($Definition.oneOf -or $Definition.anyOf) {
         $items = @(if ($Definition.oneOf) { $Definition.oneOf } else { $Definition.anyOf })
@@ -644,10 +1101,8 @@ function New-ModelClass {
                         default { $backingType = "int" }
                     }
                 }
-                # Integer enums don't need JsonConverter - they serialize naturally as numbers
                 $result += "public enum $className : $backingType`n{"
             } else {
-                # String enums need JsonEnumMemberConverter to handle JsonEnumValue attributes
                 $result += "[JsonConverter(typeof(JsonEnumMemberConverter<$className>))]`n"
                 $result += "public enum $className`n{"
             }
@@ -711,8 +1166,6 @@ function New-ModelClass {
                     if ($item.const -ne $null) {
                         $enumEntry += "    $enumName = $constValue"
                     } else {
-                        # This item has no const value, it's a catch-all - use a safe default value
-                        # Find a value that doesn't conflict
                         $enumEntry += "    $enumName = 0"
                     }
                 } else {
@@ -730,7 +1183,7 @@ function New-ModelClass {
             $result += "}"
 
             return $result
-        } 
+        }
 
         # Check if this is a union type (different types, no properties)
         $hasProperties = $false
@@ -850,96 +1303,26 @@ function New-ModelClass {
 
     # Determine class type
     $classDeclaration = "public class $className"
+    $derivedInfo = $null
+    if ($script:DiscriminatorDerivedInfo -and $script:DiscriminatorDerivedInfo.ContainsKey($Name)) {
+        $derivedInfo = $script:DiscriminatorDerivedInfo[$Name]
+    }
 
-    # Build properties
-    $properties = @()
-    $props = $Definition.properties
-
-    if ($null -ne $props -and $props.PSObject.Properties.Count -gt 0) {
-        foreach ($propName in ($props.PSObject.Properties.Name | Sort-Object)) {
-            $prop = $props.$propName
-            $csType = Get-PropertyType $prop $AllDefinitions
-            $csPropName = Convert-PropertyName $propName
-            $propIsRequired = ($null -ne $Definition.required) -and ($Definition.required -contains $propName)
-            $needsJsonPropertyName = $false
-
-            # Handle naming conflicts: if property name matches class name, add suffix
-            if ($csPropName -eq $className) {
-                $csPropName = "{0}Value" -f $csPropName
-                $needsJsonPropertyName = $true
-            }
-
-            # If not required and not nullable, make it nullable (only for value types)
-            # Don't add ? if there's a default value (means it's initialized and not null)
-            if (-not $propIsRequired -and -not $csType.EndsWith('?') -and $null -eq $prop.default) {
-                # Only add ? for value types, not reference types
-                if ($csType -in @('int', 'bool', 'double', 'uint', 'ushort', 'ulong', 'short', 'long', 'byte', 'sbyte', 'float', 'decimal')) {
-                    $csType = "{0}?" -f $csType
-                }
-            }
-
-            $propLine = ""
-
-            # Add XML documentation for property if description exists
-            if ($prop.description) {
-                $propDocs = @()
-                $propDocs += "    /// <summary>"
-                $propDescription = $prop.description -replace "`r`n", "`n"
-                $propDescLines = $propDescription -split "`n"
-                foreach ($propDescLine in $propDescLines) {
-                    $trimmedPropDescLine = $propDescLine.Trim()
-                    if ($trimmedPropDescLine.Length -gt 0) {
-                        $propDocs += "    /// $trimmedPropDescLine"
-                    } else {
-                        $propDocs += "    ///"
-                    }
-                }
-                $propDocs += "    /// </summary>"
-                $propLine = ($propDocs -join "`n") + "`n"
-            }
-
-            # Add JsonPropertyName attribute if name differs from property name
-            # Or if we added a conflict suffix (renamed the property)
-            if (-not $needsJsonPropertyName -and $propName -cne (Convert-PropertyName $propName)) {
-                $needsJsonPropertyName = $true
-            }
-
-            if ($needsJsonPropertyName) {
-                $propLine += "    [JsonProperty(`"$propName`")]`n"
-            }
-
-            # Build property declaration - use -f formatting instead of interpolation
-            $propDeclaration = "    public {0} {1} {{ get; set; }}" -f $csType, $csPropName
-
-            if ($propIsRequired -and -not $csType.EndsWith('?')) {
-                # Only add = null! for reference types, not value types
-                # Value types: primitive types, enums, type aliases, and union types (all structs)
-                # Reference types: string, object, List, Dictionary, and custom classes
-                $valueTypes = @('int', 'bool', 'double', 'uint', 'ushort', 'ulong', 'short', 'long', 'byte', 'sbyte', 'float', 'decimal', 'char')
-                $typeAliases = @('PermissionOptionId', 'ProtocolVersion', 'SessionConfigGroupId', 'SessionConfigId', 'SessionConfigValueId', 'SessionId', 'SessionModeId', 'ToolCallId', 'RequestId', 'SessionConfigSelectOptions')
-                $enumTypes = @('PermissionOptionKind', 'PlanEntryPriority', 'PlanEntryStatus', 'StopReason', 'ToolCallStatus', 'ToolKind', 'SessionConfigOptionCategory', 'ErrorCode')
-
-                $isValueType = ($csType -in $valueTypes) -or ($csType -in $typeAliases) -or ($csType -in $enumTypes)
-                $isReferenceType = -not $isValueType
-
-                if ($isReferenceType) {
-                    $propDeclaration += " = null!;"
-                }
-            }
-
-            $propLine += $propDeclaration
-
-            # Add default if specified
-            if ($null -ne $prop.default) {
-                $defaultValue = Convert-DefaultValue $prop.default $csType
-                if ($defaultValue) {
-                    $propLine = "{0} = {1};" -f $propLine, $defaultValue
-                }
-            }
-
-            $properties += $propLine
+    if ($derivedInfo) {
+        $baseClassName = Convert-NameToClass $derivedInfo.BaseName
+        if ($derivedInfo.IsAbstract) {
+            $classDeclaration = "public abstract class $className : $baseClassName"
+        } else {
+            $classDeclaration = "public class $className : $baseClassName"
         }
     }
+
+    $properties = @()
+    if ($derivedInfo -and -not $derivedInfo.IsAbstract) {
+        $properties += "    [JsonProperty(`"$($derivedInfo.PropertyJsonName)`")]`n    public override string $($derivedInfo.PropertyCsName) => `"$($derivedInfo.DiscriminatorValue)`";"
+    }
+
+    $properties += Get-PropertyLines $Definition $AllDefinitions $className
 
     # Generate record declaration
     $result = $xmlDocs -join "`n"
@@ -1013,6 +1396,7 @@ $output += "{"
 # Generate classes from schema definitions
 $defs = $schemaContent.'$defs'
 if ($null -ne $defs) {
+    Initialize-DiscriminatorMaps $defs
     $typeAliases = @()
     $enumDefinitions = @()
     $recordClasses = @()
