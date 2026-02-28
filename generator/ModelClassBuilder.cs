@@ -665,7 +665,7 @@ namespace dotacp.generator
             // Generate TryGet methods
             foreach (var unionType in uniqueUnionTypes)
             {
-                var cleanTypeName = unionType.Replace("<", "").Replace(">", "").Replace(",", "").Replace(" ", "");
+                var cleanTypeName = unionType.Replace("<", "").Replace(">", "").Replace(",", "").Replace(" ", "").Replace("[", "").Replace("]", "");
                 var methodName = "TryGet" + char.ToUpper(cleanTypeName[0]) + cleanTypeName.Substring(1);
 
                 sb.AppendLineLf($"    public bool {methodName}(out {unionType} value)");

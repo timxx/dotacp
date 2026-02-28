@@ -45,4 +45,3 @@ namespace dotacp.protocol
         public const string TerminalWaitForExit = "terminal/wait_for_exit";
     }
 }
-

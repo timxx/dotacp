@@ -12,7 +12,7 @@ namespace dotacp.unittest
         [DataRow("integer", "int")]
         [DataRow("boolean", "bool")]
         [DataRow("object", "object")]
-        [DataRow("array", "List<object>")]
+        [DataRow("array", "object[]")]
         [DataRow("null", "object")]
         public void GetTypeName_MapsJsonTypesToCSharpTypes(string jsonType, string expected)
         {
@@ -71,9 +71,9 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
-        public void ConvertDefaultValue_ReturnsNullForNullList()
+        public void ConvertDefaultValue_ReturnsNullForNullArray()
         {
-            var result = TypeMapper.ConvertDefaultValue(null, "List<string>");
+            var result = TypeMapper.ConvertDefaultValue(null, "string[]");
             Assert.IsNull(result);
         }
 
@@ -85,10 +85,10 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
-        public void ConvertDefaultValue_CreatesNewListForNonNullList()
+        public void ConvertDefaultValue_CreatesNewArrayForNonNullArray()
         {
-            var result = TypeMapper.ConvertDefaultValue("dummy", "List<string>");
-            Assert.AreEqual("new List<string>()", result);
+            var result = TypeMapper.ConvertDefaultValue("dummy", "string[]");
+            Assert.AreEqual("new string[0]", result);
         }
 
         [TestMethod]
@@ -105,7 +105,7 @@ namespace dotacp.unittest
         {
             Assert.IsFalse(TypeMapper.IsValueType("string"), "string should be a reference type");
             Assert.IsFalse(TypeMapper.IsValueType("object"), "object should be a reference type");
-            Assert.IsFalse(TypeMapper.IsValueType("List<string>"), "List<string> should be a reference type");
+            Assert.IsFalse(TypeMapper.IsValueType("string[]"), "string[] should be a reference type");
         }
 
         [TestMethod]
@@ -113,7 +113,7 @@ namespace dotacp.unittest
         {
             Assert.IsTrue(TypeMapper.IsReferenceType("string"), "string should be a reference type");
             Assert.IsTrue(TypeMapper.IsReferenceType("object"), "object should be a reference type");
-            Assert.IsTrue(TypeMapper.IsReferenceType("List<string>"), "List<string> should be a reference type");
+            Assert.IsTrue(TypeMapper.IsReferenceType("string[]"), "string[] should be a reference type");
         }
 
         [TestMethod]

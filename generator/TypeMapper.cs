@@ -19,7 +19,7 @@ namespace dotacp.generator
                 case "integer": return "int";
                 case "boolean": return "bool";
                 case "object": return "object";
-                case "array": return "List<object>";
+                case "array": return "object[]";
                 case "null": return "object";
                 default: return "object";
             }
@@ -87,6 +87,18 @@ namespace dotacp.generator
                 }
             }
 
+            // Handle array types (check before string types since string[] starts with "string")
+            if (csType.EndsWith("[]"))
+            {
+                return $"new {csType.TrimEnd('[', ']')}[0]";
+            }
+
+            // Handle Dictionary types
+            if (csType.StartsWith("Dictionary<"))
+            {
+                return $"new {csType}()";
+            }
+
             // Handle string types
             if (csType.StartsWith("string"))
             {
@@ -94,18 +106,6 @@ namespace dotacp.generator
                 {
                     return $"\"{stringValue}\"";
                 }
-            }
-
-            // Handle List types
-            if (csType.StartsWith("List<"))
-            {
-                return $"new {csType}()";
-            }
-
-            // Handle Dictionary types
-            if (csType.StartsWith("Dictionary<"))
-            {
-                return $"new {csType}()";
             }
 
             return null;

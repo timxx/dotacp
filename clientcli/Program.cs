@@ -62,7 +62,7 @@ namespace clientcli
                 session = await connection.NewSessionAsync(new NewSessionRequest()
                 {
                     Cwd = Environment.CurrentDirectory,
-                    McpServers = new List<McpServer>()
+                    McpServers = new McpServer[0],
                 });
             }
             catch (Exception ex)
@@ -87,6 +87,10 @@ namespace clientcli
             {
                 Console.WriteLine("Press Enter to send a request, or type '/exit' to quit.");
                 var input = Console.ReadLine();
+                if (input == null)
+                    break;
+                if (input.Length == 0)
+                    continue;
                 if (input == "/exit")
                     break;
 
@@ -95,7 +99,7 @@ namespace clientcli
                     var promptResp = await connection.PromptAsync(new PromptRequest()
                     {
                         SessionId = session.SessionId,
-                        Prompt = new List<ContentBlock>
+                        Prompt = new ContentBlock[1]
                         {
                             new TextContent()
                             {

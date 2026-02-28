@@ -223,7 +223,7 @@ namespace dotacp.unittest
             var request = new PromptRequest
             {
                 SessionId = sessionId,
-                Prompt = new List<ContentBlock>()
+                Prompt = new ContentBlock[0]
             };
 
             var json = JsonConvert.SerializeObject(request);

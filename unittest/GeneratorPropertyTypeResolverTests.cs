@@ -23,23 +23,23 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
-        public void GetPropertyType_WrapsArrayItemsInList()
+        public void GetPropertyType_WrapsArrayItemsInArray()
         {
             var resolver = CreateResolver();
             var property = JObject.Parse(@"{ 'type': 'array', 'items': { 'type': 'string' } }");
 
             var result = resolver.GetPropertyType(property);
-            Assert.AreEqual("List<string>", result);
+            Assert.AreEqual("string[]", result);
         }
 
         [TestMethod]
-        public void GetPropertyType_DefaultsToListObjectForArraysWithoutItems()
+        public void GetPropertyType_DefaultsToObjectArrayForArraysWithoutItems()
         {
             var resolver = CreateResolver();
             var property = JObject.Parse(@"{ 'type': 'array' }");
 
             var result = resolver.GetPropertyType(property);
-            Assert.AreEqual("List<object>", result);
+            Assert.AreEqual("object[]", result);
         }
 
         [TestMethod]
@@ -115,7 +115,7 @@ namespace dotacp.unittest
 
             Assert.AreEqual("string", resolver.GetPropertyType(JObject.Parse(@"{ 'type': ['string', 'null'] }")));
             Assert.AreEqual("object", resolver.GetPropertyType(JObject.Parse(@"{ 'type': ['object', 'null'] }")));
-            Assert.AreEqual("List<object>", resolver.GetPropertyType(JObject.Parse(@"{ 'type': ['array', 'null'] }")));
+            Assert.AreEqual("object[]", resolver.GetPropertyType(JObject.Parse(@"{ 'type': ['array', 'null'] }")));
         }
 
         [TestMethod]

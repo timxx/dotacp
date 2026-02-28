@@ -35,7 +35,7 @@ namespace clientcli
             }
             else if (update is ConfigOptionUpdate configOption)
             {
-                Console.WriteLine($"Config option update: {configOption.ConfigOptions.Count}");
+                Console.WriteLine($"Config option update: {configOption.ConfigOptions.Length}");
             }
             else if (update is CurrentModeUpdate currentMode)
             {
@@ -51,7 +51,7 @@ namespace clientcli
             }
             else if (update is ToolCall toolCall)
             {
-                Console.WriteLine($"Tool call update: {toolCall.Title} {toolCall.ToolCallId}");
+                Console.WriteLine($"Tool call: {toolCall.Title} {toolCall.ToolCallId}");
             }
             else if (update is SessionUpdateToolCallUpdate toolCallUpdate)
             {

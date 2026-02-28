@@ -61,8 +61,8 @@ namespace dotacp.generator
                     {
                         var items = property["items"] as JObject;
                         var itemType = items != null ? GetPropertyType(items) : "object";
-                        var result = $"List<{itemType}>";
-                        // For nullable array, don't add ? since List<T> is already nullable
+                        var result = $"{itemType}[]";
+                        // For nullable array, don't add ? since arrays are reference types
                         return result;
                     }
                     
@@ -76,7 +76,7 @@ namespace dotacp.generator
                     // Handle simple array type
                     var items = property["items"] as JObject;
                     var itemType = items != null ? GetPropertyType(items) : "object";
-                    return $"List<{itemType}>";
+                    return $"{itemType}[]";
                 }
                 else if (typeToken.Type == JTokenType.String)
                 {

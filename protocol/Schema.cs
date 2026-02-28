@@ -203,17 +203,17 @@ namespace dotacp.protocol
         private readonly object _value;
         private readonly int _typeIndex;
 
-        public SessionConfigSelectOptions(List<object> value)
+        public SessionConfigSelectOptions(object[] value)
         {
             _value = value;
             _typeIndex = 0;
         }
 
-        public static implicit operator SessionConfigSelectOptions(List<object> value) => new SessionConfigSelectOptions(value);
+        public static implicit operator SessionConfigSelectOptions(object[] value) => new SessionConfigSelectOptions(value);
 
-        public bool TryGetListobject(out List<object> value)
+        public bool TryGetObject(out object[] value)
         {
-            if (_value is List<object> v)
+            if (_value is object[] v)
             {
                 value = v;
                 return true;
@@ -562,6 +562,7 @@ namespace dotacp.protocol
 
         /// <summary>
         /// The turn was cancelled by the client via `session/cancel`.
+        ///
         /// This stop reason MUST be returned when the client sends a `session/cancel`
         /// notification, even if the cancellation causes exceptions in underlying operations.
         /// Agents should catch these exceptions and return this semantically meaningful
@@ -780,7 +781,7 @@ namespace dotacp.protocol
         public object Meta { get; set; }
 
         [JsonProperty("audience")]
-        public List<Role> Audience { get; set; }
+        public Role[] Audience { get; set; }
 
         [JsonProperty("lastModified")]
         public string LastModified { get; set; }
@@ -955,7 +956,7 @@ namespace dotacp.protocol
         /// Commands the agent can execute
         /// </summary>
         [JsonProperty("availableCommands")]
-        public List<AvailableCommand> AvailableCommands { get; set; } = null!;
+        public AvailableCommand[] AvailableCommands { get; set; } = null!;
     }
 
     /// <summary>
@@ -1104,7 +1105,7 @@ namespace dotacp.protocol
         /// The full set of configuration options and their current values.
         /// </summary>
         [JsonProperty("configOptions")]
-        public List<SessionConfigOption> ConfigOptions { get; set; } = null!;
+        public SessionConfigOption[] ConfigOptions { get; set; } = null!;
     }
 
     /// <summary>
@@ -1206,7 +1207,7 @@ namespace dotacp.protocol
         /// Array of command arguments.
         /// </summary>
         [JsonProperty("args")]
-        public List<string> Args { get; set; }
+        public string[] Args { get; set; }
 
         /// <summary>
         /// The command to execute.
@@ -1224,7 +1225,7 @@ namespace dotacp.protocol
         /// Environment variables for the command.
         /// </summary>
         [JsonProperty("env")]
-        public List<EnvVariable> Env { get; set; }
+        public EnvVariable[] Env { get; set; }
 
         /// <summary>
         /// Maximum number of output bytes to retain.
@@ -1669,7 +1670,7 @@ namespace dotacp.protocol
         /// Authentication methods supported by the agent.
         /// </summary>
         [JsonProperty("authMethods")]
-        public List<AuthMethod> AuthMethods { get; set; } = new List<AuthMethod>();
+        public AuthMethod[] AuthMethods { get; set; } = new AuthMethod[0];
 
         /// <summary>
         /// The protocol version the client specified if supported by the agent,
@@ -1754,7 +1755,7 @@ namespace dotacp.protocol
         /// List of MCP servers to connect to for this session.
         /// </summary>
         [JsonProperty("mcpServers")]
-        public List<McpServer> McpServers { get; set; } = null!;
+        public McpServer[] McpServers { get; set; } = null!;
 
         /// <summary>
         /// The ID of the session to load.
@@ -1782,7 +1783,7 @@ namespace dotacp.protocol
         /// Initial session configuration options if supported by the Agent.
         /// </summary>
         [JsonProperty("configOptions")]
-        public List<SessionConfigOption> ConfigOptions { get; set; }
+        public SessionConfigOption[] ConfigOptions { get; set; }
 
         /// <summary>
         /// Initial mode state if supported by the Agent
@@ -1854,7 +1855,7 @@ namespace dotacp.protocol
         /// HTTP headers to set when making requests to the MCP server.
         /// </summary>
         [JsonProperty("headers")]
-        public List<HttpHeader> Headers { get; set; } = null!;
+        public HttpHeader[] Headers { get; set; } = null!;
 
         /// <summary>
         /// Human-readable name identifying this MCP server.
@@ -1888,7 +1889,7 @@ namespace dotacp.protocol
         /// HTTP headers to set when making requests to the MCP server.
         /// </summary>
         [JsonProperty("headers")]
-        public List<HttpHeader> Headers { get; set; } = null!;
+        public HttpHeader[] Headers { get; set; } = null!;
 
         /// <summary>
         /// Human-readable name identifying this MCP server.
@@ -1922,7 +1923,7 @@ namespace dotacp.protocol
         /// Command-line arguments to pass to the MCP server.
         /// </summary>
         [JsonProperty("args")]
-        public List<string> Args { get; set; } = null!;
+        public string[] Args { get; set; } = null!;
 
         /// <summary>
         /// Path to the MCP server executable.
@@ -1934,7 +1935,7 @@ namespace dotacp.protocol
         /// Environment variables to set when launching the MCP server.
         /// </summary>
         [JsonProperty("env")]
-        public List<EnvVariable> Env { get; set; } = null!;
+        public EnvVariable[] Env { get; set; } = null!;
 
         /// <summary>
         /// Human-readable name identifying this MCP server.
@@ -1970,7 +1971,7 @@ namespace dotacp.protocol
         /// List of MCP (Model Context Protocol) servers the agent should connect to.
         /// </summary>
         [JsonProperty("mcpServers")]
-        public List<McpServer> McpServers { get; set; } = null!;
+        public McpServer[] McpServers { get; set; } = null!;
     }
 
     /// <summary>
@@ -1994,7 +1995,7 @@ namespace dotacp.protocol
         /// Initial session configuration options if supported by the Agent.
         /// </summary>
         [JsonProperty("configOptions")]
-        public List<SessionConfigOption> ConfigOptions { get; set; }
+        public SessionConfigOption[] ConfigOptions { get; set; }
 
         /// <summary>
         /// Initial mode state if supported by the Agent
@@ -2078,7 +2079,7 @@ namespace dotacp.protocol
         /// with their current status. The client replaces the entire plan with each update.
         /// </summary>
         [JsonProperty("entries")]
-        public List<PlanEntry> Entries { get; set; } = null!;
+        public PlanEntry[] Entries { get; set; } = null!;
     }
 
     /// <summary>
@@ -2203,7 +2204,7 @@ namespace dotacp.protocol
         /// pieces of context from sources the agent may not have access to.
         /// </summary>
         [JsonProperty("prompt")]
-        public List<ContentBlock> Prompt { get; set; } = null!;
+        public ContentBlock[] Prompt { get; set; } = null!;
 
         /// <summary>
         /// The ID of the session to send this user message to
@@ -2396,7 +2397,7 @@ namespace dotacp.protocol
         /// Available permission options for the user to choose from.
         /// </summary>
         [JsonProperty("options")]
-        public List<PermissionOption> Options { get; set; } = null!;
+        public PermissionOption[] Options { get; set; } = null!;
 
         /// <summary>
         /// The session ID for this request.
@@ -2624,7 +2625,7 @@ namespace dotacp.protocol
         /// The set of option values in this group.
         /// </summary>
         [JsonProperty("options")]
-        public List<SessionConfigSelectOption> Options { get; set; } = null!;
+        public SessionConfigSelectOption[] Options { get; set; } = null!;
     }
 
     /// <summary>
@@ -2707,7 +2708,7 @@ namespace dotacp.protocol
         /// The set of modes that the Agent can operate in
         /// </summary>
         [JsonProperty("availableModes")]
-        public List<SessionMode> AvailableModes { get; set; } = null!;
+        public SessionMode[] AvailableModes { get; set; } = null!;
 
         /// <summary>
         /// The current mode the Agent is in.
@@ -2873,7 +2874,7 @@ namespace dotacp.protocol
         /// Replace the content collection.
         /// </summary>
         [JsonProperty("content")]
-        public List<ToolCallContent> Content { get; set; }
+        public ToolCallContent[] Content { get; set; }
 
         /// <summary>
         /// Update the tool kind.
@@ -2885,7 +2886,7 @@ namespace dotacp.protocol
         /// Replace the locations collection.
         /// </summary>
         [JsonProperty("locations")]
-        public List<ToolCallLocation> Locations { get; set; }
+        public ToolCallLocation[] Locations { get; set; }
 
         /// <summary>
         /// Update the raw input.
@@ -2971,7 +2972,7 @@ namespace dotacp.protocol
         /// The full set of configuration options and their current values.
         /// </summary>
         [JsonProperty("configOptions")]
-        public List<SessionConfigOption> ConfigOptions { get; set; } = null!;
+        public SessionConfigOption[] ConfigOptions { get; set; } = null!;
     }
 
     /// <summary>
@@ -3204,7 +3205,7 @@ namespace dotacp.protocol
         /// Content produced by the tool call.
         /// </summary>
         [JsonProperty("content")]
-        public List<ToolCallContent> Content { get; set; }
+        public ToolCallContent[] Content { get; set; }
 
         /// <summary>
         /// The category of tool being invoked.
@@ -3218,7 +3219,7 @@ namespace dotacp.protocol
         /// Enables "follow-along" features in clients.
         /// </summary>
         [JsonProperty("locations")]
-        public List<ToolCallLocation> Locations { get; set; }
+        public ToolCallLocation[] Locations { get; set; }
 
         /// <summary>
         /// Raw input parameters sent to the tool.
@@ -3331,7 +3332,7 @@ namespace dotacp.protocol
         /// Replace the content collection.
         /// </summary>
         [JsonProperty("content")]
-        public List<ToolCallContent> Content { get; set; }
+        public ToolCallContent[] Content { get; set; }
 
         /// <summary>
         /// Update the tool kind.
@@ -3343,7 +3344,7 @@ namespace dotacp.protocol
         /// Replace the locations collection.
         /// </summary>
         [JsonProperty("locations")]
-        public List<ToolCallLocation> Locations { get; set; }
+        public ToolCallLocation[] Locations { get; set; }
 
         /// <summary>
         /// Update the raw input.
