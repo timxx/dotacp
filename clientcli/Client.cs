@@ -134,9 +134,14 @@ namespace clientcli
             if (block is ResourceLink resource)
                 return $"[Resource: {resource.Name}({resource.Uri})]";
 
-            // TODO: fix EmbeddedResourceResource convert
             if (block is EmbeddedResource embeddedResource)
-                return $"[Embedded resource: ]";
+            {
+                if (embeddedResource.Resource is TextResourceContents textResource)
+                    return $"[Embedded text resource: {textResource.Text}]";
+                if (embeddedResource.Resource is BlobResourceContents blobResource)
+                    return $"[Embedded blob resource: {blobResource.Uri}]";
+                return $"[Unknown embedded resource: {embeddedResource.Resource.GetType().Name}]";
+            }
 
             if (block is AudioContent audioContent)
                 return $"[Audio: {audioContent.MimeType}]";

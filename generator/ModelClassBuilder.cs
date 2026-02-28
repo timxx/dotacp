@@ -53,6 +53,12 @@ namespace dotacp.generator
                 return GenerateDiscriminatorBaseClass();
             }
 
+            // Handle abstract base classes (anyOf with allOf refs)
+            if (discriminatorAnalyzer.AbstractBases.Contains(name))
+            {
+                return GenerateAbstractBaseClass();
+            }
+
             // Handle oneOf/anyOf at root level
             var oneOf = definition["oneOf"] as JArray;
             var anyOf = definition["anyOf"] as JArray;
@@ -515,6 +521,22 @@ namespace dotacp.generator
             return sb.ToString();
         }
 
+        private string GenerateAbstractBaseClass()
+        {
+            var className = NamingHelper.ConvertNameToClass(name);
+            var sb = new StringBuilder();
+
+            // XML documentation
+            AppendXmlDocs(sb, definition["description"]?.ToString());
+
+            // Generate abstract base class
+            sb.AppendLineLf($"public abstract class {className}");
+            sb.AppendLineLf("{");
+            sb.Append("}");
+
+            return sb.ToString();
+        }
+
         private bool IsUnionType(JArray items, out List<string> unionTypes, out bool hasNullType)
         {
             unionTypes = new List<string>();
@@ -775,7 +797,14 @@ namespace dotacp.generator
             // Determine class type
             var classDeclaration = $"public class {className}";
 
-            if (discriminatorAnalyzer.DerivedInfo.ContainsKey(name))
+            // Check if this inherits from an abstract base
+            if (discriminatorAnalyzer.ChildToAbstractBase.ContainsKey(name))
+            {
+                var baseName = discriminatorAnalyzer.ChildToAbstractBase[name];
+                var baseClassName = NamingHelper.ConvertNameToClass(baseName);
+                classDeclaration = $"public class {className} : {baseClassName}";
+            }
+            else if (discriminatorAnalyzer.DerivedInfo.ContainsKey(name))
             {
                 var derivedInfo = discriminatorAnalyzer.DerivedInfo[name];
                 var baseClassName = NamingHelper.ConvertNameToClass(derivedInfo.BaseName);

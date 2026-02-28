@@ -930,7 +930,7 @@ namespace dotacp.protocol
     /// <summary>
     /// The input specification for a command.
     /// </summary>
-    public class AvailableCommandInput
+    public abstract class AvailableCommandInput
     {
     }
 
@@ -962,8 +962,11 @@ namespace dotacp.protocol
     /// <summary>
     /// Binary resource contents.
     /// </summary>
-    public class BlobResourceContents
+    public class BlobResourceContents : EmbeddedResourceResource
     {
+        [JsonProperty("type")]
+        public override string Type => "BlobResourceContents";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1365,8 +1368,18 @@ namespace dotacp.protocol
     /// <summary>
     /// Resource content that can be embedded in a message.
     /// </summary>
-    public class EmbeddedResourceResource
+    [JsonConverter(typeof(DiscriminatorConverter<EmbeddedResourceResource>))]
+    public abstract class EmbeddedResourceResource
     {
+        internal const string DiscriminatorPropertyName = "type";
+        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            { "BlobResourceContents", typeof(BlobResourceContents) },
+            { "TextResourceContents", typeof(TextResourceContents) }
+        };
+
+        [JsonProperty("type")]
+        public abstract string Type { get; }
     }
 
     /// <summary>
@@ -1830,17 +1843,29 @@ namespace dotacp.protocol
     ///
     /// See protocol docs: [MCP Servers](https://agentclientprotocol.com/protocol/session-setup#mcp-servers)
     /// </summary>
-    public class McpServer
+    [JsonConverter(typeof(DiscriminatorConverter<McpServer>))]
+    public abstract class McpServer
     {
+        internal const string DiscriminatorPropertyName = "type";
+        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            { "http", typeof(McpServerHttp) },
+            { "sse", typeof(McpServerSse) },
+            { "stdio", typeof(McpServerStdio) }
+        };
+
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public abstract string Type { get; }
     }
 
     /// <summary>
     /// HTTP transport configuration for MCP.
     /// </summary>
-    public class McpServerHttp
+    public class McpServerHttp : McpServer
     {
+        [JsonProperty("type")]
+        public override string Type => "http";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1873,8 +1898,11 @@ namespace dotacp.protocol
     /// <summary>
     /// SSE transport configuration for MCP.
     /// </summary>
-    public class McpServerSse
+    public class McpServerSse : McpServer
     {
+        [JsonProperty("type")]
+        public override string Type => "sse";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -1907,8 +1935,11 @@ namespace dotacp.protocol
     /// <summary>
     /// Stdio transport configuration for MCP.
     /// </summary>
-    public class McpServerStdio
+    public class McpServerStdio : McpServer
     {
+        [JsonProperty("type")]
+        public override string Type => "stdio";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -3156,8 +3187,11 @@ namespace dotacp.protocol
     /// <summary>
     /// Text-based resource contents.
     /// </summary>
-    public class TextResourceContents
+    public class TextResourceContents : EmbeddedResourceResource
     {
+        [JsonProperty("type")]
+        public override string Type => "TextResourceContents";
+
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -3380,7 +3414,7 @@ namespace dotacp.protocol
     /// <summary>
     /// All text that was typed after the command name is provided as input.
     /// </summary>
-    public class UnstructuredCommandInput
+    public class UnstructuredCommandInput : AvailableCommandInput
     {
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
