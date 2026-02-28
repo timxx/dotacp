@@ -48,10 +48,6 @@ CodeCoverage/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-# Generated protocol code
-protocol/Schema.cs
-protocol/Meta.cs
-
 # NUnit
 *.VisualState.xml
 TestResult.xml
