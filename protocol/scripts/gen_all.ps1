@@ -1,174 +1,77 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Regenerate schema models and meta definitions from ACP schema files.
+    Generate all code (Schema.cs and Meta.cs)
 
 .DESCRIPTION
-    This script orchestrates the code generation process:
-    1. Optionally downloads schema.json and meta.json from upstream
-    2. Generates C# models from schema.json
-    3. Generates Meta.cs with method mappings from meta.json
-    4. Applies formatting and post-processing
-
-.PARAMETER Version
-    Git ref (tag/branch) to fetch schema from. If omitted, uses cached schema files.
-    Example: "v0.10.8" or "main"
-
-.PARAMETER Repo
-    Source repository providing schema files (default: agentclientprotocol/agent-client-protocol)
-
-.PARAMETER NoDownload
-    Skip downloading schema files even when a version is provided.
-
-.PARAMETER Force
-    Force schema download even if the requested ref is already cached.
-
-.EXAMPLE
-    ./gen_all.ps1 -Version "v0.10.8"
-    Downloads and generates code for ACP schema v0.10.8
-
-.EXAMPLE
-    ./gen_all.ps1 -NoDownload
-    Generates code using existing local schema files
+    Wrapper script that calls the C# implementation to generate all code artifacts.
+    If the generator executable is not found, it will automatically build it.
 #>
 
 param(
-    [string]$Version = $env:ACP_SCHEMA_VERSION,
-    [string]$Repo = $(if ($env:ACP_SCHEMA_REPO) { $env:ACP_SCHEMA_REPO } else { "agentclientprotocol/agent-client-protocol" }),
+    [string]$SchemaDir = "",
+    [string]$OutputDir = "",
+    [string]$Version = "",
+    [string]$Repo = "agentclientprotocol/agent-client-protocol",
     [switch]$NoDownload,
     [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
 
-# ============================================================================
-# Helper Functions
-# ============================================================================
+$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$protocolRoot = Split-Path -Parent $scriptRoot
+$repoRoot = Split-Path -Parent $protocolRoot
+$generatorDir = Join-Path $repoRoot "generator"
 
-function Resolve-Ref {
-    param([string]$Version)
+# Find the generator executable (check Release first, then Debug, then root bin)
+$generatorExe = @(
+    (Join-Path (Join-Path $generatorDir "bin") "Release" "dotacp.generator.exe"),
+    (Join-Path (Join-Path $generatorDir "bin") "Debug" "dotacp.generator.exe"),
+    (Join-Path $generatorDir "bin" "dotacp.generator.exe")
+) | Where-Object { Test-Path $_ } | Select-Object -First 1
 
-    if (-not $Version) {
-        return "refs/heads/main"
-    }
-
-    if ($Version -match '^refs/') {
-        return $Version
-    }
-
-    if ($Version -match '^v?\d+\.\d+\.\d+$') {
-        if ($Version -notmatch '^v') {
-            $Version = "v$Version"
-        }
-        return "refs/tags/$Version"
-    }
-
-    return "refs/heads/$Version"
+# Use defaults if not provided
+if ([string]::IsNullOrEmpty($SchemaDir)) {
+    $SchemaDir = Join-Path $protocolRoot "schema"
+}
+if ([string]::IsNullOrEmpty($OutputDir)) {
+    $OutputDir = $protocolRoot
 }
 
-function Get-CachedRef {
-    if (Test-Path $VersionFile) {
-        return (Get-Content $VersionFile).Trim()
+# Check if executable exists, if not compile it
+if (-not $generatorExe -or -not (Test-Path $generatorExe)) {
+    Write-Host "  Generator executable not found, building project..." -ForegroundColor Yellow
+    dotnet build "$generatorDir\generator.csproj" -c Release
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to build generator"
+        exit 1
     }
-    return $null
-}
-
-function Download-Schema {
-    param(
-        [string]$Repository,
-        [string]$Ref
-    )
-
-    $baseUrl = "https://raw.githubusercontent.com/$Repository/$Ref/schema"
-    $schemaUrl = "$baseUrl/schema.json"
-    $metaUrl = "$baseUrl/meta.json"
-
-    New-Item -ItemType Directory -Path $SchemaDir -Force | Out-Null
-
-    try {
-        Write-Host "  Fetching from: $Repository@$($Ref.Replace('refs/tags/', '').Replace('refs/heads/', ''))" -ForegroundColor Gray
-
-        $schemaJson = (Invoke-WebRequest -Uri $schemaUrl -ErrorAction Stop).Content
-        $metaJson = (Invoke-WebRequest -Uri $metaUrl -ErrorAction Stop).Content
-
-        [System.IO.File]::WriteAllText($SchemaJsonPath, $schemaJson, [System.Text.Encoding]::UTF8)
-        [System.IO.File]::WriteAllText($MetaJsonPath, $metaJson, [System.Text.Encoding]::UTF8)
-        [System.IO.File]::WriteAllText($VersionFile, $Ref, [System.Text.Encoding]::UTF8)
-
-        Write-Host "  [OK] Schema and meta files downloaded" -ForegroundColor Gray
-    }
-    catch {
-        Write-Error "Failed to fetch schema from $Repository@$Ref : $_" -ErrorAction Stop
+    # Find the newly built executable
+    $generatorExe = @(
+        (Join-Path (Join-Path $generatorDir "bin") "Release" "dotacp.generator.exe"),
+        (Join-Path (Join-Path $generatorDir "bin") "Debug" "dotacp.generator.exe"),
+        (Join-Path $generatorDir "bin" "dotacp.generator.exe")
+    ) | Where-Object { Test-Path $_ } | Select-Object -First 1
+    
+    if (-not $generatorExe) {
+        Write-Error "Generator executable not found after build"
+        exit 1
     }
 }
 
-# ============================================================================
-# Main Script
-# ============================================================================
+# Build command arguments
+$args = @("all", "--schema-dir", $SchemaDir, "--output-dir", $OutputDir, "--repo", $Repo)
 
-# Setup paths
-$ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ProtocolDir = Split-Path -Parent $ScriptRoot
-$RepoRoot = Split-Path -Parent $ProtocolDir
-$SchemaDir = Join-Path $ProtocolDir "schema"
-$SchemaJsonPath = Join-Path $SchemaDir "schema.json"
-$MetaJsonPath = Join-Path $SchemaDir "meta.json"
-$VersionFile = Join-Path $SchemaDir "VERSION"
-
-Write-Host "[*] ACP Code Generation" -ForegroundColor Cyan
-Write-Host "Repository root: $RepoRoot" -ForegroundColor Gray
-Write-Host "Schema directory: $SchemaDir" -ForegroundColor Gray
-
-# Determine if we should download schema
-$shouldDownload = $false
-
+if (-not [string]::IsNullOrEmpty($Version)) {
+    $args += @("--version", $Version)
+}
 if ($NoDownload) {
-    $shouldDownload = $false
-} elseif ($Version) {
-    if ((Test-Path $SchemaJsonPath) -and (Test-Path $MetaJsonPath) -and -not $Force) {
-        $cachedRef = Get-CachedRef
-        $targetRef = Resolve-Ref $Version
-        if ($cachedRef -eq $targetRef) {
-            $shouldDownload = $false
-        } else {
-            $shouldDownload = $true
-        }
-    } else {
-        $shouldDownload = $true
-    }
-} else {
-    $shouldDownload = (Test-Path $SchemaJsonPath) -and (Test-Path $MetaJsonPath)
+    $args += "--no-download"
+}
+if ($Force) {
+    $args += "--force"
 }
 
-# Download schema files if needed
-if ($shouldDownload) {
-    Write-Host "[Download] Downloading schema files..." -ForegroundColor Blue
-    $ref = Resolve-Ref $Version
-    Download-Schema $Repo $ref
-} else {
-    Write-Host "[Cached] Using existing schema files" -ForegroundColor Blue
-}
-
-# Validate schema files exist
-if (-not (Test-Path $SchemaJsonPath)) {
-    Write-Error "schema/schema.json not found. Run with -Version to download." -ErrorAction Stop
-}
-if (-not (Test-Path $MetaJsonPath)) {
-    Write-Error "schema/meta.json not found. Run with -Version to download." -ErrorAction Stop
-}
-
-# Generate schema models
-Write-Host "[Generate] Generating C# models from schema..." -ForegroundColor Blue
-& (Join-Path $ScriptRoot "gen_schema.ps1")
-
-# Generate meta definitions
-Write-Host "[Generate] Generating meta definitions..." -ForegroundColor Blue
-& (Join-Path $ScriptRoot "gen_meta.ps1")
-
-Write-Host "[DONE] Code generation completed successfully!" -ForegroundColor Green
-
-if ($shouldDownload) {
-    $ref = Get-CachedRef
-    Write-Host "Generated using ref: $ref" -ForegroundColor Gray
-}
-
+# Call the C# generator
+& $generatorExe @args
