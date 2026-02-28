@@ -1,65 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5CE469AB-8A05-489C-8BE7-FECDE89C55B6}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>dotacp.protocol</RootNamespace>
-    <AssemblyName>dotacp.protocol</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="JsonEnumMemberConverter.cs" />
-    <Compile Include="JsonEnumValueAttribute.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeAliasConverter.cs" />
-    <Compile Include="Schema.cs" />
-    <Compile Include="Meta.cs" />
-    <Compile Include="UnionTypeConverter.cs" />
+    <Folder Include="scripts\" />
+    <Folder Include="schema\" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="schema\meta.json" />
-    <None Include="schema\schema.json" />
-    <None Include="schema\VERSION" />
-    <None Include="scripts\gen_all.ps1" />
-    <None Include="scripts\gen_meta.ps1" />
-    <None Include="scripts\gen_schema.ps1" />
-    <None Include="scripts\gen_schema.Tests.ps1" />
-    <None Include="scripts\README.md" />
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
+
   <PropertyGroup>
     <SchemaHashFile>$(ProjectDir)obj\$(Configuration)\schema.hash</SchemaHashFile>
+    <AssemblyName>dotacp.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>dotacp.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
-  <Target Name="GenerateProtocolCode" BeforeTargets="BeforeBuild">
+
+  <ItemGroup>
+    <_GeneratedProtocolFiles Include="$(ProjectDir)Schema.cs" />
+    <_GeneratedProtocolFiles Include="$(ProjectDir)Meta.cs" />
+  </ItemGroup>
+
+  <Target Name="GenerateProtocolCode" BeforeTargets="CoreCompile" Inputs="schema\schema.json;schema\meta.json" Outputs="Schema.cs;Meta.cs">
     <ItemGroup>
-      <_SchemaFiles Include="schema\schema.json" />
-      <_SchemaFiles Include="schema\meta.json" />
-      <_SchemaFiles Include="schema\VERSION" />
-      <_GeneratedFiles Include="Schema.cs" />
-      <_GeneratedFiles Include="Meta.cs" />
+      <_SchemaFiles Include="$(ProjectDir)schema\schema.json" />
+      <_SchemaFiles Include="$(ProjectDir)schema\meta.json" />
+      <_SchemaFiles Include="$(ProjectDir)schema\VERSION" />
     </ItemGroup>
     <GetFileHash Files="@(_SchemaFiles)" Algorithm="SHA256">
       <Output TaskParameter="Items" ItemName="_SchemaFileHashes" />
@@ -77,16 +46,23 @@
       <_NeedGen Condition="'$(_ExistingSchemaHash)' != '$(_SchemaHash)'">true</_NeedGen>
     </PropertyGroup>
     <ItemGroup>
-      <_MissingGeneratedFiles Include="@(_GeneratedFiles)" Condition="!Exists('%(Identity)')" />
+      <_MissingGeneratedFiles Include="@(_GeneratedProtocolFiles)" Condition="!Exists('%(Identity)')" />
     </ItemGroup>
     <PropertyGroup>
       <_NeedGen Condition="'@(_MissingGeneratedFiles)' != ''">true</_NeedGen>
     </PropertyGroup>
+    <Message Condition="'$(_NeedGen)' == 'true'" Text="Generating protocol code from schema files..." Importance="high" />
     <Exec Condition="'$(_NeedGen)' == 'true'" WorkingDirectory="$(ProjectDir)" Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(ProjectDir)scripts\gen_all.ps1&quot; -NoDownload" />
     <WriteLinesToFile Condition="'$(_NeedGen)' == 'true'" File="$(SchemaHashFile)" Lines="$(_SchemaHash)" Overwrite="true" />
     <ItemGroup>
       <FileWrites Include="$(SchemaHashFile)" Condition="Exists('$(SchemaHashFile)')" />
+      <FileWrites Include="@(_GeneratedProtocolFiles)" Condition="Exists('%(Identity)')" />
     </ItemGroup>
   </Target>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="CleanGeneratedProtocolCode" BeforeTargets="CoreClean">
+    <Delete Files="@(_GeneratedProtocolFiles)" />
+    <Delete Files="$(SchemaHashFile)" />
+  </Target>
+
 </Project>

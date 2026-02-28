@@ -80,7 +80,7 @@ namespace clientcli
             return v;
         }
 
-        static Process CreateAgent(string program, string args)
+        static Process? CreateAgent(string program, string args)
         {
             var process = Process.Start(new ProcessStartInfo(program, args)
             {

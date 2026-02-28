@@ -61,3 +61,4 @@ nunit-*.xml
 .cache
 compile_commands.json
 *.user
+launchSettings.json
