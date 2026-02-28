@@ -27,7 +27,9 @@ namespace dotacp.client
         {
             _client = client;
 
-            _rpc = new JsonRpc(inputStream, outputStream);
+            var handler = new NewLineDelimitedMessageHandler(
+                inputStream, outputStream, new JsonMessageFormatter());
+            _rpc = new JsonRpc(handler);
             if (traceSource != null)
                 _rpc.TraceSource = traceSource;
 
