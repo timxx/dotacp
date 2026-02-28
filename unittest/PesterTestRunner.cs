@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace dotacp.unittest
@@ -29,11 +30,11 @@ namespace dotacp.unittest
         {
             // Get the solution root directory
             string solutionRoot = GetSolutionRoot();
-            string testPath = System.IO.Path.Combine(solutionRoot, "protocol", "scripts", "gen_schema.Tests.ps1");
+            string testPath = Path.Combine(solutionRoot, "protocol", "scripts", "gen_schema.Tests.ps1");
 
-            if (!System.IO.File.Exists(testPath))
+            if (!File.Exists(testPath))
             {
-                throw new System.IO.FileNotFoundException($"Pester test file not found at {testPath}");
+                throw new FileNotFoundException($"Pester test file not found at {testPath}");
             }
 
             return testPath;
@@ -42,17 +43,17 @@ namespace dotacp.unittest
         private string GetSolutionRoot()
         {
             // Start from current directory and walk up to find .sln file
-            string currentDir = System.IO.Directory.GetCurrentDirectory();
+            string? currentDir = Directory.GetCurrentDirectory();
 
             while (currentDir != null)
             {
-                string[] slnFiles = System.IO.Directory.GetFiles(currentDir, "*.sln");
+                string[] slnFiles = Directory.GetFiles(currentDir, "*.sln");
                 if (slnFiles.Length > 0)
                 {
                     return currentDir;
                 }
 
-                currentDir = System.IO.Directory.GetParent(currentDir)?.FullName;
+                currentDir = Directory.GetParent(currentDir)?.FullName;
             }
 
             throw new InvalidOperationException("Could not find solution root (.sln file)");
@@ -110,7 +111,7 @@ try {{
         private class PesterResult
         {
             public bool AllTestsPassed { get; set; }
-            public string Output { get; set; }
+            public string? Output { get; set; }
         }
     }
 }

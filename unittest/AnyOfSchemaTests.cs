@@ -43,8 +43,8 @@ namespace dotacp.unittest
 
             // Assert
             // Integer enums serialize as numbers, not strings
-            Assert.IsTrue(json.Contains("-32600"), $"Should serialize as integer value, got: {json}");
-            Assert.IsTrue(json.Contains("Test error"));
+            Assert.Contains("-32600", json, $"Should serialize as integer value, got: {json}");
+            Assert.Contains("Test error", json);
         }
 
         [TestMethod]
@@ -82,22 +82,6 @@ namespace dotacp.unittest
 #region SessionConfigOptionCategory String Enum Tests
 
         [TestMethod]
-        public void SessionConfigOptionCategory_CanAssignValues()
-        {
-            // Arrange & Act
-            SessionConfigOptionCategory mode = SessionConfigOptionCategory.Mode;
-            SessionConfigOptionCategory model = SessionConfigOptionCategory.Model;
-            SessionConfigOptionCategory thoughtLevel = SessionConfigOptionCategory.ThoughtLevel;
-            SessionConfigOptionCategory other = SessionConfigOptionCategory.Other;
-
-            // Assert
-            Assert.IsNotNull(mode);
-            Assert.IsNotNull(model);
-            Assert.IsNotNull(thoughtLevel);
-            Assert.IsNotNull(other);
-        }
-
-        [TestMethod]
         public void SessionConfigOptionCategory_SerializesToCorrectJsonValues()
         {
             // Arrange
@@ -115,8 +99,7 @@ namespace dotacp.unittest
             for (int i = 0; i < categories.Length; i++)
             {
                 string json = JsonSerializer.Serialize(categories[i]);
-                Assert.IsTrue(json.Contains(expectedValues[i]),
-                    $"Expected {expectedValues[i]} but got {json}");
+                Assert.Contains(expectedValues[i], json, $"Expected {expectedValues[i]} but got {json}");
             }
         }
 
@@ -201,7 +184,7 @@ namespace dotacp.unittest
             string json = JsonSerializer.Serialize(request);
 
             // Assert
-            Assert.IsTrue(json.Contains("\"id\":42"), $"Expected id:42 but got {json}");
+            Assert.Contains("\"id\":42", json, $"Expected id:42 but got {json}");
         }
 
         [TestMethod]
@@ -218,8 +201,8 @@ namespace dotacp.unittest
             string json = JsonSerializer.Serialize(request);
 
             // Assert
-            Assert.IsTrue(json.Contains("\"id\":\"request-123\""),
-                $"Expected id:\"request-123\" but got {json}");
+            Assert.Contains("\"id\":\"request-123\"",
+                json, $"Expected id:\"request-123\" but got {json}");
         }
 
         [TestMethod]
@@ -236,8 +219,8 @@ namespace dotacp.unittest
             string json = JsonSerializer.Serialize(request);
 
             // Assert
-            Assert.IsTrue(json.Contains("\"id\":null"),
-                $"Expected id:null but got {json}");
+            Assert.Contains("\"id\":null",
+                json, $"Expected id:null but got {json}");
         }
 
         [TestMethod]

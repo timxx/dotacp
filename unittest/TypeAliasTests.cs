@@ -227,10 +227,10 @@ namespace dotacp.unittest
             };
 
             var json = JsonSerializer.Serialize(request);
-            Assert.IsTrue(json.Contains("\"sessionId\":\"test-session-456\""),
-                "SessionId should serialize as string in JSON");
+            Assert.Contains("\"sessionId\":\"test-session-456\"", json, "SessionId should serialize as string in JSON");
 
             var deserialized = JsonSerializer.Deserialize<PromptRequest>(json);
+            Assert.IsNotNull(deserialized);
             string deserializedId = deserialized.SessionId;
             Assert.AreEqual("test-session-456", (string)sessionId);
         }
