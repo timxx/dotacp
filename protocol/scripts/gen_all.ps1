@@ -26,9 +26,8 @@ $generatorDir = Join-Path $repoRoot "generator"
 
 # Find the generator executable (check Release first, then Debug, then root bin)
 $generatorExe = @(
-    (Join-Path (Join-Path $generatorDir "bin") "Release" "dotacp.generator.exe"),
-    (Join-Path (Join-Path $generatorDir "bin") "Debug" "dotacp.generator.exe"),
-    (Join-Path $generatorDir "bin" "dotacp.generator.exe")
+    (Join-Path (Join-Path $generatorDir "bin") "Release" "net472" "dotacp.generator.exe"),
+    (Join-Path (Join-Path $generatorDir "bin") "Debug" "net472" "dotacp.generator.exe")
 ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 
 # Use defaults if not provided
@@ -49,9 +48,8 @@ if (-not $generatorExe -or -not (Test-Path $generatorExe)) {
     }
     # Find the newly built executable
     $generatorExe = @(
-        (Join-Path (Join-Path $generatorDir "bin") "Release" "dotacp.generator.exe"),
-        (Join-Path (Join-Path $generatorDir "bin") "Debug" "dotacp.generator.exe"),
-        (Join-Path $generatorDir "bin" "dotacp.generator.exe")
+        (Join-Path (Join-Path $generatorDir "bin") "Release" "net472" "dotacp.generator.exe"),
+        (Join-Path (Join-Path $generatorDir "bin") "Debug" "net472" "dotacp.generator.exe")
     ) | Where-Object { Test-Path $_ } | Select-Object -First 1
     
     if (-not $generatorExe) {

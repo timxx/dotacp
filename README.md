@@ -240,7 +240,7 @@ The protocol types are generated from the official ACP schema. To update:
 
 ```bash
 # Run the generator
-pwsh protocol\scripts\gen_all.ps1 -no-download
+pwsh protocol\scripts\gen_all.ps1
 ```
 
 ## References
