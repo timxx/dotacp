@@ -87,18 +87,21 @@ namespace dotacp.generator
             return await rootCommand.Parse(args).InvokeAsync();
         }
 
-        static string GetDefaultSchemaDir()
+        static string GetDefaultRepoRoot()
         {
             var generatorDir = Path.GetDirectoryName(typeof(Program).Assembly.Location)!;
-            var repoRoot = Path.GetFullPath(Path.Combine(generatorDir, "..", ".."));
-            return Path.Combine(repoRoot, "protocol", "schema");
+            var repoRoot = Path.GetFullPath(Path.Combine(generatorDir, "..", "..", ".."));
+            return repoRoot;
+        }
+
+        static string GetDefaultSchemaDir()
+        {
+            return Path.Combine(GetDefaultRepoRoot(), "protocol", "schema");
         }
 
         static string GetDefaultOutputDir()
         {
-            var generatorDir = Path.GetDirectoryName(typeof(Program).Assembly.Location)!;
-            var repoRoot = Path.GetFullPath(Path.Combine(generatorDir, "..", ".."));
-            return Path.Combine(repoRoot, "protocol");
+            return Path.Combine(GetDefaultRepoRoot(), "protocol");
         }
 
         static int GenerateSchema(string schemaDir, string outputDir)
