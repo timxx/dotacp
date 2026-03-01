@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "*"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build_and_test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDKs
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore dotacp.sln
+
+      - name: Build (includes modern TFMs for client/protocol)
+        run: dotnet build dotacp.sln -c Release --no-restore /p:EnableCiTargetFrameworks=true
+
+      - name: Test
+        run: dotnet test unittest/unittest.csproj -c Release --no-build
+
+  detect_version:
+    runs-on: ubuntu-latest
+    outputs:
+      has_tag: ${{ steps.meta.outputs.has_tag }}
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version/tag for current commit
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --tags --force
+
+          TAG=""
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG="$(git tag --points-at "${GITHUB_SHA}" | head -n 1 || true)"
+          fi
+
+          if [[ -n "${TAG}" ]]; then
+            VERSION="${TAG#v}"
+            HAS_TAG="true"
+          else
+            VERSION="$(date -u +%Y.%m.%d)"
+            HAS_TAG="false"
+          fi
+
+          echo "has_tag=${HAS_TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+  publish_nuget:
+    runs-on: windows-latest
+    needs:
+      - build_and_test
+      - detect_version
+    if: ${{ needs.detect_version.outputs.has_tag == 'true' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDKs
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore dotacp.sln
+
+      - name: Pack client
+        run: dotnet pack client/client.csproj -c Release --no-restore -o artifacts /p:EnableCiTargetFrameworks=true /p:PackageVersion=${{ needs.detect_version.outputs.version }}
+
+      - name: Pack protocol
+        run: dotnet pack protocol/protocol.csproj -c Release --no-restore -o artifacts /p:EnableCiTargetFrameworks=true /p:PackageVersion=${{ needs.detect_version.outputs.version }}
+
+      - name: Publish to NuGet
+        run: dotnet nuget push "artifacts/*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key "${{ secrets.NUGET_API_KEY }}" --skip-duplicate

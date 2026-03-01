@@ -243,6 +243,27 @@ The protocol types are generated from the official ACP schema. To update:
 pwsh protocol\scripts\gen_all.ps1
 ```
 
+### Local CI-Style Build
+
+For testing the CI build locally (with modern target frameworks), use the helper script:
+
+```bash
+# Build and test with modern TFMs enabled (default)
+pwsh ./scripts/build-ci.ps1
+
+# Debug build variant
+pwsh ./scripts/build-ci.ps1 -Configuration Debug
+
+# Disable modern TFMs (local dev mode)
+pwsh ./scripts/build-ci.ps1 -EnableModernTargetFrameworks:$false
+```
+
+### Target Frameworks
+
+- **Local/VS2019 default**: `netstandard2.0;net472` (unchanged, no new SDK required)
+- **CI builds**: Adds `net10.0;net9.0;net8.0` for `client` and `protocol` only
+- **Activation**: Set `/p:EnableCiTargetFrameworks=true` in MSBuild or use the script above
+
 ## References
 
 - [Agent Client Protocol Official Documentation](https://agentclientprotocol.com/)
