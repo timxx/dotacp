@@ -28,7 +28,7 @@ jobs:
             10.0.x
 
       - name: Restore
-        run: dotnet restore dotacp.sln
+        run: dotnet restore dotacp.sln /p:EnableCiTargetFrameworks=true
 
       - name: Build (includes modern TFMs for client/protocol)
         run: dotnet build dotacp.sln -c Release --no-restore /p:EnableCiTargetFrameworks=true
@@ -80,7 +80,7 @@ jobs:
     needs:
       - build_and_test
       - detect_version
-    if: ${{ needs.detect_version.outputs.has_tag == 'true' }}
+    if: ${{ github.ref_type == 'tag' }}
 
     steps:
       - name: Checkout
@@ -95,7 +95,7 @@ jobs:
             10.0.x
 
       - name: Restore
-        run: dotnet restore dotacp.sln
+        run: dotnet restore dotacp.sln /p:EnableCiTargetFrameworks=true
 
       - name: Pack client
         run: dotnet pack client/client.csproj -c Release --no-restore -o artifacts /p:EnableCiTargetFrameworks=true /p:PackageVersion=${{ needs.detect_version.outputs.version }}
