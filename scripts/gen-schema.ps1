@@ -20,8 +20,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$protocolRoot = Split-Path -Parent $scriptRoot
-$repoRoot = Split-Path -Parent $protocolRoot
+$repoRoot = Split-Path -Parent $scriptRoot
+$protocolRoot = Join-Path $repoRoot "protocol"
 $generatorDir = Join-Path $repoRoot "generator"
 
 # Find the generator executable (check Release first, then Debug, then root bin)

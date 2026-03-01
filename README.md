@@ -239,8 +239,11 @@ dotnet pack -c Release
 The protocol types are generated from the official ACP schema. To update:
 
 ```bash
-# Run the generator
-pwsh protocol\scripts\gen_all.ps1
+# Generate from current schema
+pwsh ./scripts/gen-schema.ps1
+
+# Update to latest schema
+pwsh ./scripts/gen-schema.ps1 -Version main -Force
 ```
 
 ### Local CI-Style Build
