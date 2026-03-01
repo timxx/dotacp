@@ -1,5 +1,12 @@
 <Project>
   <PropertyGroup>
     <LangVersion>8.0</LangVersion>
+
+    <Description>Agent Client Protocol .NET SDK.</Description>
+    <PackageTags>acp;agentclientprotocol</PackageTags>
+    <RepositoryUrl>https://github.com/timxx/dotacp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 </Project>

@@ -6,6 +6,7 @@
     <AssemblyName>dotacp.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>dotacp.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <Nullable>enable</Nullable>
+    <PackageId>dotacp.client</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\protocol\protocol.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="README.md" />
   </ItemGroup>
 
 </Project>

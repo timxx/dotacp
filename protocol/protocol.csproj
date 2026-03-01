@@ -17,6 +17,11 @@
     <SchemaHashFile>$(ProjectDir)obj\$(Configuration)\schema.hash</SchemaHashFile>
     <AssemblyName>dotacp.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>dotacp.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <PackageId>dotacp.protocol</PackageId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
 
 </Project>
