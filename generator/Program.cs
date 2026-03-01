@@ -13,42 +13,78 @@ namespace dotacp.generator
             var rootCommand = new RootCommand("ACP Protocol Code Generator");
 
             // Common options
-            var schemaDirOption = new Option<string>("--schema-dir", GetDefaultSchemaDir, "Path to schema directory");
-            var outputDirOption = new Option<string>("--output-dir", GetDefaultOutputDir, "Path to output directory");
+            var schemaDirOption = new Option<string>("--schema-dir")
+            {
+                Description = "Path to schema directory",
+                DefaultValueFactory = _ => GetDefaultSchemaDir()
+            };
+            var outputDirOption = new Option<string>("--output-dir")
+            {
+                Description = "Path to output directory",
+                DefaultValueFactory = _ => GetDefaultOutputDir()
+            };
 
             var schemaCommand = new Command("schema", "Generate C# models from schema.json");
-            schemaCommand.AddOption(schemaDirOption);
-            schemaCommand.AddOption(outputDirOption);
-            schemaCommand.SetHandler((string schemaDir, string outputDir) => GenerateSchema(schemaDir, outputDir), 
-                schemaDirOption, outputDirOption);
+            schemaCommand.Options.Add(schemaDirOption);
+            schemaCommand.Options.Add(outputDirOption);
+            schemaCommand.SetAction(parseResult =>
+            {
+                var schemaDir = parseResult.GetValue(schemaDirOption);
+                var outputDir = parseResult.GetValue(outputDirOption);
+                return GenerateSchema(schemaDir, outputDir);
+            });
 
             var metaCommand = new Command("meta", "Generate Meta.cs from meta.json");
-            metaCommand.AddOption(schemaDirOption);
-            metaCommand.AddOption(outputDirOption);
-            metaCommand.SetHandler((string schemaDir, string outputDir) => GenerateMeta(schemaDir, outputDir),
-                schemaDirOption, outputDirOption);
+            metaCommand.Options.Add(schemaDirOption);
+            metaCommand.Options.Add(outputDirOption);
+            metaCommand.SetAction(parseResult =>
+            {
+                var schemaDir = parseResult.GetValue(schemaDirOption);
+                var outputDir = parseResult.GetValue(outputDirOption);
+                return GenerateMeta(schemaDir, outputDir);
+            });
 
             var allCommand = new Command("all", "Generate all code (schema + meta)");
-            var versionOption = new Option<string>("--version", "Git ref (tag/branch) to fetch schema from");
-            var repoOption = new Option<string>("--repo", () => "agentclientprotocol/agent-client-protocol", "Source repository");
-            var noDownloadOption = new Option<bool>("--no-download", "Skip downloading schema files");
-            var forceOption = new Option<bool>("--force", "Force schema download");
+            var versionOption = new Option<string>("--version")
+            {
+                Description = "Git ref (tag/branch) to fetch schema from"
+            };
+            var repoOption = new Option<string>("--repo")
+            {
+                Description = "Source repository",
+                DefaultValueFactory = _ => "agentclientprotocol/agent-client-protocol"
+            };
+            var noDownloadOption = new Option<bool>("--no-download")
+            {
+                Description = "Skip downloading schema files"
+            };
+            var forceOption = new Option<bool>("--force")
+            {
+                Description = "Force schema download"
+            };
             
-            allCommand.AddOption(versionOption);
-            allCommand.AddOption(repoOption);
-            allCommand.AddOption(noDownloadOption);
-            allCommand.AddOption(forceOption);
-            allCommand.AddOption(schemaDirOption);
-            allCommand.AddOption(outputDirOption);
-            allCommand.SetHandler((string version, string repo, bool noDownload, bool force, string schemaDir, string outputDir) => 
-                GenerateAll(version, repo, noDownload, force, schemaDir, outputDir), 
-                versionOption, repoOption, noDownloadOption, forceOption, schemaDirOption, outputDirOption);
+            allCommand.Options.Add(versionOption);
+            allCommand.Options.Add(repoOption);
+            allCommand.Options.Add(noDownloadOption);
+            allCommand.Options.Add(forceOption);
+            allCommand.Options.Add(schemaDirOption);
+            allCommand.Options.Add(outputDirOption);
+            allCommand.SetAction(parseResult =>
+            {
+                var version = parseResult.GetValue(versionOption);
+                var repo = parseResult.GetValue(repoOption);
+                var noDownload = parseResult.GetValue(noDownloadOption);
+                var force = parseResult.GetValue(forceOption);
+                var schemaDir = parseResult.GetValue(schemaDirOption);
+                var outputDir = parseResult.GetValue(outputDirOption);
+                return GenerateAll(version, repo, noDownload, force, schemaDir, outputDir);
+            });
 
-            rootCommand.AddCommand(schemaCommand);
-            rootCommand.AddCommand(metaCommand);
-            rootCommand.AddCommand(allCommand);
+            rootCommand.Subcommands.Add(schemaCommand);
+            rootCommand.Subcommands.Add(metaCommand);
+            rootCommand.Subcommands.Add(allCommand);
 
-            return await rootCommand.InvokeAsync(args);
+            return await rootCommand.Parse(args).InvokeAsync();
         }
 
         static string GetDefaultSchemaDir()

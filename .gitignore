@@ -58,3 +58,4 @@ nunit-*.xml
 compile_commands.json
 *.user
 launchSettings.json
+.vscode
