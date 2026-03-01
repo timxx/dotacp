@@ -7,45 +7,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  detect_version:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.meta.outputs.version }}
-      tag: ${{ steps.meta.outputs.tag }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Determine version/tag for current commit
-        id: meta
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch --tags --force
-
-          TAG=""
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            TAG="${GITHUB_REF#refs/tags/}"
-          else
-            TAG="$(git tag --points-at "${GITHUB_SHA}" | head -n 1 || true)"
-          fi
-
-          if [[ -n "${TAG}" ]]; then
-            VERSION="${TAG#v}"
-          else
-            VERSION="$(date -u +%Y.%m.%d)"
-          fi
-
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-
   publish_nuget:
     runs-on: windows-latest
-    needs: detect_version
     if: ${{ github.ref_type == 'tag' }}
+    env:
+      PACKAGE_VERSION: ${{ github.ref_name }}
 
     steps:
       - name: Checkout
@@ -62,11 +28,20 @@ jobs:
       - name: Restore
         run: dotnet restore dotacp.sln /p:EnableCiTargetFrameworks=true
 
-      - name: Pack client
-        run: dotnet pack client/client.csproj -c Release --no-restore -o artifacts /p:EnableCiTargetFrameworks=true /p:PackageVersion=${{ needs.detect_version.outputs.version }}
+      - name: Pack projects
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = $env:PACKAGE_VERSION.TrimStart('v')
+          $projects = @(
+            "client/client.csproj",
+            "protocol/protocol.csproj"
+          )
 
-      - name: Pack protocol
-        run: dotnet pack protocol/protocol.csproj -c Release --no-restore -o artifacts /p:EnableCiTargetFrameworks=true /p:PackageVersion=${{ needs.detect_version.outputs.version }}
+          foreach ($project in $projects) {
+            dotnet pack $project -c Release --no-restore -o artifacts /p:EnableCiTargetFrameworks=true /p:PackageVersion=$version
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
 
       - name: Publish to NuGet
-        run: dotnet nuget push "artifacts/*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key "${{ secrets.NUGET_API_KEY }}" --skip-duplicate
+        run: dotnet nuget push artifacts\*.nupkg --source "https://api.nuget.org/v3/index.json" --api-key "${{ secrets.NUGET_API_KEY }}" --skip-duplicate
