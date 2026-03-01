@@ -1,7 +1,7 @@
 # dotacp - Agent Client Protocol .NET SDK
 
 [![GitHub](https://img.shields.io/badge/github-timxx/dotacp-blue)](https://github.com/timxx/dotacp)
-[![License](https://img.shields.io/badge/license-MIT-green)](#license)
+[![License](https://img.shields.io/badge/license-Apache-green)](#license)
 [![Build Status](https://github.com/timxx/dotacp/actions/workflows/build.yml/badge.svg)](https://github.com/timxx/dotacp/actions/workflows/build.yml)
 [![Unit Testing](https://github.com/timxx/dotacp/actions/workflows/test.yml/badge.svg)](https://github.com/timxx/dotacp/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/timxx/dotacp/branch/main/graph/badge.svg)](https://codecov.io/gh/timxx/dotacp)
@@ -282,7 +282,7 @@ pwsh ./scripts/build-ci.ps1 -EnableModernTargetFrameworks:$false
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License. See [LICENSE](LICENSE) file for details.
 
 ## Support
 
