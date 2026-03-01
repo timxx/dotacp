@@ -31,5 +31,12 @@ jobs:
       - name: Build
         run: dotnet build dotacp.sln -c Release --no-restore /p:EnableCiTargetFrameworks=false
 
-      - name: Test
-        run: dotnet test unittest/unittest.csproj -c Release --no-build
+      - name: Test with Coverage
+        run: dotnet test unittest/unittest.csproj -c Release --no-build --collect:"XPlat Code Coverage" --results-directory TestResults
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./TestResults
+          fail_ci_if_error: false
