@@ -122,5 +122,92 @@ namespace dotacp.unittest
             Assert.IsFalse(TypeMapper.IsReferenceType("int"), "int should be a value type");
             Assert.IsFalse(TypeMapper.IsReferenceType("bool"), "bool should be a value type");
         }
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesJTokenValues()
+        {
+            var jValue = new Newtonsoft.Json.Linq.JValue(true);
+            var result = TypeMapper.ConvertDefaultValue(jValue, "bool");
+            Assert.AreEqual("true", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesLongIntegerConversion()
+        {
+            long longValue = 100L;
+            var result = TypeMapper.ConvertDefaultValue(longValue, "int");
+            Assert.AreEqual("100", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesStringNumberConversion()
+        {
+            var result = TypeMapper.ConvertDefaultValue("42", "int");
+            Assert.AreEqual("42", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_CreatesNewDictionary()
+        {
+            var result = TypeMapper.ConvertDefaultValue("dummy", "Dictionary<string, int>");
+            Assert.AreEqual("new Dictionary<string, int>()", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesComplexDictionaryTypes()
+        {
+            var result = TypeMapper.ConvertDefaultValue("val", "Dictionary<string, object>");
+            Assert.AreEqual("new Dictionary<string, object>()", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesIntArrayCreation()
+        {
+            var result = TypeMapper.ConvertDefaultValue("dummy", "int[]");
+            Assert.AreEqual("new int[0]", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesObjectArrayCreation()
+        {
+            var result = TypeMapper.ConvertDefaultValue("val", "object[]");
+            Assert.AreEqual("new object[0]", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesDoubleWithGFormat()
+        {
+            double value = 1.23456789;
+            var result = TypeMapper.ConvertDefaultValue(value, "double");
+            Assert.IsNotNull(result);
+            Assert.IsTrue(double.TryParse(result, out _), "Result should be parseable as double");
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesBoolStringParsing()
+        {
+            var result = TypeMapper.ConvertDefaultValue("true", "bool");
+            Assert.AreEqual("true", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesBoolFalseParsing()
+        {
+            var result = TypeMapper.ConvertDefaultValue("false", "bool?");
+            Assert.AreEqual("false", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesStringType()
+        {
+            var result = TypeMapper.ConvertDefaultValue("hello", "string");
+            Assert.AreEqual("\"hello\"", result);
+        }
+
+        [TestMethod]
+        public void ConvertDefaultValue_HandlesEmptyString()
+        {
+            var result = TypeMapper.ConvertDefaultValue("", "string");
+            Assert.AreEqual("\"\"", result);
+        }
     }
 }

@@ -74,5 +74,40 @@ namespace dotacp.unittest
             Assert.IsTrue(string.Equals(name1, name2, System.StringComparison.OrdinalIgnoreCase), "OrdinalIgnoreCase comparison should be equal");
             Assert.IsFalse(string.Equals(name1, name2, System.StringComparison.Ordinal), "Ordinal comparison should be different");
         }
+        [TestMethod]
+        [DataRow("hello_world", "HelloWorld")]
+        [DataRow("type_alias", "TypeAlias")]
+        [DataRow("simple", "Simple")]
+        [DataRow("", "")]
+        public void ConvertToPascalCase_ConvertsToPascalCase(string input, string expected)
+        {
+            var result = NamingHelper.ConvertToPascalCase(input);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void GetDiscriminatorPropertyInfo_ReturnsNormalNameWhenNotConflicting()
+        {
+            var (csName, jsonName) = NamingHelper.GetDiscriminatorPropertyInfo("ContentBlock", "type");
+            Assert.AreEqual("Type", csName);
+            Assert.AreEqual("type", jsonName);
+        }
+
+        [TestMethod]
+        public void GetDiscriminatorPropertyInfo_AddsSuffixWhenNameConflicts()
+        {
+            var (csName, jsonName) = NamingHelper.GetDiscriminatorPropertyInfo("Content", "content");
+            Assert.AreEqual("ContentValue", csName);
+            Assert.AreEqual("content", jsonName);
+        }
+
+        [TestMethod]
+        public void GetDiscriminatorPropertyInfo_HandlesCaseSensitivityInConflictDetection()
+        {
+            // "Type" from "type" vs class name "Type" should trigger suffix
+            var (csName, jsonName) = NamingHelper.GetDiscriminatorPropertyInfo("Type", "type");
+            Assert.AreEqual("TypeValue", csName);
+            Assert.AreEqual("type", jsonName);
+        }
     }
 }
