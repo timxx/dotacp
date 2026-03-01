@@ -1,9 +1,9 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json.Linq;
 
 namespace dotacp.generator
 {
@@ -45,9 +45,9 @@ namespace dotacp.generator
             sb.AppendLineLf();
 
             // Generate using statements
+            sb.AppendLineLf("using Newtonsoft.Json;");
             sb.AppendLineLf("using System;");
             sb.AppendLineLf("using System.Collections.Generic;");
-            sb.AppendLineLf("using Newtonsoft.Json;");
             sb.AppendLineLf();
 
             // Start namespace
@@ -125,10 +125,10 @@ namespace dotacp.generator
         private string GenerateModelClass(string name, JObject definition)
         {
             var modelBuilder = new ModelClassBuilder(
-                name, 
-                definition, 
-                definitions, 
-                typeResolver!, 
+                name,
+                definition,
+                definitions,
+                typeResolver!,
                 discriminatorAnalyzer!
             );
 

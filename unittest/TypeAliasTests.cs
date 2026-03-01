@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using dotacp.protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using dotacp.protocol;
+using Newtonsoft.Json;
+using System;
 
 namespace dotacp.unittest
 {
@@ -12,7 +11,7 @@ namespace dotacp.unittest
     [TestClass]
     public class TypeAliasTests
     {
-#region SessionId Tests (string alias)
+        #region SessionId Tests (string alias)
 
         [TestMethod]
         public void SessionId_IsStructNotClass()
@@ -98,9 +97,9 @@ namespace dotacp.unittest
             Assert.AreEqual("test-session-id", sessionId.ToString());
         }
 
-#endregion
+        #endregion
 
-#region ProtocolVersion Tests (ushort alias)
+        #region ProtocolVersion Tests (ushort alias)
 
         [TestMethod]
         public void ProtocolVersion_IsStructNotClass()
@@ -157,9 +156,9 @@ namespace dotacp.unittest
             Assert.AreEqual(v1.GetHashCode(), v2.GetHashCode());
         }
 
-#endregion
+        #endregion
 
-#region All String Type Aliases Tests
+        #region All String Type Aliases Tests
 
         [TestMethod]
 
@@ -213,9 +212,9 @@ namespace dotacp.unittest
             }
         }
 
-#endregion
+        #endregion
 
-#region Integration Tests
+        #region Integration Tests
         [TestMethod]
         public void TypeAliasInComplexObject_WorksWithPromptRequest()
         {
@@ -235,6 +234,6 @@ namespace dotacp.unittest
             Assert.AreEqual("test-session-456", (string)sessionId);
         }
 
-#endregion
+        #endregion
     }
 }

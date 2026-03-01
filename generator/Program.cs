@@ -62,7 +62,7 @@ namespace dotacp.generator
             {
                 Description = "Force schema download"
             };
-            
+
             allCommand.Options.Add(versionOption);
             allCommand.Options.Add(repoOption);
             allCommand.Options.Add(noDownloadOption);

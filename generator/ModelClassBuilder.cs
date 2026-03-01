@@ -1,8 +1,8 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json.Linq;
 
 namespace dotacp.generator
 {
@@ -270,7 +270,7 @@ namespace dotacp.generator
             sb.AppendLineLf("    internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)");
             sb.AppendLineLf("    {");
 
-            var mappingLines = baseInfo.Mapping.OrderBy(kv => kv.Key).Select(kv => 
+            var mappingLines = baseInfo.Mapping.OrderBy(kv => kv.Key).Select(kv =>
                 $"        {{ \"{kv.Key}\", typeof({kv.Value}) }}");
             sb.Append(string.Join(",\n", mappingLines));
             sb.AppendLineLf();
@@ -822,7 +822,7 @@ namespace dotacp.generator
             var properties = new List<string>();
 
             // Add discriminator override if needed
-            if (discriminatorAnalyzer.DerivedInfo.ContainsKey(name) && 
+            if (discriminatorAnalyzer.DerivedInfo.ContainsKey(name) &&
                 !discriminatorAnalyzer.DerivedInfo[name].IsAbstract)
             {
                 var derivedInfo = discriminatorAnalyzer.DerivedInfo[name];

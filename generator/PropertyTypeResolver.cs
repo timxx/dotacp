@@ -1,5 +1,5 @@
-using System.Linq;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace dotacp.generator
 {
@@ -55,7 +55,7 @@ namespace dotacp.generator
                     var typeArray = typeToken as JArray;
                     isNullable = typeArray!.Any(t => t.ToString() == "null");
                     var nonNullTypes = typeArray.Where(t => t.ToString() != "null").ToList();
-                    
+
                     // Handle array type in type array (e.g., ["array", "null"])
                     if (nonNullTypes.Count > 0 && nonNullTypes[0].ToString() == "array")
                     {
@@ -65,7 +65,7 @@ namespace dotacp.generator
                         // For nullable array, don't add ? since arrays are reference types
                         return result;
                     }
-                    
+
                     if (nonNullTypes.Count == 1)
                     {
                         typeString = nonNullTypes[0].ToString();

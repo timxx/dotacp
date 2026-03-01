@@ -22,7 +22,7 @@ namespace dotacp.generator
 
             var parts = name.Split('_');
             var sb = new StringBuilder();
-            
+
             foreach (var part in parts)
             {
                 if (part.Length > 0)

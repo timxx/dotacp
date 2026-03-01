@@ -1,7 +1,7 @@
+using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json.Linq;
 
 namespace dotacp.generator
 {
@@ -22,7 +22,7 @@ namespace dotacp.generator
 
             // Generate header
             sb.AppendLineLf("// Generated from schema/meta.json. Do not edit by hand.");
-            
+
             if (File.Exists(versionFilePath))
             {
                 var gitRef = File.ReadAllText(versionFilePath).Trim();

@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using dotacp.protocol;
+﻿using dotacp.protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace dotacp.unittest
 {
@@ -12,7 +11,7 @@ namespace dotacp.unittest
     [TestClass]
     public class AnyOfSchemaTests
     {
-#region ErrorCode Enum Tests
+        #region ErrorCode Enum Tests
 
         [TestMethod]
         public void ErrorCode_IntegerEnum_CanAssignValues()
@@ -77,9 +76,9 @@ namespace dotacp.unittest
             Assert.AreEqual(errorValue, backToInt);
         }
 
-#endregion
+        #endregion
 
-#region SessionConfigOptionCategory String Enum Tests
+        #region SessionConfigOptionCategory String Enum Tests
 
         [TestMethod]
         public void SessionConfigOptionCategory_SerializesToCorrectJsonValues()
@@ -116,9 +115,9 @@ namespace dotacp.unittest
             Assert.AreEqual(SessionConfigOptionCategory.ThoughtLevel, category);
         }
 
-#endregion
+        #endregion
 
-#region RequestId Union Type Tests
+        #region RequestId Union Type Tests
 
         [TestMethod]
         public void RequestId_CanHoldLongValue()
@@ -314,9 +313,9 @@ namespace dotacp.unittest
             Assert.AreEqual(string.Empty, nullId.ToString());
         }
 
-#endregion
+        #endregion
 
-#region Integration Tests
+        #region Integration Tests
 
         [TestMethod]
         public void Error_WithErrorCodeEnum_RoundTripSerialization()
@@ -377,6 +376,6 @@ namespace dotacp.unittest
             }
         }
 
-#endregion
+        #endregion
     }
 }

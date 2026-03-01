@@ -1,5 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using dotacp.generator;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace dotacp.unittest
 {

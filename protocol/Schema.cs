@@ -1,9 +1,9 @@
 // Generated from schema/schema.json. Do not edit by hand.
 // Schema ref: refs/tags/v0.10.8
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace dotacp.protocol
 {
