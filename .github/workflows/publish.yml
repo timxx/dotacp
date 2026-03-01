@@ -1,45 +1,15 @@
-name: CI
+name: Publish
 
 on:
   push:
-    branches:
-      - "**"
     tags:
       - "*"
-  pull_request:
   workflow_dispatch:
 
 jobs:
-  build_and_test:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup .NET SDKs
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            8.0.x
-            9.0.x
-            10.0.x
-
-      - name: Restore
-        run: dotnet restore dotacp.sln /p:EnableCiTargetFrameworks=true
-
-      - name: Build (includes modern TFMs for client/protocol)
-        run: dotnet build dotacp.sln -c Release --no-restore /p:EnableCiTargetFrameworks=true
-
-      - name: Test
-        run: dotnet test unittest/unittest.csproj -c Release --no-build
-
   detect_version:
     runs-on: ubuntu-latest
     outputs:
-      has_tag: ${{ steps.meta.outputs.has_tag }}
       version: ${{ steps.meta.outputs.version }}
       tag: ${{ steps.meta.outputs.tag }}
 
@@ -65,21 +35,16 @@ jobs:
 
           if [[ -n "${TAG}" ]]; then
             VERSION="${TAG#v}"
-            HAS_TAG="true"
           else
             VERSION="$(date -u +%Y.%m.%d)"
-            HAS_TAG="false"
           fi
 
-          echo "has_tag=${HAS_TAG}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
   publish_nuget:
     runs-on: windows-latest
-    needs:
-      - build_and_test
-      - detect_version
+    needs: detect_version
     if: ${{ github.ref_type == 'tag' }}
 
     steps:

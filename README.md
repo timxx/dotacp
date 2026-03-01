@@ -2,8 +2,9 @@
 
 [![GitHub](https://img.shields.io/badge/github-timxx/dotacp-blue)](https://github.com/timxx/dotacp)
 [![License](https://img.shields.io/badge/license-MIT-green)](#license)
-[![Build Status](https://github.com/timxx/dotacp/actions/workflows/ci.yml/badge.svg)](https://github.com/timxx/dotacp/actions)
-[![Unit Testing](https://github.com/timxx/dotacp/actions/workflows/ci.yml/badge.svg)](https://github.com/timxx/dotacp/actions)
+[![Build Status](https://github.com/timxx/dotacp/actions/workflows/build.yml/badge.svg)](https://github.com/timxx/dotacp/actions/workflows/build.yml)
+[![Unit Testing](https://github.com/timxx/dotacp/actions/workflows/test.yml/badge.svg)](https://github.com/timxx/dotacp/actions/workflows/test.yml)
+[![NuGet](https://img.shields.io/nuget/v/dotacp.protocol.svg)](https://www.nuget.org/packages/dotacp.protocol)
 
 A comprehensive .NET implementation of the [Agent Client Protocol (ACP)](https://agentclientprotocol.com/), enabling seamless communication between code editors/IDEs and AI coding agents.
 
