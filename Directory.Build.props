@@ -1,9 +1,5 @@
 <Project>
   <PropertyGroup>
-    <OutputPath>$(SolutionDir)bin\$(Configuration)\$(TargetFramework)\</OutputPath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\$(TargetFramework)\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 </Project>

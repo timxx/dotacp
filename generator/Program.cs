@@ -90,7 +90,7 @@ namespace dotacp.generator
         static string GetDefaultRepoRoot()
         {
             var generatorDir = Path.GetDirectoryName(typeof(Program).Assembly.Location)!;
-            var repoRoot = Path.GetFullPath(Path.Combine(generatorDir, "..", "..", ".."));
+            var repoRoot = Path.GetFullPath(Path.Combine(generatorDir, "..", "..", "..", ".."));
             return repoRoot;
         }
 
