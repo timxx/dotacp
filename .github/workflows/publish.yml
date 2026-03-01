@@ -36,6 +36,7 @@ jobs:
           $projects = @(
             "client/client.csproj",
             "protocol/protocol.csproj"
+            "agent/agent.csproj"
           )
 
           foreach ($project in $projects) {

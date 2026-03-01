@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clientcli", "clientcli\clie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "generator", "generator\generator.csproj", "{E8A3C9D1-5B2F-4E7A-9C8D-1F2E3A4B5C6D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "agent", "agent\agent.csproj", "{1C473A51-8703-442C-9FA5-DCBC1F1A3E49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E8A3C9D1-5B2F-4E7A-9C8D-1F2E3A4B5C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8A3C9D1-5B2F-4E7A-9C8D-1F2E3A4B5C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E8A3C9D1-5B2F-4E7A-9C8D-1F2E3A4B5C6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C473A51-8703-442C-9FA5-DCBC1F1A3E49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C473A51-8703-442C-9FA5-DCBC1F1A3E49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C473A51-8703-442C-9FA5-DCBC1F1A3E49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C473A51-8703-442C-9FA5-DCBC1F1A3E49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

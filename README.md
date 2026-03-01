@@ -46,6 +46,8 @@ This repository contains a complete .NET SDK implementation with the following c
   - Demonstrates how to use the SDK to build an ACP client
   - Reference implementation for developers
 
+- **`agent/`** - Agent library for implementing ACP agents
+
 - **`unittest/`** - Comprehensive test suite
   - Protocol conformance tests
   - Integration tests
