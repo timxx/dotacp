@@ -12,7 +12,7 @@ if ($EnableModernTargetFrameworks) {
 }
 
 Write-Host "Restoring solution..."
-dotnet restore "dotacp.sln"
+dotnet restore "dotacp.sln" $props
 
 Write-Host "Building solution..."
 dotnet build "dotacp.sln" -c $Configuration --no-restore $props
