@@ -61,6 +61,14 @@ namespace clientcli
             {
                 Console.WriteLine($"User message: {ContentBlockText(userMessage.Content)}");
             }
+            else if (update is UsageUpdate usage)
+            {
+                Console.WriteLine($"Context: {usage.Size} | Used: {usage.Used}");
+            }
+            else if (update is SessionInfoUpdate sessionInfo)
+            {
+                Console.WriteLine($"Session info: Title - {sessionInfo.Title}");
+            }
             else
             {
                 Console.WriteLine($"Unhandled session update type: {update.GetType().Name}");
