@@ -208,5 +208,47 @@ namespace dotacp.unittest
             // Should return object for ambiguous cases
             Assert.AreEqual("object", result);
         }
+
+        [TestMethod]
+        public void GetPropertyType_ReturnsDictionaryForMetaProperty()
+        {
+            var resolver = CreateResolver();
+            var property = JObject.Parse(@"{ 'type': ['object', 'null'], 'additionalProperties': true }");
+
+            var result = resolver.GetPropertyType(property, "_meta");
+            Assert.AreEqual("Dictionary<string, object>", result);
+        }
+
+        [TestMethod]
+        public void GetPropertyType_ReturnsDictionaryForMetaPropertyRegardlessOfDefinition()
+        {
+            var resolver = CreateResolver();
+            // Even with different property definitions, _meta should always return Dictionary
+            var property = JObject.Parse(@"{ 'type': 'string' }");
+
+            var result = resolver.GetPropertyType(property, "_meta");
+            Assert.AreEqual("Dictionary<string, object>", result);
+        }
+
+        [TestMethod]
+        public void GetPropertyType_DoesNotReturnDictionaryForOtherProperties()
+        {
+            var resolver = CreateResolver();
+            var property = JObject.Parse(@"{ 'type': ['object', 'null'], 'additionalProperties': true }");
+
+            // Without _meta property name, should not return Dictionary
+            var result = resolver.GetPropertyType(property);
+            Assert.AreEqual("object", result);
+        }
+
+        [TestMethod]
+        public void GetPropertyType_MetaPropertyWithNullableType()
+        {
+            var resolver = CreateResolver();
+            var property = JObject.Parse(@"{ 'type': ['object', 'null'] }");
+
+            var result = resolver.GetPropertyType(property, "_meta");
+            Assert.AreEqual("Dictionary<string, object>", result);
+        }
     }
 }
