@@ -1,0 +1,153 @@
+﻿using dotacp.agent;
+using dotacp.protocol;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace agentcli
+{
+    internal class Agent : IAcpAgent
+    {
+        private Dictionary<string, Session> _sessions = new Dictionary<string, Session>();
+        private Connection? _connection;
+
+        public void OnClientConnected(Connection connection)
+        {
+            _connection = connection;
+        }
+
+        public Task<InitializeResponse> InitializeAsync(InitializeRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new InitializeResponse()
+            {
+                ProtocolVersion = ProtocolMeta.Version,
+                AgentInfo = new Implementation()
+                {
+                    Name = "agentcli",
+                    Version = "0.1.0",
+                    Title = "Simple ACP Agent Demo",
+                },
+                AgentCapabilities = new AgentCapabilities()
+                {
+                    LoadSession = false,
+                },
+            });
+        }
+
+        public Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new AuthenticateResponse());
+        }
+
+        public Task<NewSessionResponse> NewSessionAsync(NewSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var sessionId = Guid.NewGuid().ToString();
+            var session = new Session { SessionId = sessionId, Cwd = request.Cwd };
+            _sessions[sessionId] = session;
+
+            return Task.FromResult(new NewSessionResponse()
+            {
+                SessionId = sessionId,
+            });
+        }
+
+        public Task<LoadSessionResponse> LoadSessionAsync(LoadSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new LoadSessionResponse());
+        }
+
+        public async Task<PromptResponse> PromptAsync(PromptRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_sessions.TryGetValue(request.SessionId, out var session))
+            {
+                throw new InvalidOperationException($"Session {request.SessionId} not found.");
+            }
+
+            foreach (var block in request.Prompt)
+            {
+                if (!(block is TextContent))
+                {
+                    Console.WriteLine($"Received unsupported content block of type {block.Type}");
+                    continue;
+                }
+
+                await _connection!.SessionUpdateAsync(new SessionNotification()
+                {
+                    SessionId = request.SessionId,
+                    Update = new SessionUpdateAgentMessageChunk()
+                    {
+                        Content = new TextContent()
+                        {
+                            Text = $"Received: {(block as TextContent)!.Text}"
+                        },
+                    },
+                }, cancellationToken);
+            }
+
+            var response = new PromptResponse()
+            {
+                StopReason = StopReason.EndTurn,
+            };
+
+            return response;
+        }
+
+        public Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(
+            SetSessionConfigOptionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_sessions.TryGetValue(request.SessionId, out var session))
+            {
+                throw new InvalidOperationException($"Session {request.SessionId} not found.");
+            }
+
+            return Task.FromResult(new SetSessionConfigOptionResponse());
+        }
+
+        public Task<SetSessionModeResponse> SetSessionModeAsync(SetSessionModeRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_sessions.TryGetValue(request.SessionId, out var session))
+            {
+                throw new InvalidOperationException($"Session {request.SessionId} not found.");
+            }
+
+            return Task.FromResult(new SetSessionModeResponse());
+        }
+
+        public Task CancelAsync(CancelNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            Console.WriteLine($"Cancel operation received for session {notification.SessionId}");
+            return Task.CompletedTask;
+        }
+
+        public Task<object> ExtMethodAsync(string method, object request,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<object>(new Dictionary<string, string>()
+            {
+                {"example", "response" }
+            });
+        }
+
+        public Task ExtNotificationAsync(string method, object notification,
+            CancellationToken cancellationToken = default)
+        {
+            Console.WriteLine($"Extended notification '{method}' received.");
+            return Task.CompletedTask;
+        }
+
+        private class Session
+        {
+            public string SessionId { get; set; } = null!;
+            public string Cwd { get; set; } = null!;
+        }
+    }
+}

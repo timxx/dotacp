@@ -6,6 +6,8 @@ namespace dotacp.agent
 {
     public interface IAcpAgent
     {
+        void OnClientConnected(Connection connection);
+
         Task<InitializeResponse> InitializeAsync(InitializeRequest request,
             CancellationToken cancellationToken = default);
 

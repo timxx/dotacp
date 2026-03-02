@@ -75,12 +75,15 @@ namespace clientcli
             // FIXME: models is in unstable schema
             // Console.WriteLine("Available models:");
 
-            Console.WriteLine("Available modes:");
-            foreach (var mode in session.Modes.AvailableModes)
+            if (session.Modes != null)
             {
-                Console.WriteLine($"  {mode.Id}: {mode.Name} - {mode.Description}");
+                Console.WriteLine("Available modes:");
+                foreach (var mode in session.Modes.AvailableModes)
+                {
+                    Console.WriteLine($"  {mode.Id}: {mode.Name} - {mode.Description}");
+                }
+                Console.WriteLine($"Current mode: {session.Modes.CurrentModeId}");
             }
-            Console.WriteLine($"Current mode: {session.Modes.CurrentModeId}");
 
             while (true)
             {

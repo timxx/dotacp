@@ -1,0 +1,81 @@
+using dotacp.protocol;
+using StreamJsonRpc;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace dotacp.agent
+{
+    internal sealed class AgentRpcTarget
+    {
+        private readonly IAcpAgent _agent;
+
+        public AgentRpcTarget(IAcpAgent agent)
+        {
+            _agent = agent;
+        }
+
+        [JsonRpcMethod(AgentMethods.Initialize, UseSingleObjectParameterDeserialization = true)]
+        public Task<InitializeResponse> InitializeAsync(
+            InitializeRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.InitializeAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.Authenticate, UseSingleObjectParameterDeserialization = true)]
+        public Task<AuthenticateResponse> AuthenticateAsync(
+            AuthenticateRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.AuthenticateAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.SessionNew, UseSingleObjectParameterDeserialization = true)]
+        public Task<NewSessionResponse> NewSessionAsync(
+            NewSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.NewSessionAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.SessionLoad, UseSingleObjectParameterDeserialization = true)]
+        public Task<LoadSessionResponse> LoadSessionAsync(
+            LoadSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.LoadSessionAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.SessionPrompt, UseSingleObjectParameterDeserialization = true)]
+        public Task<PromptResponse> PromptAsync(
+            PromptRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.PromptAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.SessionSetConfigOption, UseSingleObjectParameterDeserialization = true)]
+        public Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(
+            SetSessionConfigOptionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.SetSessionConfigOptionAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.SessionSetMode, UseSingleObjectParameterDeserialization = true)]
+        public Task<SetSessionModeResponse> SetSessionModeAsync(
+            SetSessionModeRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.SetSessionModeAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.SessionCancel, UseSingleObjectParameterDeserialization = true)]
+        public Task CancelAsync(
+            CancelNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.CancelAsync(notification, cancellationToken);
+        }
+    }
+}
