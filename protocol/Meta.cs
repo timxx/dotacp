@@ -24,11 +24,15 @@ namespace dotacp.protocol
         public const string Authenticate = "authenticate";
         public const string Initialize = "initialize";
         public const string SessionCancel = "session/cancel";
+        public const string SessionFork = "session/fork";
+        public const string SessionList = "session/list";
         public const string SessionLoad = "session/load";
         public const string SessionNew = "session/new";
         public const string SessionPrompt = "session/prompt";
+        public const string SessionResume = "session/resume";
         public const string SessionSetConfigOption = "session/set_config_option";
         public const string SessionSetMode = "session/set_mode";
+        public const string SessionSetModel = "session/set_model";
     }
 
     /// <summary>

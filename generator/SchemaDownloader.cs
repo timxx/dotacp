@@ -64,8 +64,8 @@ namespace dotacp.generator
             Console.WriteLine($"  Fetching from: {repository}@{refDisplay}");
 
             var baseUrl = $"https://raw.githubusercontent.com/{repository}/{gitRef}/schema";
-            var schemaUrl = $"{baseUrl}/schema.json";
-            var metaUrl = $"{baseUrl}/meta.json";
+            var schemaUrl = $"{baseUrl}/schema.unstable.json";
+            var metaUrl = $"{baseUrl}/meta.unstable.json";
 
             try
             {
