@@ -738,7 +738,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Whether the agent supports `session/load`.
@@ -816,7 +816,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("audience")]
         public Role[] Audience { get; set; }
@@ -844,7 +844,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
@@ -871,7 +871,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the authentication method to use.
@@ -894,7 +894,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -910,7 +910,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Optional description providing more details about this authentication method.
@@ -944,7 +944,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Human-readable description of what the command does.
@@ -988,7 +988,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Commands the agent can execute
@@ -1013,7 +1013,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("blob")]
         public string Blob { get; set; } = null!;
@@ -1040,7 +1040,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the session to cancel operations for.
@@ -1068,7 +1068,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the request to cancel.
@@ -1095,7 +1095,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// File system capabilities supported by the client.
@@ -1168,7 +1168,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The full set of configuration options and their current values.
@@ -1193,7 +1193,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The actual content block.
@@ -1248,7 +1248,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// A single item of content
@@ -1292,7 +1292,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Array of command arguments.
@@ -1351,7 +1351,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The unique identifier for the created terminal.
@@ -1378,7 +1378,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the current mode
@@ -1407,7 +1407,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The new content after modification.
@@ -1444,7 +1444,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
@@ -1483,7 +1483,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The name of the environment variable.
@@ -1579,7 +1579,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Whether the Client supports `fs/read_text_file` requests.
@@ -1616,7 +1616,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The working directory for this session.
@@ -1654,7 +1654,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Initial session configuration options if supported by the Agent.
@@ -1700,7 +1700,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The name of the HTTP header.
@@ -1731,7 +1731,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
@@ -1761,7 +1761,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Intended for programmatic or logical use, but can be used as a display
@@ -1804,7 +1804,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Capabilities supported by the client.
@@ -1844,7 +1844,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Capabilities supported by the agent.
@@ -1889,7 +1889,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The session ID for this request.
@@ -1917,7 +1917,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -1939,7 +1939,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Opaque cursor token from a previous response's nextCursor field for cursor-based pagination
@@ -1971,7 +1971,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Opaque cursor token. If present, pass this in the next request's cursor parameter
@@ -2004,7 +2004,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The working directory for this session.
@@ -2038,7 +2038,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Initial session configuration options if supported by the Agent.
@@ -2078,7 +2078,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Agent supports [`McpServer::Http`].
@@ -2132,7 +2132,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// HTTP headers to set when making requests to the MCP server.
@@ -2169,7 +2169,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// HTTP headers to set when making requests to the MCP server.
@@ -2206,7 +2206,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Command-line arguments to pass to the MCP server.
@@ -2250,7 +2250,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Optional description of the model.
@@ -2286,7 +2286,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The working directory for this session. Must be an absolute path.
@@ -2316,7 +2316,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Initial session configuration options if supported by the Agent.
@@ -2364,7 +2364,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Hint about the nature of this permission option.
@@ -2407,7 +2407,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The list of tasks to be accomplished.
@@ -2436,7 +2436,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Human-readable description of what this task aims to accomplish.
@@ -2482,7 +2482,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Agent supports [`ContentBlock::Audio`].
@@ -2523,7 +2523,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The blocks of content that compose the user's message.
@@ -2565,7 +2565,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Indicates why the agent stopped processing the turn.
@@ -2599,7 +2599,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Maximum number of lines to read.
@@ -2639,7 +2639,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("content")]
         public string Content { get; set; } = null!;
@@ -2658,7 +2658,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The session ID for this request.
@@ -2686,7 +2686,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -2738,7 +2738,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Available permission options for the user to choose from.
@@ -2772,7 +2772,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The user's decision on the permission request.
@@ -2797,7 +2797,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
@@ -2843,7 +2843,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The working directory for this session.
@@ -2881,7 +2881,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Initial session configuration options if supported by the Agent.
@@ -2924,7 +2924,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the option the user selected.
@@ -2954,7 +2954,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// **UNSTABLE**
@@ -3010,7 +3010,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Optional semantic category for this option (UX only).
@@ -3071,7 +3071,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Unique identifier for this group.
@@ -3105,7 +3105,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Optional description for this option value.
@@ -3145,7 +3145,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -3165,7 +3165,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The working directory for this session. Must be an absolute path.
@@ -3211,7 +3211,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Human-readable title for the session. Set to null to clear.
@@ -3243,7 +3243,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -3261,7 +3261,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("description")]
         public string Description { get; set; }
@@ -3290,7 +3290,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The set of models that the Agent can use
@@ -3318,7 +3318,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The set of modes that the Agent can operate in
@@ -3350,7 +3350,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the session this update pertains to.
@@ -3384,7 +3384,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -3433,7 +3433,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// A single item of content
@@ -3458,7 +3458,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// A single item of content
@@ -3483,7 +3483,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// A single item of content
@@ -3508,7 +3508,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Replace the content collection.
@@ -3572,7 +3572,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the configuration option to set.
@@ -3606,7 +3606,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The full set of configuration options and their current values.
@@ -3632,7 +3632,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the model to set.
@@ -3664,7 +3664,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -3680,7 +3680,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The ID of the mode to set.
@@ -3701,7 +3701,7 @@ namespace dotacp.protocol
     public class SetSessionModeResponse
     {
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -3724,7 +3724,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("terminalId")]
         public string TerminalId { get; set; } = null!;
@@ -3743,7 +3743,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The process exit code (may be null if terminated by signal).
@@ -3771,7 +3771,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The session ID for this request.
@@ -3799,7 +3799,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Exit status if the command has completed.
@@ -3836,7 +3836,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
@@ -3861,7 +3861,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         [JsonProperty("mimeType")]
         public string MimeType { get; set; }
@@ -3894,7 +3894,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Content produced by the tool call.
@@ -3988,7 +3988,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Optional line number within the file.
@@ -4021,7 +4021,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Replace the content collection.
@@ -4085,7 +4085,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// A hint to display when the input hasn't been provided yet
@@ -4160,7 +4160,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Cumulative session cost (optional).
@@ -4194,7 +4194,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The session ID for this request.
@@ -4222,7 +4222,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The process exit code (may be null if terminated by signal).
@@ -4252,7 +4252,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// The text content to write to the file.
@@ -4286,7 +4286,7 @@ namespace dotacp.protocol
         /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
         /// </summary>
         [JsonProperty("_meta")]
-        public object Meta { get; set; }
+        public Dictionary<string, object> Meta { get; set; }
     }
 
 }

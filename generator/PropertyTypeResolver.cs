@@ -18,8 +18,14 @@ namespace dotacp.generator
         /// <summary>
         /// Get C# type for a JSON schema property
         /// </summary>
-        public string GetPropertyType(JObject property)
+        public string GetPropertyType(JObject property, string propName = null)
         {
+            // Special case: _meta property is always a dictionary
+            if (propName == "_meta")
+            {
+                return "Dictionary<string, object>";
+            }
+
             // Handle $ref first
             var refValue = property["$ref"]?.ToString();
             if (!string.IsNullOrEmpty(refValue))

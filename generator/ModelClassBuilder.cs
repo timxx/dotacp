@@ -880,7 +880,7 @@ namespace dotacp.generator
                 if (prop == null)
                     continue;
 
-                var csType = typeResolver.GetPropertyType(prop);
+                var csType = typeResolver.GetPropertyType(prop, propName);
                 var csPropName = NamingHelper.ConvertPropertyName(propName);
                 var propIsRequired = requiredProps.Contains(propName);
                 var needsJsonPropertyName = false;
