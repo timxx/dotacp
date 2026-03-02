@@ -1,4 +1,7 @@
-﻿using dotacp.protocol;
+// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
+// Schema ref: refs/tags/v0.10.8
+
+using dotacp.protocol;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,93 +13,84 @@ namespace dotacp.client
     public interface IAcpClient
     {
         /// <summary>
-        /// Handles the protocol <c>session/request_permission</c> request.
+        /// Handles the protocol <c>fs/read_text_file</c> request.
         /// </summary>
-        /// <param name="request">The permission request.</param>
+        /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The permission response.</returns>
-        Task<RequestPermissionResponse> RequestPermissionAsync(
-            RequestPermissionRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>session/update</c> notification.
-        /// </summary>
-        /// <param name="notification">The session update notification payload.</param>
-        /// <param name="cancellationToken">A token that cancels notification handling.</param>
-        /// <returns>A task that completes when handling is finished.</returns>
-        Task SessionUpdateAsync(
-            SessionNotification notification,
+        /// <returns>The response.</returns>
+        Task<ReadTextFileResponse> ReadTextFileAsync(ReadTextFileRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Handles the protocol <c>fs/write_text_file</c> request.
         /// </summary>
-        /// <param name="request">The write-text-file request.</param>
+        /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The write operation response.</returns>
-        Task<WriteTextFileResponse> WriteTextFileAsync(
-            WriteTextFileRequest request,
+        /// <returns>The response.</returns>
+        Task<WriteTextFileResponse> WriteTextFileAsync(WriteTextFileRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Handles the protocol <c>fs/read_text_file</c> request.
+        /// Handles the protocol <c>session/request_permission</c> request.
         /// </summary>
-        /// <param name="request">The read-text-file request.</param>
+        /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The read operation response.</returns>
-        Task<ReadTextFileResponse> ReadTextFileAsync(
-            ReadTextFileRequest request,
+        /// <returns>The response.</returns>
+        Task<RequestPermissionResponse> RequestPermissionAsync(RequestPermissionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/update</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task SessionUpdateAsync(SessionNotification notification,
             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Handles the protocol <c>terminal/create</c> request.
         /// </summary>
-        /// <param name="request">The create-terminal request.</param>
+        /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The terminal creation response.</returns>
-        Task<CreateTerminalResponse> CreateTerminalAsync(
-            CreateTerminalRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>terminal/output</c> request.
-        /// </summary>
-        /// <param name="request">The terminal output request.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The terminal output response.</returns>
-        Task<TerminalOutputRequest> TerminalOutputAsync(
-            TerminalOutputRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>terminal/release</c> request.
-        /// </summary>
-        /// <param name="request">The release-terminal request.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The terminal release response.</returns>
-        Task<ReleaseTerminalResponse> ReleaseTerminalAsync(
-            ReleaseTerminalRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>terminal/wait_for_exit</c> request.
-        /// </summary>
-        /// <param name="request">The wait-for-exit request.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The terminal exit response.</returns>
-        Task<WaitForTerminalExitResponse> WaitForTerminalExitAsync(
-            WaitForTerminalExitRequest request,
+        /// <returns>The response.</returns>
+        Task<CreateTerminalResponse> CreateTerminalAsync(CreateTerminalRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Handles the protocol <c>terminal/kill</c> request.
         /// </summary>
-        /// <param name="request">The kill-terminal request.</param>
+        /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The kill operation response.</returns>
-        Task<KillTerminalCommandResponse> KillTerminalCommandAsync(
-            KillTerminalCommandRequest request,
+        /// <returns>The response.</returns>
+        Task<KillTerminalCommandResponse> KillTerminalAsync(KillTerminalCommandRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>terminal/output</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<TerminalOutputResponse> TerminalOutputAsync(TerminalOutputRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>terminal/release</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<ReleaseTerminalResponse> ReleaseTerminalAsync(ReleaseTerminalRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>terminal/wait_for_exit</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<WaitForTerminalExitResponse> WaitForTerminalExitAsync(WaitForTerminalExitRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>

@@ -176,7 +176,7 @@ public class MyAcpClient : IAcpClient
         return new WaitForTerminalExitResponse { ExitCode = 0 };
     }
 
-    public async Task<KillTerminalCommandResponse> KillTerminalCommandAsync(
+    public async Task<KillTerminalCommandResponse> KillTerminalAsync(
         KillTerminalCommandRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -232,7 +232,7 @@ var agentProcess = Process.Start(new ProcessStartInfo
 var client = new MyAcpClient();
 
 // Connect to the agent
-var connection = Connection.ConnectToAgent(
+var connection = Connection.RunClient(
     client,
     agentProcess.StandardInput.BaseStream,
     agentProcess.StandardOutput.BaseStream);

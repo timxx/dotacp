@@ -128,6 +128,64 @@ namespace agentcli
             return Task.CompletedTask;
         }
 
+        public Task<ForkSessionResponse> ForkSessionAsync(ForkSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_sessions.TryGetValue(request.SessionId, out var session))
+            {
+                throw new InvalidOperationException($"Session {request.SessionId} not found.");
+            }
+
+            var newSessionId = Guid.NewGuid().ToString();
+            var newSession = new Session { SessionId = newSessionId, Cwd = request.Cwd };
+            _sessions[newSessionId] = newSession;
+
+            return Task.FromResult(new ForkSessionResponse()
+            {
+                SessionId = newSessionId,
+            });
+        }
+
+        public Task<ListSessionsResponse> ListSessionsAsync(ListSessionsRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var sessions = new List<SessionInfo>();
+            foreach (var session in _sessions.Values)
+            {
+                sessions.Add(new SessionInfo()
+                {
+                    SessionId = session.SessionId,
+                });
+            }
+
+            return Task.FromResult(new ListSessionsResponse()
+            {
+                Sessions = sessions.ToArray(),
+            });
+        }
+
+        public Task<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_sessions.TryGetValue(request.SessionId, out var session))
+            {
+                throw new InvalidOperationException($"Session {request.SessionId} not found.");
+            }
+
+            return Task.FromResult(new ResumeSessionResponse());
+        }
+
+        public Task<SetSessionModelResponse> SetSessionModelAsync(SetSessionModelRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_sessions.TryGetValue(request.SessionId, out var session))
+            {
+                throw new InvalidOperationException($"Session {request.SessionId} not found.");
+            }
+
+            return Task.FromResult(new SetSessionModelResponse());
+        }
+
         public Task<object> ExtMethodAsync(string method, object request,
             CancellationToken cancellationToken = default)
         {

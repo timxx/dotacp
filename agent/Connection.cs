@@ -1,4 +1,7 @@
-﻿using dotacp.protocol;
+// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
+// Schema ref: refs/tags/v0.10.8
+
+using dotacp.protocol;
 using StreamJsonRpc;
 using System.Diagnostics;
 using System.IO;
@@ -70,51 +73,11 @@ namespace dotacp.agent
         }
 
         /// <summary>
-        /// Requests permission from the client to perform an action.
+        /// Calls the client <c>fs/read_text_file</c> method.
         /// </summary>
-        /// <param name="request">The permission request payload.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The client's permission decision.</returns>
-        public Task<RequestPermissionResponse> RequestPermissionAsync(
-            RequestPermissionRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return SendRequestAsync<RequestPermissionRequest, RequestPermissionResponse>(
-                ClientMethods.SessionRequestPermission, request, cancellationToken);
-        }
-
-        /// <summary>
-        /// Sends a session update notification to the client.
-        /// </summary>
-        /// <param name="notification">The update payload to send.</param>
-        /// <param name="cancellationToken">A token that cancels the send operation before dispatch.</param>
-        /// <returns>A task that completes after the notification is queued for transport.</returns>
-        public Task SessionUpdateAsync(SessionNotification notification,
-            CancellationToken cancellationToken = default)
-        {
-            return SendNotificationAsync(ClientMethods.SessionUpdate, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Requests the client to write text to a file.
-        /// </summary>
-        /// <param name="request">The file write request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The write result returned by the client.</returns>
-        public Task<WriteTextFileResponse> WriteTextFileAsync(
-            WriteTextFileRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return SendRequestAsync<WriteTextFileRequest, WriteTextFileResponse>(
-                ClientMethods.FsWriteTextFile, request, cancellationToken);
-        }
-
-        /// <summary>
-        /// Requests the client to read text from a file.
-        /// </summary>
-        /// <param name="request">The file read request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The file content response returned by the client.</returns>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
         public Task<ReadTextFileResponse> ReadTextFileAsync(
             ReadTextFileRequest request,
             CancellationToken cancellationToken = default)
@@ -124,11 +87,52 @@ namespace dotacp.agent
         }
 
         /// <summary>
-        /// Requests the client to create a terminal.
+        /// Calls the client <c>fs/write_text_file</c> method.
         /// </summary>
-        /// <param name="request">The terminal creation request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The terminal creation response.</returns>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<WriteTextFileResponse> WriteTextFileAsync(
+            WriteTextFileRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<WriteTextFileRequest, WriteTextFileResponse>(
+                ClientMethods.FsWriteTextFile, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the client <c>session/request_permission</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<RequestPermissionResponse> RequestPermissionAsync(
+            RequestPermissionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<RequestPermissionRequest, RequestPermissionResponse>(
+                ClientMethods.SessionRequestPermission, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the client <c>session/update</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task SessionUpdateAsync(
+            SessionNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(ClientMethods.SessionUpdate, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the client <c>terminal/create</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
         public Task<CreateTerminalResponse> CreateTerminalAsync(
             CreateTerminalRequest request,
             CancellationToken cancellationToken = default)
@@ -138,25 +142,39 @@ namespace dotacp.agent
         }
 
         /// <summary>
-        /// Requests the client to return terminal output.
+        /// Calls the client <c>terminal/kill</c> method.
         /// </summary>
-        /// <param name="request">The terminal output request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The terminal output response.</returns>
-        public Task<TerminalOutputRequest> TerminalOutputAsync(
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<KillTerminalCommandResponse> KillTerminalAsync(
+            KillTerminalCommandRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<KillTerminalCommandRequest, KillTerminalCommandResponse>(
+                ClientMethods.TerminalKill, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the client <c>terminal/output</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<TerminalOutputResponse> TerminalOutputAsync(
             TerminalOutputRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<TerminalOutputRequest, TerminalOutputRequest>(
+            return SendRequestAsync<TerminalOutputRequest, TerminalOutputResponse>(
                 ClientMethods.TerminalOutput, request, cancellationToken);
         }
 
         /// <summary>
-        /// Requests the client to release a terminal.
+        /// Calls the client <c>terminal/release</c> method.
         /// </summary>
-        /// <param name="request">The terminal release request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The terminal release response.</returns>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
         public Task<ReleaseTerminalResponse> ReleaseTerminalAsync(
             ReleaseTerminalRequest request,
             CancellationToken cancellationToken = default)
@@ -166,11 +184,11 @@ namespace dotacp.agent
         }
 
         /// <summary>
-        /// Requests the client to wait for terminal exit.
+        /// Calls the client <c>terminal/wait_for_exit</c> method.
         /// </summary>
-        /// <param name="request">The wait-for-exit request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The terminal exit status response.</returns>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
         public Task<WaitForTerminalExitResponse> WaitForTerminalExitAsync(
             WaitForTerminalExitRequest request,
             CancellationToken cancellationToken = default)
@@ -180,43 +198,31 @@ namespace dotacp.agent
         }
 
         /// <summary>
-        /// Requests the client to kill a terminal command.
-        /// </summary>
-        /// <param name="request">The terminal kill request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The terminal kill response.</returns>
-        public Task<KillTerminalCommandResponse> KillTerminalCommandAsync(
-            KillTerminalCommandRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return SendRequestAsync<KillTerminalCommandRequest, KillTerminalCommandResponse>(
-                ClientMethods.TerminalKill, request, cancellationToken);
-        }
-
-        /// <summary>
-        /// Calls an extended method on the client.
+        /// Calls a client extension method.
         /// </summary>
         /// <param name="method">The extension method name.</param>
-        /// <param name="request">The request object for the extension method.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The response object returned by the client extension method.</returns>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response object.</returns>
         public Task<object> ExtMethodAsync(string method, object request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<object, object>(method, request, cancellationToken);
+            return SendRequestAsync<object, object>(
+                "_" + method, request, cancellationToken);
         }
 
         /// <summary>
-        /// Sends an extended notification to the client.
+        /// Sends a client extension notification.
         /// </summary>
         /// <param name="method">The extension notification name.</param>
         /// <param name="notification">The notification payload.</param>
-        /// <param name="cancellationToken">A token that cancels dispatch before send.</param>
-        /// <returns>A task that completes after the notification is queued for transport.</returns>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
         public Task ExtNotificationAsync(string method, object notification,
             CancellationToken cancellationToken = default)
         {
-            return SendNotificationAsync(method, notification, cancellationToken);
+            return SendNotificationAsync(
+                "_" + method, notification, cancellationToken);
         }
     }
 }

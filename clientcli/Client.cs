@@ -11,7 +11,7 @@ namespace clientcli
         public Task<RequestPermissionResponse> RequestPermissionAsync(
             RequestPermissionRequest request, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task SessionUpdateAsync(SessionNotification notification, CancellationToken cancellationToken = default)
@@ -72,55 +72,55 @@ namespace clientcli
         public Task<WriteTextFileResponse> WriteTextFileAsync(
             WriteTextFileRequest request, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task<ReadTextFileResponse> ReadTextFileAsync(
             ReadTextFileRequest request, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task<CreateTerminalResponse> CreateTerminalAsync(
             CreateTerminalRequest request, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<KillTerminalCommandResponse> KillTerminalCommandAsync(
+        public Task<KillTerminalCommandResponse> KillTerminalAsync(
             KillTerminalCommandRequest request, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task<ReleaseTerminalResponse> ReleaseTerminalAsync(
             ReleaseTerminalRequest request, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<TerminalOutputRequest> TerminalOutputAsync(
+        public Task<TerminalOutputResponse> TerminalOutputAsync(
             TerminalOutputRequest request, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task<WaitForTerminalExitResponse> WaitForTerminalExitAsync(
             WaitForTerminalExitRequest request, CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task<object> ExtMethodAsync(string method, object request,
             CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task ExtNotificationAsync(string method, object notification,
             CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private string ContentBlockText(ContentBlock block)

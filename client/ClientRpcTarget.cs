@@ -1,4 +1,7 @@
-﻿using dotacp.protocol;
+// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
+// Schema ref: refs/tags/v0.10.8
+
+using dotacp.protocol;
 using StreamJsonRpc;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,19 +17,12 @@ namespace dotacp.client
             _client = client;
         }
 
-        [JsonRpcMethod(ClientMethods.SessionRequestPermission, UseSingleObjectParameterDeserialization = true)]
-        public Task<RequestPermissionResponse> RequestPermissionAsync(
-            RequestPermissionRequest request,
+        [JsonRpcMethod(ClientMethods.FsReadTextFile, UseSingleObjectParameterDeserialization = true)]
+        public Task<ReadTextFileResponse> ReadTextFileAsync(
+            ReadTextFileRequest request,
             CancellationToken cancellationToken = default)
         {
-            return _client.RequestPermissionAsync(request, cancellationToken);
-        }
-
-        [JsonRpcMethod(ClientMethods.SessionUpdate, UseSingleObjectParameterDeserialization = true)]
-        public Task SessionUpdateAsync(SessionNotification notification,
-            CancellationToken cancellationToken = default)
-        {
-            return _client.SessionUpdateAsync(notification, cancellationToken);
+            return _client.ReadTextFileAsync(request, cancellationToken);
         }
 
         [JsonRpcMethod(ClientMethods.FsWriteTextFile, UseSingleObjectParameterDeserialization = true)]
@@ -37,12 +33,20 @@ namespace dotacp.client
             return _client.WriteTextFileAsync(request, cancellationToken);
         }
 
-        [JsonRpcMethod(ClientMethods.FsReadTextFile, UseSingleObjectParameterDeserialization = true)]
-        public Task<ReadTextFileResponse> ReadTextFileAsync(
-            ReadTextFileRequest request,
+        [JsonRpcMethod(ClientMethods.SessionRequestPermission, UseSingleObjectParameterDeserialization = true)]
+        public Task<RequestPermissionResponse> RequestPermissionAsync(
+            RequestPermissionRequest request,
             CancellationToken cancellationToken = default)
         {
-            return _client.ReadTextFileAsync(request, cancellationToken);
+            return _client.RequestPermissionAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(ClientMethods.SessionUpdate, UseSingleObjectParameterDeserialization = true)]
+        public Task SessionUpdateAsync(
+            SessionNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return _client.SessionUpdateAsync(notification, cancellationToken);
         }
 
         [JsonRpcMethod(ClientMethods.TerminalCreate, UseSingleObjectParameterDeserialization = true)]
@@ -53,8 +57,16 @@ namespace dotacp.client
             return _client.CreateTerminalAsync(request, cancellationToken);
         }
 
+        [JsonRpcMethod(ClientMethods.TerminalKill, UseSingleObjectParameterDeserialization = true)]
+        public Task<KillTerminalCommandResponse> KillTerminalAsync(
+            KillTerminalCommandRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _client.KillTerminalAsync(request, cancellationToken);
+        }
+
         [JsonRpcMethod(ClientMethods.TerminalOutput, UseSingleObjectParameterDeserialization = true)]
-        public Task<TerminalOutputRequest> TerminalOutputAsync(
+        public Task<TerminalOutputResponse> TerminalOutputAsync(
             TerminalOutputRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -75,14 +87,6 @@ namespace dotacp.client
             CancellationToken cancellationToken = default)
         {
             return _client.WaitForTerminalExitAsync(request, cancellationToken);
-        }
-
-        [JsonRpcMethod(ClientMethods.TerminalKill, UseSingleObjectParameterDeserialization = true)]
-        public Task<KillTerminalCommandResponse> KillTerminalCommandAsync(
-            KillTerminalCommandRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return _client.KillTerminalCommandAsync(request, cancellationToken);
         }
     }
 }

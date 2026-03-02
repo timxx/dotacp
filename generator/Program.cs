@@ -44,7 +44,17 @@ namespace dotacp.generator
                 return GenerateMeta(schemaDir, outputDir);
             });
 
-            var allCommand = new Command("all", "Generate all code (schema + meta)");
+            var interfacesCommand = new Command("interfaces", "Generate agent/client interfaces and connections");
+            interfacesCommand.Options.Add(schemaDirOption);
+            interfacesCommand.Options.Add(outputDirOption);
+            interfacesCommand.SetAction(parseResult =>
+            {
+                var schemaDir = parseResult.GetValue(schemaDirOption);
+                var outputDir = parseResult.GetValue(outputDirOption);
+                return GenerateInterfaces(schemaDir, outputDir);
+            });
+
+            var allCommand = new Command("all", "Generate all code (schema + meta + interfaces)");
             var versionOption = new Option<string>("--version")
             {
                 Description = "Git ref (tag/branch) to fetch schema from"
@@ -82,6 +92,7 @@ namespace dotacp.generator
 
             rootCommand.Subcommands.Add(schemaCommand);
             rootCommand.Subcommands.Add(metaCommand);
+            rootCommand.Subcommands.Add(interfacesCommand);
             rootCommand.Subcommands.Add(allCommand);
 
             return await rootCommand.Parse(args).InvokeAsync();
@@ -166,6 +177,45 @@ namespace dotacp.generator
             }
         }
 
+        static int GenerateInterfaces(string schemaDir, string outputDir)
+        {
+            try
+            {
+                var metaPath = Path.Combine(schemaDir, "meta.json");
+                var schemaPath = Path.Combine(schemaDir, "schema.json");
+                var versionPath = Path.Combine(schemaDir, "VERSION");
+
+                if (!File.Exists(metaPath))
+                {
+                    Console.Error.WriteLine($"Error: meta.json not found at {metaPath}");
+                    return 1;
+                }
+
+                if (!File.Exists(schemaPath))
+                {
+                    Console.Error.WriteLine($"Error: schema.json not found at {schemaPath}");
+                    return 1;
+                }
+
+                Console.WriteLine("  Parsing meta.json and schema.json...");
+                var repoRoot = ResolveRepoRoot(outputDir);
+                var agentDir = Path.Combine(repoRoot, "agent");
+                var clientDir = Path.Combine(repoRoot, "client");
+
+                var generator = new InterfaceGenerator();
+                generator.Generate(metaPath, schemaPath, versionPath, agentDir, clientDir);
+
+                Console.WriteLine($"  [OK] Generated interface files in agent/ and client/");
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error generating interfaces: {ex.Message}");
+                Console.Error.WriteLine(ex.StackTrace);
+                return 1;
+            }
+        }
+
         static int GenerateAll(string version, string repo, bool noDownload, bool force, string schemaDir, string outputDir)
         {
             try
@@ -198,6 +248,11 @@ namespace dotacp.generator
                 var metaResult = GenerateMeta(schemaDir, outputDir);
                 if (metaResult != 0) return metaResult;
 
+                // Generate interfaces
+                Console.WriteLine("Generating interfaces...");
+                var interfacesResult = GenerateInterfaces(schemaDir, outputDir);
+                if (interfacesResult != 0) return interfacesResult;
+
                 Console.WriteLine("Code generation complete!");
                 return 0;
             }
@@ -207,6 +262,24 @@ namespace dotacp.generator
                 Console.Error.WriteLine(ex.StackTrace);
                 return 1;
             }
+        }
+
+        private static string ResolveRepoRoot(string outputDir)
+        {
+            if (string.IsNullOrWhiteSpace(outputDir))
+                return GetDefaultRepoRoot();
+
+            var candidate = outputDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var agentPath = Path.Combine(candidate, "agent");
+            var clientPath = Path.Combine(candidate, "client");
+
+            if (Directory.Exists(agentPath) && Directory.Exists(clientPath))
+                return candidate;
+
+            if (string.Equals(Path.GetFileName(candidate), "protocol", StringComparison.OrdinalIgnoreCase))
+                return Path.GetFullPath(Path.Combine(candidate, ".."));
+
+            return candidate;
         }
 
         private static void WriteText(string text, string outputPath)

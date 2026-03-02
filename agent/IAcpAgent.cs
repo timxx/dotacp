@@ -1,4 +1,7 @@
-﻿using dotacp.protocol;
+// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
+// Schema ref: refs/tags/v0.10.8
+
+using dotacp.protocol;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,76 +19,111 @@ namespace dotacp.agent
         void OnClientConnected(Connection connection);
 
         /// <summary>
-        /// Handles the protocol <c>initialize</c> request.
-        /// </summary>
-        /// <param name="request">The client initialization request containing version and capabilities.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The initialization response with the negotiated version and agent capabilities.</returns>
-        Task<InitializeResponse> InitializeAsync(InitializeRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Handles the protocol <c>authenticate</c> request.
         /// </summary>
-        /// <param name="request">The authentication request.</param>
+        /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The authentication result.</returns>
+        /// <returns>The response.</returns>
         Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Handles the protocol <c>session/new</c> request.
+        /// Handles the protocol <c>initialize</c> request.
         /// </summary>
-        /// <param name="request">The session creation request.</param>
+        /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The new session response.</returns>
-        Task<NewSessionResponse> NewSessionAsync(NewSessionRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>session/load</c> request.
-        /// </summary>
-        /// <param name="request">The session load request.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The loaded session response.</returns>
-        Task<LoadSessionResponse> LoadSessionAsync(LoadSessionRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>session/prompt</c> request.
-        /// </summary>
-        /// <param name="request">The prompt request for an existing session.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The prompt response.</returns>
-        Task<PromptResponse> PromptAsync(PromptRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>session/set_config_option</c> request.
-        /// </summary>
-        /// <param name="request">The config option update request.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The update result.</returns>
-        Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(
-            SetSessionConfigOptionRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>session/set_mode</c> request.
-        /// </summary>
-        /// <param name="request">The session mode change request.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The mode change result.</returns>
-        Task<SetSessionModeResponse> SetSessionModeAsync(SetSessionModeRequest request,
+        /// <returns>The response.</returns>
+        Task<InitializeResponse> InitializeAsync(InitializeRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Handles the protocol <c>session/cancel</c> notification.
         /// </summary>
-        /// <param name="notification">The cancellation notification.</param>
-        /// <param name="cancellationToken">A token that cancels notification handling.</param>
-        /// <returns>A task that completes when cancellation handling is finished.</returns>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
         Task CancelAsync(CancelNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/fork</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<ForkSessionResponse> ForkSessionAsync(ForkSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/list</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<ListSessionsResponse> ListSessionsAsync(ListSessionsRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/load</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<LoadSessionResponse> LoadSessionAsync(LoadSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/new</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<NewSessionResponse> NewSessionAsync(NewSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/prompt</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<PromptResponse> PromptAsync(PromptRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/resume</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/set_config_option</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(SetSessionConfigOptionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/set_mode</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<SetSessionModeResponse> SetSessionModeAsync(SetSessionModeRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/set_model</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<SetSessionModelResponse> SetSessionModelAsync(SetSessionModelRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>

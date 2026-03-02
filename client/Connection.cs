@@ -1,4 +1,7 @@
-﻿using dotacp.protocol;
+// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
+// Schema ref: refs/tags/v0.10.8
+
+using dotacp.protocol;
 using StreamJsonRpc;
 using System.Diagnostics;
 using System.IO;
@@ -9,11 +12,16 @@ namespace dotacp.client
 {
     /// <summary>
     /// Manages a JSON-RPC connection between an ACP client and an ACP agent.
-    /// The client can use this connection to communicate with the Agent so it behaves like an Agent.
+    /// The client can use this connection to communicate with the Agent.
     /// </summary>
     public class Connection
     {
         private JsonRpc _rpc;
+
+        /// <summary>
+        /// Gets a task that completes when the underlying RPC channel is closed.
+        /// </summary>
+        public Task Completion => _rpc.Completion;
 
         private Connection(IAcpClient client, Stream inputStream, Stream outputStream,
             TraceSource? traceSource = null)
@@ -24,11 +32,10 @@ namespace dotacp.client
             if (traceSource != null)
                 _rpc.TraceSource = traceSource;
 
-            // TODO: handle ext methods and notifications
-            // don't known what acp agents will need yet
             _rpc.AddLocalRpcTarget(new ClientRpcTarget(client));
             _rpc.StartListening();
         }
+
         private Task<TResponse> SendRequestAsync<TRequest, TResponse>(
             string method, TRequest request, CancellationToken cancellationToken)
         {
@@ -46,14 +53,14 @@ namespace dotacp.client
         /// <summary>
         /// Create a Connection to an ACP agent over the given streams.
         /// </summary>
-        /// <param name="client">The client implementation that handles inbound agent calls.</param>
+        /// <param name="client">The client implementation that handles incoming RPC calls.</param>
         /// <param name="inputStream">The (agent) input stream to write to.</param>
         /// <param name="outputStream">The (agent) output stream to read from.</param>
         /// <param name="traceSource">Optional trace source used for StreamJsonRpc diagnostics.</param>
         /// <returns>
         /// A running <see cref="Connection"/> instance, or <see langword="null"/> when a required argument is <see langword="null"/>.
         /// </returns>
-        public static Connection? ConnectToAgent(IAcpClient client,
+        public static Connection? RunClient(IAcpClient client,
             Stream inputStream, Stream outputStream,
             TraceSource? traceSource = null)
         {
@@ -64,25 +71,13 @@ namespace dotacp.client
         }
 
         /// <summary>
-        /// Initializes the agent using the specified initialization parameters.
+        /// Calls the agent <c>authenticate</c> method.
         /// </summary>
-        /// <param name="request">The initialization request with protocol version and client capabilities.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The initialization response from the agent.</returns>
-        public Task<InitializeResponse> InitializeAsync(InitializeRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return SendRequestAsync<InitializeRequest, InitializeResponse>(
-                AgentMethods.Initialize, request, cancellationToken);
-        }
-
-        /// <summary>
-        /// Authenticates a user using the specified authentication request.
-        /// </summary>
-        /// <param name="request">The authentication request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The authentication response from the agent.</returns>
-        public Task<AuthenticateResponse> AuthenticateAsync(AuthenticateRequest request,
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<AuthenticateResponse> AuthenticateAsync(
+            AuthenticateRequest request,
             CancellationToken cancellationToken = default)
         {
             return SendRequestAsync<AuthenticateRequest, AuthenticateResponse>(
@@ -90,25 +85,55 @@ namespace dotacp.client
         }
 
         /// <summary>
-        /// Creates a new session using the specified session parameters.
+        /// Calls the agent <c>initialize</c> method.
         /// </summary>
-        /// <param name="request">The session creation request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The new session response from the agent.</returns>
-        public Task<NewSessionResponse> NewSessionAsync(NewSessionRequest request,
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<InitializeResponse> InitializeAsync(
+            InitializeRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<NewSessionRequest, NewSessionResponse>(
-                AgentMethods.SessionNew, request, cancellationToken);
+            return SendRequestAsync<InitializeRequest, InitializeResponse>(
+                AgentMethods.Initialize, request, cancellationToken);
         }
 
         /// <summary>
-        /// Loads an existing session using the specified session parameters.
+        /// Calls the agent <c>session/fork</c> method.
         /// </summary>
-        /// <param name="request">The session load request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The loaded session response from the agent.</returns>
-        public Task<LoadSessionResponse> LoadSessionAsync(LoadSessionRequest request,
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<ForkSessionResponse> ForkSessionAsync(
+            ForkSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<ForkSessionRequest, ForkSessionResponse>(
+                AgentMethods.SessionFork, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/list</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<ListSessionsResponse> ListSessionsAsync(
+            ListSessionsRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<ListSessionsRequest, ListSessionsResponse>(
+                AgentMethods.SessionList, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/load</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<LoadSessionResponse> LoadSessionAsync(
+            LoadSessionRequest request,
             CancellationToken cancellationToken = default)
         {
             return SendRequestAsync<LoadSessionRequest, LoadSessionResponse>(
@@ -116,12 +141,27 @@ namespace dotacp.client
         }
 
         /// <summary>
-        /// Sends a user prompt to the agent for the specified session.
+        /// Calls the agent <c>session/new</c> method.
         /// </summary>
-        /// <param name="request">The prompt request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The prompt response from the agent.</returns>
-        public Task<PromptResponse> PromptAsync(PromptRequest request,
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<NewSessionResponse> NewSessionAsync(
+            NewSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<NewSessionRequest, NewSessionResponse>(
+                AgentMethods.SessionNew, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/prompt</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<PromptResponse> PromptAsync(
+            PromptRequest request,
             CancellationToken cancellationToken = default)
         {
             return SendRequestAsync<PromptRequest, PromptResponse>(
@@ -129,11 +169,25 @@ namespace dotacp.client
         }
 
         /// <summary>
-        /// Sets a session configuration option for the specified session.
+        /// Calls the agent <c>session/resume</c> method.
         /// </summary>
-        /// <param name="request">The config option update request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The update response from the agent.</returns>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<ResumeSessionResponse> ResumeSessionAsync(
+            ResumeSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<ResumeSessionRequest, ResumeSessionResponse>(
+                AgentMethods.SessionResume, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/set_config_option</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
         public Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(
             SetSessionConfigOptionRequest request,
             CancellationToken cancellationToken = default)
@@ -143,12 +197,13 @@ namespace dotacp.client
         }
 
         /// <summary>
-        /// Sets the session mode for the specified session.
+        /// Calls the agent <c>session/set_mode</c> method.
         /// </summary>
-        /// <param name="request">The session mode change request.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The mode change response from the agent.</returns>
-        public Task<SetSessionModeResponse> SetSessionModeAsync(SetSessionModeRequest request,
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<SetSessionModeResponse> SetSessionModeAsync(
+            SetSessionModeRequest request,
             CancellationToken cancellationToken = default)
         {
             return SendRequestAsync<SetSessionModeRequest, SetSessionModeResponse>(
@@ -156,41 +211,45 @@ namespace dotacp.client
         }
 
         /// <summary>
-        /// Notifies the agent to cancel ongoing operations for a session.
+        /// Calls the agent <c>session/set_model</c> method.
         /// </summary>
-        /// <param name="notification">The cancellation notification.</param>
-        /// <param name="cancellationToken">A token that cancels dispatch before send.</param>
-        /// <returns>A task that completes after the notification is queued for transport.</returns>
-        public Task CancelAsync(CancelNotification notification,
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<SetSessionModelResponse> SetSessionModelAsync(
+            SetSessionModelRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendNotificationAsync(AgentMethods.SessionCancel, notification, cancellationToken);
+            return SendRequestAsync<SetSessionModelRequest, SetSessionModelResponse>(
+                AgentMethods.SessionSetModel, request, cancellationToken);
         }
 
         /// <summary>
-        /// Calls an extension method on the agent that is not part of the core protocol.
+        /// Calls an agent extension method.
         /// </summary>
         /// <param name="method">The extension method name.</param>
-        /// <param name="request">The request object for the extension method.</param>
-        /// <param name="cancellationToken">A token that cancels the request.</param>
-        /// <returns>The extension method response object.</returns>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response object.</returns>
         public Task<object> ExtMethodAsync(string method, object request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<object, object>(method, request, cancellationToken);
+            return SendRequestAsync<object, object>(
+                "_" + method, request, cancellationToken);
         }
 
         /// <summary>
-        /// Sends an extension notification to the agent that is not part of the core protocol.
+        /// Sends an agent extension notification.
         /// </summary>
         /// <param name="method">The extension notification name.</param>
         /// <param name="notification">The notification payload.</param>
-        /// <param name="cancellationToken">A token that cancels dispatch before send.</param>
-        /// <returns>A task that completes after the notification is queued for transport.</returns>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
         public Task ExtNotificationAsync(string method, object notification,
             CancellationToken cancellationToken = default)
         {
-            return SendNotificationAsync(method, notification, cancellationToken);
+            return SendNotificationAsync(
+                "_" + method, notification, cancellationToken);
         }
     }
 }
