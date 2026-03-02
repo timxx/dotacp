@@ -2,11 +2,14 @@
   <PropertyGroup>
     <LangVersion>8.0</LangVersion>
 
+    <PackageVersion>0.1.0</PackageVersion>
     <Description>Agent Client Protocol .NET SDK.</Description>
-    <PackageTags>acp;agentclientprotocol</PackageTags>
+    <PackageTags>acp;agentclientprotocol;agent;client</PackageTags>
     <RepositoryUrl>https://github.com/timxx/dotacp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Authors>timxx</Authors>
+    <Copyright>© Weitian Leung</Copyright>
   </PropertyGroup>
 </Project>
