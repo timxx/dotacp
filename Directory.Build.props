@@ -4,6 +4,7 @@
 
     <PackageVersion>0.1.0</PackageVersion>
     <Version>$(PackageVersion)</Version>
+    <VersionPrefix>$([System.String]::Copy('$(PackageVersion)').Split('-')[0])</VersionPrefix>
 
     <Description>Agent Client Protocol .NET SDK.</Description>
     <PackageTags>acp;agentclientprotocol;agent;client</PackageTags>
@@ -15,7 +16,7 @@
     <Authors>timxx</Authors>
     <Copyright>© Weitian Leung</Copyright>
 
-    <AssemblyVersion>$(PackageVersion)</AssemblyVersion>
-    <FileVersion>$(PackageVersion)</FileVersion>
+    <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+    <FileVersion>$(VersionPrefix)</FileVersion>
   </PropertyGroup>
 </Project>
