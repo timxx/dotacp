@@ -7,7 +7,7 @@
     <RootNamespace>dotacp.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageId>dotacp.client</PackageId>
-    <Title>Agent Client Protocol client implementation</Title>
+    <Title>.NET library for implementing Agent Client Protocol (ACP) clients (editors/IDEs).</Title>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="README.md" Pack="true" PackagePath="README.md" />
   </ItemGroup>
 
 </Project>
