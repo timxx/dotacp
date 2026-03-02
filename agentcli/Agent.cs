@@ -73,7 +73,7 @@ namespace agentcli
             {
                 if (!(block is TextContent))
                 {
-                    Console.WriteLine($"Received unsupported content block of type {block.Type}");
+                    await Console.Error.WriteLineAsync($"Received unsupported content block of type {block.Type}");
                     continue;
                 }
 
@@ -121,11 +121,10 @@ namespace agentcli
             return Task.FromResult(new SetSessionModeResponse());
         }
 
-        public Task CancelAsync(CancelNotification notification,
+        public async Task CancelAsync(CancelNotification notification,
             CancellationToken cancellationToken = default)
         {
-            Console.WriteLine($"Cancel operation received for session {notification.SessionId}");
-            return Task.CompletedTask;
+            await Console.Error.WriteLineAsync($"Cancel operation received for session {notification.SessionId}");
         }
 
         public Task<ForkSessionResponse> ForkSessionAsync(ForkSessionRequest request,
