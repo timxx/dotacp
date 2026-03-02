@@ -9,7 +9,7 @@ namespace dotacp.protocol
     /// Handles serialization/deserialization of types that can be one of several different types.
     /// </summary>
     /// <typeparam name="TUnion">The union type struct</typeparam>
-    public class UnionTypeConverter<TUnion> : JsonConverter
+    internal class UnionTypeConverter<TUnion> : JsonConverter
     {
         private static readonly FieldInfo _valueField = typeof(TUnion).GetField("_value", BindingFlags.Instance | BindingFlags.NonPublic);
         private static readonly FieldInfo _isNullField = typeof(TUnion).GetField("_isNull", BindingFlags.Instance | BindingFlags.NonPublic);

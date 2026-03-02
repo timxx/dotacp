@@ -3,6 +3,7 @@
   <PropertyGroup>
     <CiExtraTargetFrameworksSuffix Condition="'$(EnableCiTargetFrameworks)' == 'true'">;net10.0;net9.0;net8.0</CiExtraTargetFrameworksSuffix>
     <TargetFrameworks>netstandard2.0;net472$(CiExtraTargetFrameworksSuffix)</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

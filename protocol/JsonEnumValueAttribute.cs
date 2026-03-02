@@ -7,7 +7,7 @@ namespace dotacp.protocol
     /// Used when the JSON representation differs from the enum member name.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class JsonEnumValueAttribute : Attribute
+    internal sealed class JsonEnumValueAttribute : Attribute
     {
         /// <summary>
         /// Gets the JSON string value for this enum member.

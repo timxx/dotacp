@@ -11,7 +11,7 @@ namespace dotacp.protocol
     /// Uses a discriminator property to select the concrete derived type.
     /// </summary>
     /// <typeparam name="TBase">The base type for the discriminated union.</typeparam>
-    public sealed class DiscriminatorConverter<TBase> : JsonConverter where TBase : class
+    internal sealed class DiscriminatorConverter<TBase> : JsonConverter where TBase : class
     {
         private static readonly Lazy<DiscriminatorInfo> _info = new Lazy<DiscriminatorInfo>(BuildInfo);
 

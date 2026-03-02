@@ -8,6 +8,7 @@
     <Nullable>enable</Nullable>
     <PackageId>dotacp.agent</PackageId>
     <Title>Agent Client Protocol agent implementation</Title>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

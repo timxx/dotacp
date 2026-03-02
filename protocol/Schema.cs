@@ -1,6 +1,8 @@
 // Generated from schema/schema.json. Do not edit by hand.
 // Schema ref: refs/tags/v0.10.8
 
+#pragma warning disable CS1591
+
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -3542,3 +3544,5 @@ namespace dotacp.protocol
     }
 
 }
+
+#pragma warning restore CS1591

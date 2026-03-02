@@ -43,6 +43,8 @@ namespace dotacp.generator
             }
 
             sb.AppendLineLf();
+            sb.AppendLineLf("#pragma warning disable CS1591");
+            sb.AppendLineLf();
 
             // Generate using statements
             sb.AppendLineLf("using Newtonsoft.Json;");
@@ -118,6 +120,8 @@ namespace dotacp.generator
 
             // Close namespace
             sb.AppendLineLf("}");
+            sb.AppendLineLf();
+            sb.AppendLineLf("#pragma warning restore CS1591");
 
             return sb.ToString();
         }

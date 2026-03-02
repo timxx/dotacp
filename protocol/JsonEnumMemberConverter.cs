@@ -11,7 +11,7 @@ namespace dotacp.protocol
     /// Falls back to the enum member name if no attribute is present.
     /// </summary>
     /// <typeparam name="TEnum">The enum type to convert.</typeparam>
-    public class JsonEnumMemberConverter<TEnum> : JsonConverter where TEnum : struct, Enum
+    internal class JsonEnumMemberConverter<TEnum> : JsonConverter where TEnum : struct, Enum
     {
         private readonly Dictionary<TEnum, string> _enumToString;
         private readonly Dictionary<string, TEnum> _stringToEnum;

@@ -33,6 +33,8 @@ namespace dotacp.generator
             }
 
             sb.AppendLineLf();
+            sb.AppendLineLf("#pragma warning disable CS1591");
+            sb.AppendLineLf();
             sb.AppendLineLf("namespace dotacp.protocol");
             sb.AppendLineLf("{");
 
@@ -94,6 +96,8 @@ namespace dotacp.generator
 
             sb.AppendLineLf("    }");
             sb.AppendLineLf("}");
+            sb.AppendLineLf();
+            sb.AppendLineLf("#pragma warning restore CS1591");
 
             return sb.ToString();
         }

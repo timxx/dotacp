@@ -1,6 +1,8 @@
 // Generated from schema/meta.json. Do not edit by hand.
 // Schema ref: refs/tags/v0.10.8
 
+#pragma warning disable CS1591
+
 namespace dotacp.protocol
 {
     /// <summary>
@@ -45,3 +47,5 @@ namespace dotacp.protocol
         public const string TerminalWaitForExit = "terminal/wait_for_exit";
     }
 }
+
+#pragma warning restore CS1591

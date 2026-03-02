@@ -10,7 +10,7 @@ namespace dotacp.protocol
     /// </summary>
     /// <typeparam name="TAlias">The type alias struct type</typeparam>
     /// <typeparam name="TValue">The underlying value type</typeparam>
-    public class TypeAliasConverter<TAlias, TValue> : JsonConverter
+    internal class TypeAliasConverter<TAlias, TValue> : JsonConverter
     {
         private static readonly FieldInfo _valueField = typeof(TAlias).GetField("_value", BindingFlags.Instance | BindingFlags.NonPublic);
 
