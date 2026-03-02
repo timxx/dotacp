@@ -18,6 +18,7 @@
     <AssemblyName>dotacp.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>dotacp.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <PackageId>dotacp.protocol</PackageId>
+    <Title>Agent Client Protocol</Title>
   </PropertyGroup>
 
   <ItemGroup>
