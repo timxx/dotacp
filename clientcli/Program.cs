@@ -111,7 +111,9 @@ namespace clientcli
             while (true)
             {
                 Console.WriteLine("Press Enter to send a request, or type '/exit' to quit.");
+                Console.ForegroundColor = ConsoleColor.Green;
                 var input = Console.ReadLine();
+                Console.ResetColor();
                 if (input == null)
                     break;
                 if (input.Length == 0)
@@ -132,7 +134,9 @@ namespace clientcli
                             }
                         }
                     });
-                    Console.WriteLine($"Stop reason: {promptResp.StopReason}");
+
+                    client.EndTurn(promptResp.StopReason);
+                    Console.WriteLine($"\nStop reason: {promptResp.StopReason}");
                 }
                 catch (Exception ex)
                 {
