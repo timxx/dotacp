@@ -189,17 +189,22 @@ namespace agentcli
         public Task<object> ExtMethodAsync(string method, object request,
             CancellationToken cancellationToken = default)
         {
+            if (method != "test_extmethod")
+                throw new Exception($"Method not found: {method}");
+
             return Task.FromResult<object>(new Dictionary<string, string>()
             {
                 {"example", "response" }
             });
         }
 
-        public Task ExtNotificationAsync(string method, object notification,
+        public async Task ExtNotificationAsync(string method, object notification,
             CancellationToken cancellationToken = default)
         {
-            Console.WriteLine($"Extended notification '{method}' received.");
-            return Task.CompletedTask;
+            await Console.Error.WriteLineAsync($"Extended notification '{method}' received.");
+
+            if (method != "test_extnotification")
+                throw new Exception($"Notification method not found: {method}");
         }
 
         private class Session

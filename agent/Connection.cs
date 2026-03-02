@@ -2,6 +2,7 @@
 // Schema ref: refs/tags/v0.10.8
 
 using dotacp.protocol;
+using dotacp.shared;
 using StreamJsonRpc;
 using System.Diagnostics;
 using System.IO;
@@ -28,7 +29,8 @@ namespace dotacp.agent
         {
             var handler = new NewLineDelimitedMessageHandler(
                 inputStream, outputStream, new JsonMessageFormatter());
-            _rpc = new JsonRpc(handler);
+            var routingHandler = new ExtensionMethodRoutingMessageHandler(handler);
+            _rpc = new JsonRpc(routingHandler);
             if (traceSource != null)
                 _rpc.TraceSource = traceSource;
 

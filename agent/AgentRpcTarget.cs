@@ -2,6 +2,7 @@
 // Schema ref: refs/tags/v0.10.8
 
 using dotacp.protocol;
+using dotacp.shared;
 using StreamJsonRpc;
 using System.Threading;
 using System.Threading.Tasks;
@@ -111,6 +112,22 @@ namespace dotacp.agent
             CancellationToken cancellationToken = default)
         {
             return _agent.SetSessionModelAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod("__acp_ext_method__", UseSingleObjectParameterDeserialization = true)]
+        public Task<object> HandleExtensionMethodAsync(
+            ExtensionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.ExtMethodAsync(request.Method, request.Arguments, cancellationToken);
+        }
+
+        [JsonRpcMethod("__acp_ext_notification__", UseSingleObjectParameterDeserialization = true)]
+        public Task HandleExtensionNotificationAsync(
+            ExtensionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.ExtNotificationAsync(request.Method, request.Arguments, cancellationToken);
         }
     }
 }

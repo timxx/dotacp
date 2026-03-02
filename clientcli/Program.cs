@@ -1,5 +1,6 @@
 ﻿using dotacp.client;
 using dotacp.protocol;
+using StreamJsonRpc;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -83,6 +84,24 @@ namespace clientcli
                     Console.WriteLine($"  {mode.Id}: {mode.Name} - {mode.Description}");
                 }
                 Console.WriteLine($"Current mode: {session.Modes.CurrentModeId}");
+            }
+
+            try
+            {
+                var result = await connection.ExtMethodAsync(
+                    "test_extmethod",
+                    new { text = "hello from client" });
+
+                await connection.ExtNotificationAsync(
+                    "test_extnotification",
+                    new object[] { 1, 2, 3 });
+            }
+            catch (RemoteMethodNotFoundException)
+            {
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Extension method/notification call failed: {ex}");
             }
 
             while (true)

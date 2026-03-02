@@ -23,4 +23,8 @@
     <ProjectReference Include="..\protocol\protocol.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\shared\*.cs" />
+  </ItemGroup>
+
 </Project>

@@ -237,6 +237,7 @@ namespace dotacp.generator
             }
             sb.AppendLineLf();
             sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
             sb.AppendLineLf("using System.Threading;");
             sb.AppendLineLf("using System.Threading.Tasks;");
@@ -271,6 +272,22 @@ namespace dotacp.generator
                 sb.AppendLineLf("        }");
             }
 
+            sb.AppendLineLf();
+            sb.AppendLineLf("        [JsonRpcMethod(\"__acp_ext_method__\", UseSingleObjectParameterDeserialization = true)]");
+            sb.AppendLineLf("        public Task<object> HandleExtensionMethodAsync(");
+            sb.AppendLineLf("            ExtensionRequest request,");
+            sb.AppendLineLf("            CancellationToken cancellationToken = default)");
+            sb.AppendLineLf("        {");
+            sb.AppendLineLf("            return _agent.ExtMethodAsync(request.Method, request.Arguments, cancellationToken);");
+            sb.AppendLineLf("        }");
+            sb.AppendLineLf();
+            sb.AppendLineLf("        [JsonRpcMethod(\"__acp_ext_notification__\", UseSingleObjectParameterDeserialization = true)]");
+            sb.AppendLineLf("        public Task HandleExtensionNotificationAsync(");
+            sb.AppendLineLf("            ExtensionRequest request,");
+            sb.AppendLineLf("            CancellationToken cancellationToken = default)");
+            sb.AppendLineLf("        {");
+            sb.AppendLineLf("            return _agent.ExtNotificationAsync(request.Method, request.Arguments, cancellationToken);");
+            sb.AppendLineLf("        }");
             sb.AppendLineLf("    }");
             sb.AppendLineLf("}");
 
@@ -287,6 +304,7 @@ namespace dotacp.generator
             }
             sb.AppendLineLf();
             sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
             sb.AppendLineLf("using System.Diagnostics;");
             sb.AppendLineLf("using System.IO;");
@@ -313,7 +331,8 @@ namespace dotacp.generator
             sb.AppendLineLf("        {");
             sb.AppendLineLf("            var handler = new NewLineDelimitedMessageHandler(");
             sb.AppendLineLf("                inputStream, outputStream, new JsonMessageFormatter());");
-            sb.AppendLineLf("            _rpc = new JsonRpc(handler);");
+            sb.AppendLineLf("            var routingHandler = new ExtensionMethodRoutingMessageHandler(handler);");
+            sb.AppendLineLf("            _rpc = new JsonRpc(routingHandler);");
             sb.AppendLineLf("            if (traceSource != null)");
             sb.AppendLineLf("                _rpc.TraceSource = traceSource;");
             sb.AppendLineLf();
@@ -504,6 +523,7 @@ namespace dotacp.generator
             }
             sb.AppendLineLf();
             sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
             sb.AppendLineLf("using System.Threading;");
             sb.AppendLineLf("using System.Threading.Tasks;");
@@ -538,6 +558,22 @@ namespace dotacp.generator
                 sb.AppendLineLf("        }");
             }
 
+            sb.AppendLineLf();
+            sb.AppendLineLf("        [JsonRpcMethod(\"__acp_ext_method__\", UseSingleObjectParameterDeserialization = true)]");
+            sb.AppendLineLf("        public Task<object> HandleExtensionMethodAsync(");
+            sb.AppendLineLf("            ExtensionRequest request,");
+            sb.AppendLineLf("            CancellationToken cancellationToken = default)");
+            sb.AppendLineLf("        {");
+            sb.AppendLineLf("            return _client.ExtMethodAsync(request.Method, request.Arguments, cancellationToken);");
+            sb.AppendLineLf("        }");
+            sb.AppendLineLf();
+            sb.AppendLineLf("        [JsonRpcMethod(\"__acp_ext_notification__\", UseSingleObjectParameterDeserialization = true)]");
+            sb.AppendLineLf("        public Task HandleExtensionNotificationAsync(");
+            sb.AppendLineLf("            ExtensionRequest request,");
+            sb.AppendLineLf("            CancellationToken cancellationToken = default)");
+            sb.AppendLineLf("        {");
+            sb.AppendLineLf("            return _client.ExtNotificationAsync(request.Method, request.Arguments, cancellationToken);");
+            sb.AppendLineLf("        }");
             sb.AppendLineLf("    }");
             sb.AppendLineLf("}");
 
@@ -554,6 +590,7 @@ namespace dotacp.generator
             }
             sb.AppendLineLf();
             sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
             sb.AppendLineLf("using System.Diagnostics;");
             sb.AppendLineLf("using System.IO;");
@@ -580,7 +617,8 @@ namespace dotacp.generator
             sb.AppendLineLf("        {");
             sb.AppendLineLf("            var handler = new NewLineDelimitedMessageHandler(");
             sb.AppendLineLf("                inputStream, outputStream, new JsonMessageFormatter());");
-            sb.AppendLineLf("            _rpc = new JsonRpc(handler);");
+            sb.AppendLineLf("            var routingHandler = new ExtensionMethodRoutingMessageHandler(handler);");
+            sb.AppendLineLf("            _rpc = new JsonRpc(routingHandler);");
             sb.AppendLineLf("            if (traceSource != null)");
             sb.AppendLineLf("                _rpc.TraceSource = traceSource;");
             sb.AppendLineLf();

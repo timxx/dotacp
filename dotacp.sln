@@ -17,6 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "agent", "agent\agent.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "agentcli", "agentcli\agentcli.csproj", "{8AFF3B84-0494-4C30-A079-C6C2CD30B647}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{F96F9CA9-225E-44FC-886E-D41B47F7845C}"
+	ProjectSection(SolutionItems) = preProject
+		shared\ExtensionMethodRoutingMessageHandler.cs = shared\ExtensionMethodRoutingMessageHandler.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
