@@ -44,7 +44,7 @@ namespace clientcli
                 await Console.Out.WriteLineAsync($"Available commands:");
                 foreach (var command in commands.AvailableCommands)
                 {
-                    await Console.Out.WriteLineAsync($"  - {command.Name}: {command.Description}");
+                    await Console.Out.WriteLineAsync($"  - /{command.Name}: {command.Description}");
                 }
             }
             else if (update is SessionUpdateAgentMessageChunk agentMessage)

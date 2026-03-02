@@ -77,17 +77,19 @@ namespace clientcli
             {
                 Console.WriteLine("Available models:");
                 foreach (var model in session.Models.AvailableModels)
-                    Console.WriteLine($"  {model.ModelId}: {model.Name} - {model.Description}");
+                    Console.WriteLine($"  - {model.ModelId}: {model.Name} - {model.Description}");
             }
 
+            bool hasModes = false;
             if (session.Modes != null)
             {
                 Console.WriteLine("Available modes:");
                 foreach (var mode in session.Modes.AvailableModes)
                 {
-                    Console.WriteLine($"  {mode.Id}: {mode.Name} - {mode.Description}");
+                    Console.WriteLine($"  - {mode.Id}: {mode.Name} - {mode.Description}");
                 }
                 Console.WriteLine($"Current mode: {session.Modes.CurrentModeId}");
+                hasModes = session.Modes.AvailableModes.Length > 0;
             }
 
             try
@@ -108,9 +110,16 @@ namespace clientcli
                 Console.WriteLine($"Extension method/notification call failed: {ex}");
             }
 
+            Console.WriteLine("Commands:");
+            Console.WriteLine("  /exit - Exit the client");
+            if (hasModes)
+            {
+                Console.WriteLine("  /switchmode <modeId> - Switch mode");
+            }
+
             while (true)
             {
-                Console.WriteLine("Press Enter to send a request, or type '/exit' to quit.");
+                Console.WriteLine("Press Enter to send a request");
                 Console.ForegroundColor = ConsoleColor.Green;
                 var input = Console.ReadLine();
                 Console.ResetColor();
@@ -118,8 +127,21 @@ namespace clientcli
                     break;
                 if (input.Length == 0)
                     continue;
+
+                input = input.Trim();
                 if (input == "/exit")
                     break;
+
+                if (hasModes && input.StartsWith("/switchmode "))
+                {
+                    var modeId = input.Split(' ')[1].Trim();
+                    await connection.SetSessionModeAsync(new SetSessionModeRequest()
+                    {
+                        SessionId = session.SessionId,
+                        ModeId = modeId
+                    });
+                    continue;
+                }
 
                 try
                 {
