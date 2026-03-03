@@ -388,5 +388,42 @@ namespace dotacp.unittest
                 Assert.IsNotNull(pair.Agent.LastExtNotificationPayload);
             }
         }
+
+        [TestMethod]
+        public async Task TestCancelAsync()
+        {
+            using (var pair = ConnectionPair.Create())
+            {
+                pair.Agent.PromptResponseToReturn = new PromptResponse
+                {
+                    StopReason = StopReason.EndTurn,
+                };
+
+                var request = new PromptRequest
+                {
+                    Meta = new Dictionary<string, object> { { "testCancel", true } },
+                    SessionId = "session-1",
+                    Prompt = new ContentBlock[]
+                    {
+                        new TextContent { Text = "Hello, agent!" }
+                    }
+                };
+
+                var promptTask = pair.ClientConn.PromptAsync(request);
+
+                await pair.ClientConn.CancelAsync(new CancelNotification
+                {
+                    SessionId = "session-1"
+                });
+
+                var promptResponse = await promptTask;
+
+                Assert.IsNotNull(pair.Agent.LastCancelNotification);
+                Assert.AreEqual("session-1", (string)pair.Agent.LastCancelNotification!.SessionId);
+
+                Assert.IsNotNull(promptResponse);
+                Assert.AreEqual(StopReason.Cancelled, promptResponse.StopReason);
+            }
+        }
     }
 }

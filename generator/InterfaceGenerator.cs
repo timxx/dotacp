@@ -666,25 +666,28 @@ namespace dotacp.generator
             {
                 if (string.IsNullOrEmpty(method.RequestType) || string.IsNullOrEmpty(method.ResponseType))
                     continue;
-
-                // Skip notifications - clients shouldn't call agent notifications
-                if (method.IsNotification)
-                    continue;
-
                 var methodName = GetMethodName(method);
+                var returnType = method.IsNotification ? "Task" : $"Task<{method.ResponseType}>";
 
                 sb.AppendLineLf("        /// <summary>");
-                sb.AppendLineLf($"        /// Calls the agent <c>{method.MethodPath}</c> method.");
+                sb.AppendLineLf($"        /// {(method.IsNotification ? "Sends" : "Calls")} the agent <c>{method.MethodPath}</c> {(method.IsNotification ? "notification" : "method")}.");
                 sb.AppendLineLf("        /// </summary>");
-                sb.AppendLineLf("        /// <param name=\"request\">The request payload.</param>");
+                sb.AppendLineLf($"        /// <param name=\"{(method.IsNotification ? "notification" : "request")}\">The {(method.IsNotification ? "notification" : "request")} payload.</param>");
                 sb.AppendLineLf("        /// <param name=\"cancellationToken\">A token that cancels the operation.</param>");
-                sb.AppendLineLf("        /// <returns>The response.</returns>");
-                sb.AppendLineLf($"        public Task<{method.ResponseType}> {methodName}Async(");
-                sb.AppendLineLf($"            {method.RequestType} request,");
+                sb.AppendLineLf($"        /// <returns>{(method.IsNotification ? "A task that completes when the notification is sent." : "The response.")}</returns>");
+                sb.AppendLineLf($"        public {returnType} {methodName}Async(");
+                sb.AppendLineLf($"            {method.RequestType} {(method.IsNotification ? "notification" : "request")},");
                 sb.AppendLineLf("            CancellationToken cancellationToken = default)");
                 sb.AppendLineLf("        {");
-                sb.AppendLineLf($"            return SendRequestAsync<{method.RequestType}, {method.ResponseType}>(");
-                sb.AppendLineLf($"                AgentMethods.{method.MethodName}, request, cancellationToken);");
+                if (method.IsNotification)
+                {
+                    sb.AppendLineLf($"            return SendNotificationAsync(AgentMethods.{method.MethodName}, notification, cancellationToken);");
+                }
+                else
+                {
+                    sb.AppendLineLf($"            return SendRequestAsync<{method.RequestType}, {method.ResponseType}>(");
+                    sb.AppendLineLf($"                AgentMethods.{method.MethodName}, request, cancellationToken);");
+                }
                 sb.AppendLineLf("        }");
                 sb.AppendLineLf();
             }

@@ -96,10 +96,21 @@ namespace dotacp.unittest
             return Task.FromResult(NewSessionResponseToReturn);
         }
 
-        public Task<PromptResponse> PromptAsync(PromptRequest request, CancellationToken cancellationToken = default)
+        public async Task<PromptResponse> PromptAsync(PromptRequest request, CancellationToken cancellationToken = default)
         {
+            if (request.Meta != null && request.Meta.TryGetValue("testCancel", out var testCancel)
+                && (bool)testCancel)
+            {
+                await CancelReceivedSignal.Task;
+                return new PromptResponse
+                {
+                    // According to the schema, it must return a PromptResponse with StopReason.Cancelled when the session is cancelled
+                    StopReason = StopReason.Cancelled
+                };
+            }
+
             LastPromptRequest = request;
-            return Task.FromResult(PromptResponseToReturn);
+            return PromptResponseToReturn;
         }
 
         public Task<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request, CancellationToken cancellationToken = default)

@@ -101,6 +101,19 @@ namespace dotacp.client
         }
 
         /// <summary>
+        /// Sends the agent <c>session/cancel</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task CancelAsync(
+            CancelNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(AgentMethods.SessionCancel, notification, cancellationToken);
+        }
+
+        /// <summary>
         /// Calls the agent <c>session/fork</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
