@@ -11,11 +11,14 @@
   <ItemGroup>
     <PackageReference Include="MSTest" Version="4.0.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="StreamJsonRpc" Version="2.7.76" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\protocol\protocol.csproj" />
     <ProjectReference Include="..\generator\generator.csproj" />
+    <ProjectReference Include="..\agent\agent.csproj" />
+    <ProjectReference Include="..\client\client.csproj" />
   </ItemGroup>
 
 </Project>

@@ -17,7 +17,7 @@ namespace dotacp.shared
 
         public ExtensionMethodRoutingMessageHandler(IJsonRpcMessageHandler innerHandler)
         {
-            _innerHandler = innerHandler ?? throw new ArgumentNullException(nameof(innerHandler));
+            _innerHandler = innerHandler;
         }
 
         public IJsonRpcMessageFormatter Formatter => _innerHandler.Formatter;
