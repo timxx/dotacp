@@ -49,7 +49,8 @@ namespace clientcli
                 return;
             }
 
-            if (!await InitiliazeAsync(connection))
+            var capabilities = await InitiliazeAsync(connection);
+            if (capabilities == null)
             {
                 Console.WriteLine("Failed to initialize connection.");
                 process.Close();
@@ -120,6 +121,17 @@ namespace clientcli
                 Console.WriteLine("  /switchmode <modeId> - Switch mode");
             if (hasModels)
                 Console.WriteLine("  /switchmodel <modelId> - Switch model");
+            if (capabilities.LoadSession)
+                Console.WriteLine("  /loadsession <sessionId> - Load another session");
+            if (capabilities.SessionCapabilities  != null)
+            {
+                if (capabilities.SessionCapabilities.List != null)
+                    Console.WriteLine("  /listsessions - List available sessions to load");
+                if (capabilities.SessionCapabilities.Fork != null)
+                    Console.WriteLine("  /forksession - Fork the current session");
+                if (capabilities.SessionCapabilities.Resume  != null)
+                    Console.WriteLine("  /resumesession <sessionId> - Resume a suspended session");
+            }
 
             while (true)
             {
@@ -156,6 +168,51 @@ namespace clientcli
                         ModelId = modelId
                     });
                     continue;
+                }
+
+                if (capabilities.LoadSession && input.StartsWith("/loadsession "))
+                {
+                    var sessionId = input.Split(' ')[1].Trim();
+                    var loadResp = await connection.LoadSessionAsync(new LoadSessionRequest()
+                    {
+                        SessionId = sessionId,
+                        Cwd = Environment.CurrentDirectory,
+                        McpServers = Array.Empty<McpServer>()
+                    });
+                    continue;
+                }
+
+                if (capabilities.SessionCapabilities != null)
+                {
+                    if (capabilities.SessionCapabilities.List != null && input == "/listsessions")
+                    {
+                        var listResp = await connection.ListSessionsAsync(new ListSessionsRequest());
+                        Console.WriteLine("Available sessions:");
+                        foreach (var s in listResp.Sessions)
+                            Console.WriteLine($"  - {s.SessionId}: {s.Title}");
+                        continue;
+                    }
+
+                    if (capabilities.SessionCapabilities.Fork != null && input == "/forksession")
+                    {
+                        var forkResp = await connection.ForkSessionAsync(new ForkSessionRequest()
+                        {
+                            SessionId = session.SessionId,
+                            Cwd = Environment.CurrentDirectory,
+                        });
+                        continue;
+                    }
+
+                    if (capabilities.SessionCapabilities.Resume != null && input.StartsWith("/resumesession "))
+                    {
+                        var sessionId = input.Split(' ')[1].Trim();
+                        var resumeResp = await connection.ResumeSessionAsync(new ResumeSessionRequest()
+                        {
+                            SessionId = sessionId,
+                            Cwd = Environment.CurrentDirectory,
+                        });
+                        continue;
+                    }
                 }
 
                 try
@@ -222,7 +279,7 @@ namespace clientcli
             return process;
         }
 
-        static async Task<bool> InitiliazeAsync(Connection connection)
+        static async Task<AgentCapabilities?> InitiliazeAsync(Connection connection)
         {
             try
             {
@@ -267,14 +324,14 @@ namespace clientcli
                     }
                 }
 
-                return true;
+                return response.AgentCapabilities;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-            return false;
+            return null;
         }
 
         static void PrintAgentCapabilities(AgentCapabilities caps)
