@@ -315,6 +315,106 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public void EnvelopeTypes_GenerateInlineUnionStructsForParamsAndResult()
+        {
+            var defs = JObject.Parse(@"{
+  'RequestId': { 'anyOf': [ { 'type': 'integer', 'format': 'int64' }, { 'type': 'string' }, { 'type': 'null' } ] },
+  'Error': { 'type': 'object', 'properties': { 'message': { 'type': 'string' } } },
+  'SessionNotification': { 'type': 'object', 'properties': { 'sessionId': { 'type': 'string' } } },
+  'ExtNotification': { 'type': 'object', 'properties': { 'ext': { 'type': 'string' } } },
+  'WriteTextFileRequest': { 'type': 'object', 'properties': { 'path': { 'type': 'string' } } },
+  'ReadTextFileRequest': { 'type': 'object', 'properties': { 'path': { 'type': 'string' } } },
+  'InitializeResponse': { 'type': 'object', 'properties': { 'ok': { 'type': 'boolean' } } },
+  'AuthenticateResponse': { 'type': 'object', 'properties': { 'ok': { 'type': 'boolean' } } },
+  'ExtResponse': { 'type': 'object', 'properties': { 'ok': { 'type': 'boolean' } } },
+  'AgentNotification': {
+    'type': 'object',
+    'properties': {
+      'method': { 'type': 'string' },
+      'params': {
+        'anyOf': [
+          {
+            'anyOf': [
+              { 'allOf': [ { '$ref': '#/$defs/SessionNotification' } ] },
+              { 'allOf': [ { '$ref': '#/$defs/ExtNotification' } ] }
+            ]
+          },
+          { 'type': 'null' }
+        ]
+      }
+    }
+  },
+  'AgentRequest': {
+    'type': 'object',
+    'properties': {
+      'id': { '$ref': '#/$defs/RequestId' },
+      'method': { 'type': 'string' },
+      'params': {
+        'anyOf': [
+          {
+            'anyOf': [
+              { 'allOf': [ { '$ref': '#/$defs/WriteTextFileRequest' } ] },
+              { 'allOf': [ { '$ref': '#/$defs/ReadTextFileRequest' } ] }
+            ]
+          },
+          { 'type': 'null' }
+        ]
+      }
+    }
+  },
+  'AgentResponse': {
+    'anyOf': [
+      {
+        'type': 'object',
+        'properties': {
+          'id': { '$ref': '#/$defs/RequestId' },
+          'result': {
+            'anyOf': [
+              { 'allOf': [ { '$ref': '#/$defs/InitializeResponse' } ] },
+              { 'allOf': [ { '$ref': '#/$defs/AuthenticateResponse' } ] },
+              { 'allOf': [ { '$ref': '#/$defs/ExtResponse' } ] }
+            ]
+          }
+        },
+        'required': [ 'id', 'result' ]
+      },
+      {
+        'type': 'object',
+        'properties': {
+          'id': { '$ref': '#/$defs/RequestId' },
+          'error': { '$ref': '#/$defs/Error' }
+        },
+        'required': [ 'id', 'error' ]
+      }
+    ]
+  }
+}");
+
+            var notificationResult = BuildModel("AgentNotification", defs);
+            StringAssert.Contains(notificationResult, "public readonly struct AgentNotificationParams");
+            StringAssert.Contains(notificationResult, "public AgentNotificationParams(SessionNotification value)");
+            StringAssert.Contains(notificationResult, "public AgentNotificationParams(ExtNotification value)");
+            StringAssert.Contains(notificationResult, "public static AgentNotificationParams Null");
+            StringAssert.Contains(notificationResult, "public AgentNotificationParams Params { get; set; }");
+            Assert.DoesNotContain("public object Params { get; set; }", notificationResult);
+
+            var requestResult = BuildModel("AgentRequest", defs);
+            StringAssert.Contains(requestResult, "public readonly struct AgentRequestParams");
+            StringAssert.Contains(requestResult, "public AgentRequestParams(WriteTextFileRequest value)");
+            StringAssert.Contains(requestResult, "public AgentRequestParams(ReadTextFileRequest value)");
+            StringAssert.Contains(requestResult, "public AgentRequestParams Params { get; set; }");
+            Assert.DoesNotContain("public object Params { get; set; }", requestResult);
+
+            var responseResult = BuildModel("AgentResponse", defs);
+            StringAssert.Contains(responseResult, "public readonly struct AgentResponseResult");
+            StringAssert.Contains(responseResult, "public AgentResponseResult(InitializeResponse value)");
+            StringAssert.Contains(responseResult, "public AgentResponseResult(AuthenticateResponse value)");
+            StringAssert.Contains(responseResult, "public AgentResponseResult(ExtResponse value)");
+            StringAssert.Contains(responseResult, "public AgentResponseResult Result { get; set; }");
+            Assert.DoesNotContain("public object Result { get; set; }", responseResult);
+        }
+
+        [TestMethod]
         public void AnyOfVsDiscriminatedUnion_GeneratesClassWhenAnyOfHasProperties()
         {
             var defs = JObject.Parse(@"{

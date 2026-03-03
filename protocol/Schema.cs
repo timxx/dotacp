@@ -11,6 +11,1266 @@ namespace dotacp.protocol
 {
     // Type aliases
 
+    [JsonConverter(typeof(UnionTypeConverter<AgentNotificationParams>))]
+    public readonly struct AgentNotificationParams : IEquatable<AgentNotificationParams>
+    {
+        private readonly object _value;
+        private readonly int _typeIndex;
+        private readonly bool _isNull;
+
+        public AgentNotificationParams(SessionNotification value)
+        {
+            _value = value;
+            _typeIndex = 0;
+            _isNull = false;
+        }
+
+        public AgentNotificationParams(ExtNotification value)
+        {
+            _value = value;
+            _typeIndex = 1;
+            _isNull = false;
+        }
+
+        private AgentNotificationParams(bool isNull)
+        {
+            _value = null;
+            _typeIndex = -1;
+            _isNull = isNull;
+        }
+
+        public static AgentNotificationParams Null => new AgentNotificationParams(true);
+
+        public static implicit operator AgentNotificationParams(SessionNotification value) => new AgentNotificationParams(value);
+        public static implicit operator AgentNotificationParams(ExtNotification value) => new AgentNotificationParams(value);
+
+        public bool IsNull => _isNull;
+
+        public bool TryGetSessionNotification(out SessionNotification value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is SessionNotification v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetExtNotification(out ExtNotification value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ExtNotification v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool Equals(AgentNotificationParams other) => _isNull == other._isNull && (_isNull || (Equals(_value, other._value) && _typeIndex == other._typeIndex));
+        public override bool Equals(object obj) => obj is AgentNotificationParams other && Equals(other);
+        public override int GetHashCode()
+        {
+            if (_isNull) return 0;
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);
+                hash = hash * 31 + _typeIndex;
+                return hash;
+            }
+        }
+        public override string ToString() => _isNull ? string.Empty : (_value?.ToString() ?? string.Empty);
+    }
+
+    public class AgentNotification
+    {
+        [JsonProperty("method")]
+        public string Method { get; set; } = null!;
+
+        [JsonProperty("params")]
+        public AgentNotificationParams Params { get; set; }
+    }
+
+    [JsonConverter(typeof(UnionTypeConverter<AgentRequestParams>))]
+    public readonly struct AgentRequestParams : IEquatable<AgentRequestParams>
+    {
+        private readonly object _value;
+        private readonly int _typeIndex;
+        private readonly bool _isNull;
+
+        public AgentRequestParams(WriteTextFileRequest value)
+        {
+            _value = value;
+            _typeIndex = 0;
+            _isNull = false;
+        }
+
+        public AgentRequestParams(ReadTextFileRequest value)
+        {
+            _value = value;
+            _typeIndex = 1;
+            _isNull = false;
+        }
+
+        public AgentRequestParams(RequestPermissionRequest value)
+        {
+            _value = value;
+            _typeIndex = 2;
+            _isNull = false;
+        }
+
+        public AgentRequestParams(CreateTerminalRequest value)
+        {
+            _value = value;
+            _typeIndex = 3;
+            _isNull = false;
+        }
+
+        public AgentRequestParams(TerminalOutputRequest value)
+        {
+            _value = value;
+            _typeIndex = 4;
+            _isNull = false;
+        }
+
+        public AgentRequestParams(ReleaseTerminalRequest value)
+        {
+            _value = value;
+            _typeIndex = 5;
+            _isNull = false;
+        }
+
+        public AgentRequestParams(WaitForTerminalExitRequest value)
+        {
+            _value = value;
+            _typeIndex = 6;
+            _isNull = false;
+        }
+
+        public AgentRequestParams(KillTerminalCommandRequest value)
+        {
+            _value = value;
+            _typeIndex = 7;
+            _isNull = false;
+        }
+
+        public AgentRequestParams(ExtRequest value)
+        {
+            _value = value;
+            _typeIndex = 8;
+            _isNull = false;
+        }
+
+        private AgentRequestParams(bool isNull)
+        {
+            _value = null;
+            _typeIndex = -1;
+            _isNull = isNull;
+        }
+
+        public static AgentRequestParams Null => new AgentRequestParams(true);
+
+        public static implicit operator AgentRequestParams(WriteTextFileRequest value) => new AgentRequestParams(value);
+        public static implicit operator AgentRequestParams(ReadTextFileRequest value) => new AgentRequestParams(value);
+        public static implicit operator AgentRequestParams(RequestPermissionRequest value) => new AgentRequestParams(value);
+        public static implicit operator AgentRequestParams(CreateTerminalRequest value) => new AgentRequestParams(value);
+        public static implicit operator AgentRequestParams(TerminalOutputRequest value) => new AgentRequestParams(value);
+        public static implicit operator AgentRequestParams(ReleaseTerminalRequest value) => new AgentRequestParams(value);
+        public static implicit operator AgentRequestParams(WaitForTerminalExitRequest value) => new AgentRequestParams(value);
+        public static implicit operator AgentRequestParams(KillTerminalCommandRequest value) => new AgentRequestParams(value);
+        public static implicit operator AgentRequestParams(ExtRequest value) => new AgentRequestParams(value);
+
+        public bool IsNull => _isNull;
+
+        public bool TryGetWriteTextFileRequest(out WriteTextFileRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is WriteTextFileRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetReadTextFileRequest(out ReadTextFileRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ReadTextFileRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetRequestPermissionRequest(out RequestPermissionRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is RequestPermissionRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetCreateTerminalRequest(out CreateTerminalRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is CreateTerminalRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetTerminalOutputRequest(out TerminalOutputRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is TerminalOutputRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetReleaseTerminalRequest(out ReleaseTerminalRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ReleaseTerminalRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetWaitForTerminalExitRequest(out WaitForTerminalExitRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is WaitForTerminalExitRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetKillTerminalCommandRequest(out KillTerminalCommandRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is KillTerminalCommandRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetExtRequest(out ExtRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ExtRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool Equals(AgentRequestParams other) => _isNull == other._isNull && (_isNull || (Equals(_value, other._value) && _typeIndex == other._typeIndex));
+        public override bool Equals(object obj) => obj is AgentRequestParams other && Equals(other);
+        public override int GetHashCode()
+        {
+            if (_isNull) return 0;
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);
+                hash = hash * 31 + _typeIndex;
+                return hash;
+            }
+        }
+        public override string ToString() => _isNull ? string.Empty : (_value?.ToString() ?? string.Empty);
+    }
+
+    public class AgentRequest
+    {
+        [JsonProperty("id")]
+        public RequestId Id { get; set; }
+
+        [JsonProperty("method")]
+        public string Method { get; set; } = null!;
+
+        [JsonProperty("params")]
+        public AgentRequestParams Params { get; set; }
+    }
+
+    /// <summary>
+    /// All possible responses that an agent can send to a client.
+    ///
+    /// This enum is used internally for routing RPC responses. You typically won't need
+    /// to use this directly - the responses are handled automatically by the connection.
+    ///
+    /// These are responses to the corresponding `ClientRequest` variants.
+    /// </summary>
+    [JsonConverter(typeof(UnionTypeConverter<AgentResponseResult>))]
+    public readonly struct AgentResponseResult : IEquatable<AgentResponseResult>
+    {
+        private readonly object _value;
+        private readonly int _typeIndex;
+
+        public AgentResponseResult(InitializeResponse value)
+        {
+            _value = value;
+            _typeIndex = 0;
+        }
+
+        public AgentResponseResult(AuthenticateResponse value)
+        {
+            _value = value;
+            _typeIndex = 1;
+        }
+
+        public AgentResponseResult(NewSessionResponse value)
+        {
+            _value = value;
+            _typeIndex = 2;
+        }
+
+        public AgentResponseResult(LoadSessionResponse value)
+        {
+            _value = value;
+            _typeIndex = 3;
+        }
+
+        public AgentResponseResult(ListSessionsResponse value)
+        {
+            _value = value;
+            _typeIndex = 4;
+        }
+
+        public AgentResponseResult(ForkSessionResponse value)
+        {
+            _value = value;
+            _typeIndex = 5;
+        }
+
+        public AgentResponseResult(ResumeSessionResponse value)
+        {
+            _value = value;
+            _typeIndex = 6;
+        }
+
+        public AgentResponseResult(SetSessionModeResponse value)
+        {
+            _value = value;
+            _typeIndex = 7;
+        }
+
+        public AgentResponseResult(SetSessionConfigOptionResponse value)
+        {
+            _value = value;
+            _typeIndex = 8;
+        }
+
+        public AgentResponseResult(PromptResponse value)
+        {
+            _value = value;
+            _typeIndex = 9;
+        }
+
+        public AgentResponseResult(SetSessionModelResponse value)
+        {
+            _value = value;
+            _typeIndex = 10;
+        }
+
+        public AgentResponseResult(ExtResponse value)
+        {
+            _value = value;
+            _typeIndex = 11;
+        }
+
+        public static implicit operator AgentResponseResult(InitializeResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(AuthenticateResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(NewSessionResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(LoadSessionResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(ListSessionsResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(ForkSessionResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(ResumeSessionResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(SetSessionModeResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(SetSessionConfigOptionResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(PromptResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(SetSessionModelResponse value) => new AgentResponseResult(value);
+        public static implicit operator AgentResponseResult(ExtResponse value) => new AgentResponseResult(value);
+
+        public bool TryGetInitializeResponse(out InitializeResponse value)
+        {
+            if (_value is InitializeResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetAuthenticateResponse(out AuthenticateResponse value)
+        {
+            if (_value is AuthenticateResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetNewSessionResponse(out NewSessionResponse value)
+        {
+            if (_value is NewSessionResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetLoadSessionResponse(out LoadSessionResponse value)
+        {
+            if (_value is LoadSessionResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetListSessionsResponse(out ListSessionsResponse value)
+        {
+            if (_value is ListSessionsResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetForkSessionResponse(out ForkSessionResponse value)
+        {
+            if (_value is ForkSessionResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetResumeSessionResponse(out ResumeSessionResponse value)
+        {
+            if (_value is ResumeSessionResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSetSessionModeResponse(out SetSessionModeResponse value)
+        {
+            if (_value is SetSessionModeResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSetSessionConfigOptionResponse(out SetSessionConfigOptionResponse value)
+        {
+            if (_value is SetSessionConfigOptionResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetPromptResponse(out PromptResponse value)
+        {
+            if (_value is PromptResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSetSessionModelResponse(out SetSessionModelResponse value)
+        {
+            if (_value is SetSessionModelResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetExtResponse(out ExtResponse value)
+        {
+            if (_value is ExtResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool Equals(AgentResponseResult other) => Equals(_value, other._value) && _typeIndex == other._typeIndex;
+        public override bool Equals(object obj) => obj is AgentResponseResult other && Equals(other);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);
+                hash = hash * 31 + _typeIndex;
+                return hash;
+            }
+        }
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    public class AgentResponse
+    {
+        [JsonProperty("error")]
+        public Error Error { get; set; }
+
+        [JsonProperty("id")]
+        public RequestId Id { get; set; }
+
+        /// <summary>
+        /// All possible responses that an agent can send to a client.
+        ///
+        /// This enum is used internally for routing RPC responses. You typically won't need
+        /// to use this directly - the responses are handled automatically by the connection.
+        ///
+        /// These are responses to the corresponding `ClientRequest` variants.
+        /// </summary>
+        [JsonProperty("result")]
+        public AgentResponseResult Result { get; set; }
+    }
+
+    [JsonConverter(typeof(UnionTypeConverter<ClientNotificationParams>))]
+    public readonly struct ClientNotificationParams : IEquatable<ClientNotificationParams>
+    {
+        private readonly object _value;
+        private readonly int _typeIndex;
+        private readonly bool _isNull;
+
+        public ClientNotificationParams(CancelNotification value)
+        {
+            _value = value;
+            _typeIndex = 0;
+            _isNull = false;
+        }
+
+        public ClientNotificationParams(ExtNotification value)
+        {
+            _value = value;
+            _typeIndex = 1;
+            _isNull = false;
+        }
+
+        private ClientNotificationParams(bool isNull)
+        {
+            _value = null;
+            _typeIndex = -1;
+            _isNull = isNull;
+        }
+
+        public static ClientNotificationParams Null => new ClientNotificationParams(true);
+
+        public static implicit operator ClientNotificationParams(CancelNotification value) => new ClientNotificationParams(value);
+        public static implicit operator ClientNotificationParams(ExtNotification value) => new ClientNotificationParams(value);
+
+        public bool IsNull => _isNull;
+
+        public bool TryGetCancelNotification(out CancelNotification value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is CancelNotification v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetExtNotification(out ExtNotification value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ExtNotification v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool Equals(ClientNotificationParams other) => _isNull == other._isNull && (_isNull || (Equals(_value, other._value) && _typeIndex == other._typeIndex));
+        public override bool Equals(object obj) => obj is ClientNotificationParams other && Equals(other);
+        public override int GetHashCode()
+        {
+            if (_isNull) return 0;
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);
+                hash = hash * 31 + _typeIndex;
+                return hash;
+            }
+        }
+        public override string ToString() => _isNull ? string.Empty : (_value?.ToString() ?? string.Empty);
+    }
+
+    public class ClientNotification
+    {
+        [JsonProperty("method")]
+        public string Method { get; set; } = null!;
+
+        [JsonProperty("params")]
+        public ClientNotificationParams Params { get; set; }
+    }
+
+    [JsonConverter(typeof(UnionTypeConverter<ClientRequestParams>))]
+    public readonly struct ClientRequestParams : IEquatable<ClientRequestParams>
+    {
+        private readonly object _value;
+        private readonly int _typeIndex;
+        private readonly bool _isNull;
+
+        public ClientRequestParams(InitializeRequest value)
+        {
+            _value = value;
+            _typeIndex = 0;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(AuthenticateRequest value)
+        {
+            _value = value;
+            _typeIndex = 1;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(NewSessionRequest value)
+        {
+            _value = value;
+            _typeIndex = 2;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(LoadSessionRequest value)
+        {
+            _value = value;
+            _typeIndex = 3;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(ListSessionsRequest value)
+        {
+            _value = value;
+            _typeIndex = 4;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(ForkSessionRequest value)
+        {
+            _value = value;
+            _typeIndex = 5;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(ResumeSessionRequest value)
+        {
+            _value = value;
+            _typeIndex = 6;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(SetSessionModeRequest value)
+        {
+            _value = value;
+            _typeIndex = 7;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(SetSessionConfigOptionRequest value)
+        {
+            _value = value;
+            _typeIndex = 8;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(PromptRequest value)
+        {
+            _value = value;
+            _typeIndex = 9;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(SetSessionModelRequest value)
+        {
+            _value = value;
+            _typeIndex = 10;
+            _isNull = false;
+        }
+
+        public ClientRequestParams(ExtRequest value)
+        {
+            _value = value;
+            _typeIndex = 11;
+            _isNull = false;
+        }
+
+        private ClientRequestParams(bool isNull)
+        {
+            _value = null;
+            _typeIndex = -1;
+            _isNull = isNull;
+        }
+
+        public static ClientRequestParams Null => new ClientRequestParams(true);
+
+        public static implicit operator ClientRequestParams(InitializeRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(AuthenticateRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(NewSessionRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(LoadSessionRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(ListSessionsRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(ForkSessionRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(ResumeSessionRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(SetSessionModeRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(SetSessionConfigOptionRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(PromptRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(SetSessionModelRequest value) => new ClientRequestParams(value);
+        public static implicit operator ClientRequestParams(ExtRequest value) => new ClientRequestParams(value);
+
+        public bool IsNull => _isNull;
+
+        public bool TryGetInitializeRequest(out InitializeRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is InitializeRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetAuthenticateRequest(out AuthenticateRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is AuthenticateRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetNewSessionRequest(out NewSessionRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is NewSessionRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetLoadSessionRequest(out LoadSessionRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is LoadSessionRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetListSessionsRequest(out ListSessionsRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ListSessionsRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetForkSessionRequest(out ForkSessionRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ForkSessionRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetResumeSessionRequest(out ResumeSessionRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ResumeSessionRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSetSessionModeRequest(out SetSessionModeRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is SetSessionModeRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSetSessionConfigOptionRequest(out SetSessionConfigOptionRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is SetSessionConfigOptionRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetPromptRequest(out PromptRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is PromptRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSetSessionModelRequest(out SetSessionModelRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is SetSessionModelRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetExtRequest(out ExtRequest value)
+        {
+            if (_isNull)
+            {
+                value = default;
+                return false;
+            }
+            if (_value is ExtRequest v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool Equals(ClientRequestParams other) => _isNull == other._isNull && (_isNull || (Equals(_value, other._value) && _typeIndex == other._typeIndex));
+        public override bool Equals(object obj) => obj is ClientRequestParams other && Equals(other);
+        public override int GetHashCode()
+        {
+            if (_isNull) return 0;
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);
+                hash = hash * 31 + _typeIndex;
+                return hash;
+            }
+        }
+        public override string ToString() => _isNull ? string.Empty : (_value?.ToString() ?? string.Empty);
+    }
+
+    public class ClientRequest
+    {
+        [JsonProperty("id")]
+        public RequestId Id { get; set; }
+
+        [JsonProperty("method")]
+        public string Method { get; set; } = null!;
+
+        [JsonProperty("params")]
+        public ClientRequestParams Params { get; set; }
+    }
+
+    /// <summary>
+    /// All possible responses that a client can send to an agent.
+    ///
+    /// This enum is used internally for routing RPC responses. You typically won't need
+    /// to use this directly - the responses are handled automatically by the connection.
+    ///
+    /// These are responses to the corresponding `AgentRequest` variants.
+    /// </summary>
+    [JsonConverter(typeof(UnionTypeConverter<ClientResponseResult>))]
+    public readonly struct ClientResponseResult : IEquatable<ClientResponseResult>
+    {
+        private readonly object _value;
+        private readonly int _typeIndex;
+
+        public ClientResponseResult(WriteTextFileResponse value)
+        {
+            _value = value;
+            _typeIndex = 0;
+        }
+
+        public ClientResponseResult(ReadTextFileResponse value)
+        {
+            _value = value;
+            _typeIndex = 1;
+        }
+
+        public ClientResponseResult(RequestPermissionResponse value)
+        {
+            _value = value;
+            _typeIndex = 2;
+        }
+
+        public ClientResponseResult(CreateTerminalResponse value)
+        {
+            _value = value;
+            _typeIndex = 3;
+        }
+
+        public ClientResponseResult(TerminalOutputResponse value)
+        {
+            _value = value;
+            _typeIndex = 4;
+        }
+
+        public ClientResponseResult(ReleaseTerminalResponse value)
+        {
+            _value = value;
+            _typeIndex = 5;
+        }
+
+        public ClientResponseResult(WaitForTerminalExitResponse value)
+        {
+            _value = value;
+            _typeIndex = 6;
+        }
+
+        public ClientResponseResult(KillTerminalCommandResponse value)
+        {
+            _value = value;
+            _typeIndex = 7;
+        }
+
+        public ClientResponseResult(ExtResponse value)
+        {
+            _value = value;
+            _typeIndex = 8;
+        }
+
+        public static implicit operator ClientResponseResult(WriteTextFileResponse value) => new ClientResponseResult(value);
+        public static implicit operator ClientResponseResult(ReadTextFileResponse value) => new ClientResponseResult(value);
+        public static implicit operator ClientResponseResult(RequestPermissionResponse value) => new ClientResponseResult(value);
+        public static implicit operator ClientResponseResult(CreateTerminalResponse value) => new ClientResponseResult(value);
+        public static implicit operator ClientResponseResult(TerminalOutputResponse value) => new ClientResponseResult(value);
+        public static implicit operator ClientResponseResult(ReleaseTerminalResponse value) => new ClientResponseResult(value);
+        public static implicit operator ClientResponseResult(WaitForTerminalExitResponse value) => new ClientResponseResult(value);
+        public static implicit operator ClientResponseResult(KillTerminalCommandResponse value) => new ClientResponseResult(value);
+        public static implicit operator ClientResponseResult(ExtResponse value) => new ClientResponseResult(value);
+
+        public bool TryGetWriteTextFileResponse(out WriteTextFileResponse value)
+        {
+            if (_value is WriteTextFileResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetReadTextFileResponse(out ReadTextFileResponse value)
+        {
+            if (_value is ReadTextFileResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetRequestPermissionResponse(out RequestPermissionResponse value)
+        {
+            if (_value is RequestPermissionResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetCreateTerminalResponse(out CreateTerminalResponse value)
+        {
+            if (_value is CreateTerminalResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetTerminalOutputResponse(out TerminalOutputResponse value)
+        {
+            if (_value is TerminalOutputResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetReleaseTerminalResponse(out ReleaseTerminalResponse value)
+        {
+            if (_value is ReleaseTerminalResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetWaitForTerminalExitResponse(out WaitForTerminalExitResponse value)
+        {
+            if (_value is WaitForTerminalExitResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetKillTerminalCommandResponse(out KillTerminalCommandResponse value)
+        {
+            if (_value is KillTerminalCommandResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetExtResponse(out ExtResponse value)
+        {
+            if (_value is ExtResponse v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool Equals(ClientResponseResult other) => Equals(_value, other._value) && _typeIndex == other._typeIndex;
+        public override bool Equals(object obj) => obj is ClientResponseResult other && Equals(other);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);
+                hash = hash * 31 + _typeIndex;
+                return hash;
+            }
+        }
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    public class ClientResponse
+    {
+        [JsonProperty("error")]
+        public Error Error { get; set; }
+
+        [JsonProperty("id")]
+        public RequestId Id { get; set; }
+
+        /// <summary>
+        /// All possible responses that a client can send to an agent.
+        ///
+        /// This enum is used internally for routing RPC responses. You typically won't need
+        /// to use this directly - the responses are handled automatically by the connection.
+        ///
+        /// These are responses to the corresponding `AgentRequest` variants.
+        /// </summary>
+        [JsonProperty("result")]
+        public ClientResponseResult Result { get; set; }
+    }
+
     /// <summary>
     /// **UNSTABLE**
     ///
@@ -780,47 +2040,6 @@ namespace dotacp.protocol
         public SessionCapabilities SessionCapabilities { get; set; }
     }
 
-    public class AgentNotification
-    {
-        [JsonProperty("method")]
-        public string Method { get; set; } = null!;
-
-        [JsonProperty("params")]
-        public object Params { get; set; }
-    }
-
-    public class AgentRequest
-    {
-        [JsonProperty("id")]
-        public RequestId Id { get; set; }
-
-        [JsonProperty("method")]
-        public string Method { get; set; } = null!;
-
-        [JsonProperty("params")]
-        public object Params { get; set; }
-    }
-
-    public class AgentResponse
-    {
-        [JsonProperty("error")]
-        public Error Error { get; set; }
-
-        [JsonProperty("id")]
-        public RequestId Id { get; set; }
-
-        /// <summary>
-        /// All possible responses that an agent can send to a client.
-        ///
-        /// This enum is used internally for routing RPC responses. You typically won't need
-        /// to use this directly - the responses are handled automatically by the connection.
-        ///
-        /// These are responses to the corresponding `ClientRequest` variants.
-        /// </summary>
-        [JsonProperty("result")]
-        public object Result { get; set; }
-    }
-
     /// <summary>
     /// Optional annotations for the client. The client can use annotations to inform how objects are used or displayed
     /// </summary>
@@ -1127,47 +2346,6 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("terminal")]
         public bool Terminal { get; set; } = false;
-    }
-
-    public class ClientNotification
-    {
-        [JsonProperty("method")]
-        public string Method { get; set; } = null!;
-
-        [JsonProperty("params")]
-        public object Params { get; set; }
-    }
-
-    public class ClientRequest
-    {
-        [JsonProperty("id")]
-        public RequestId Id { get; set; }
-
-        [JsonProperty("method")]
-        public string Method { get; set; } = null!;
-
-        [JsonProperty("params")]
-        public object Params { get; set; }
-    }
-
-    public class ClientResponse
-    {
-        [JsonProperty("error")]
-        public Error Error { get; set; }
-
-        [JsonProperty("id")]
-        public RequestId Id { get; set; }
-
-        /// <summary>
-        /// All possible responses that a client can send to an agent.
-        ///
-        /// This enum is used internally for routing RPC responses. You typically won't need
-        /// to use this directly - the responses are handled automatically by the connection.
-        ///
-        /// These are responses to the corresponding `AgentRequest` variants.
-        /// </summary>
-        [JsonProperty("result")]
-        public object Result { get; set; }
     }
 
     /// <summary>

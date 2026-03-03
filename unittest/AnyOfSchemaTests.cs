@@ -475,6 +475,42 @@ namespace dotacp.unittest
             Assert.AreEqual("g1", (string)groupedOptions[0].Group);
         }
 
+        [TestMethod]
+        public void AgentEnvelopeUnionTypes_RoundTripSerialization_WorksForParamsAndResult()
+        {
+            // Arrange
+            var notification = new AgentNotification
+            {
+                Method = "session/update",
+                Params = new SessionNotification
+                {
+                    SessionId = "session-1",
+                    Update = new Plan { Entries = new PlanEntry[0] }
+                }
+            };
+
+            var response = new AgentResponse
+            {
+                Id = 1L,
+                Result = new AuthenticateResponse()
+            };
+
+            // Act
+            var notificationJson = JsonConvert.SerializeObject(notification);
+            var responseJson = JsonConvert.SerializeObject(response);
+
+            var notificationRoundTrip = JsonConvert.DeserializeObject<AgentNotification>(notificationJson);
+            var responseRoundTrip = JsonConvert.DeserializeObject<AgentResponse>(responseJson);
+
+            // Assert
+            Assert.IsNotNull(notificationRoundTrip);
+            Assert.IsTrue(notificationRoundTrip.Params.TryGetSessionNotification(out var sessionNotification));
+            Assert.AreEqual("session-1", (string)sessionNotification.SessionId);
+
+            Assert.IsNotNull(responseRoundTrip);
+            Assert.IsTrue(responseRoundTrip.Result.TryGetAuthenticateResponse(out _));
+        }
+
         #endregion
     }
 }

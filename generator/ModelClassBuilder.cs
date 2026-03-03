@@ -16,6 +16,8 @@ namespace dotacp.generator
         private readonly JObject allDefinitions;
         private readonly PropertyTypeResolver typeResolver;
         private readonly DiscriminatorAnalyzer discriminatorAnalyzer;
+        private readonly List<string> inlineUnionTypeDefinitions = new List<string>();
+        private readonly HashSet<string> inlineUnionTypeNames = new HashSet<string>(StringComparer.Ordinal);
 
         public ModelClassBuilder(
             string name,
@@ -33,6 +35,9 @@ namespace dotacp.generator
 
         public string Generate()
         {
+            inlineUnionTypeDefinitions.Clear();
+            inlineUnionTypeNames.Clear();
+
             // Check if this is a simple type alias
             if (IsSimpleTypeAlias())
             {
@@ -860,6 +865,15 @@ namespace dotacp.generator
 
             properties.AddRange(GetPropertyLines(definition, className, Array.Empty<string>()));
 
+            if (inlineUnionTypeDefinitions.Count > 0)
+            {
+                foreach (var unionTypeDef in inlineUnionTypeDefinitions)
+                {
+                    sb.AppendLineLf(unionTypeDef);
+                    sb.AppendLineLf();
+                }
+            }
+
             if (properties.Count > 0)
             {
                 sb.AppendLineLf(classDeclaration);
@@ -919,6 +933,12 @@ namespace dotacp.generator
                 {
                     csPropName = $"{csPropName}Value";
                     needsJsonPropertyName = true;
+                }
+
+                if (csType == "object" &&
+                    TryCreateInlineUnionType(prop, className, csPropName, out var inlineUnionTypeName))
+                {
+                    csType = inlineUnionTypeName;
                 }
 
                 // If not required and not nullable, make it nullable (only for value types)
@@ -1003,6 +1023,275 @@ namespace dotacp.generator
             }
 
             sb.AppendLineLf($"{indent}/// </summary>");
+        }
+
+        private bool TryCreateInlineUnionType(JObject property, string className, string csPropName, out string unionTypeName)
+        {
+            unionTypeName = null;
+
+            if (!TryGetPropertyUnionInfo(property, out var unionTypes, out var hasNullType))
+            {
+                return false;
+            }
+
+            if (unionTypes.Count < 2)
+            {
+                return false;
+            }
+
+            unionTypeName = $"{className}{csPropName}";
+            if (!inlineUnionTypeNames.Contains(unionTypeName))
+            {
+                inlineUnionTypeNames.Add(unionTypeName);
+                inlineUnionTypeDefinitions.Add(
+                    GenerateUnionTypeStruct(unionTypeName, unionTypes, hasNullType, property["description"]?.ToString()));
+            }
+
+            return true;
+        }
+
+        private bool TryGetPropertyUnionInfo(JObject property, out List<string> unionTypes, out bool hasNullType)
+        {
+            unionTypes = new List<string>();
+            hasNullType = false;
+
+            var rootUnion = (property["anyOf"] as JArray) ?? (property["oneOf"] as JArray);
+            if (rootUnion == null)
+            {
+                return false;
+            }
+
+            foreach (var unionItem in ExpandUnionItems(rootUnion))
+            {
+                var itemTypeToken = unionItem["type"];
+                if (itemTypeToken != null && itemTypeToken.Type == JTokenType.String && itemTypeToken.ToString() == "null")
+                {
+                    hasNullType = true;
+                    continue;
+                }
+
+                var resolvedType = ResolveUnionItemType(unionItem, ref hasNullType);
+                if (!string.IsNullOrEmpty(resolvedType))
+                {
+                    unionTypes.Add(resolvedType);
+                }
+            }
+
+            unionTypes = unionTypes.Distinct().ToList();
+            return unionTypes.Count > 0;
+        }
+
+        private IEnumerable<JObject> ExpandUnionItems(JArray items)
+        {
+            foreach (var item in items.OfType<JObject>())
+            {
+                var nestedAnyOf = item["anyOf"] as JArray;
+                if (nestedAnyOf != null)
+                {
+                    foreach (var nested in ExpandUnionItems(nestedAnyOf))
+                    {
+                        yield return nested;
+                    }
+
+                    continue;
+                }
+
+                var nestedOneOf = item["oneOf"] as JArray;
+                if (nestedOneOf != null)
+                {
+                    foreach (var nested in ExpandUnionItems(nestedOneOf))
+                    {
+                        yield return nested;
+                    }
+
+                    continue;
+                }
+
+                yield return item;
+            }
+        }
+
+        private string ResolveUnionItemType(JObject item, ref bool hasNullType)
+        {
+            var itemRef = item["$ref"]?.ToString();
+            if (!string.IsNullOrEmpty(itemRef))
+            {
+                var refName = itemRef.Split('/').Last();
+                return NamingHelper.ConvertNameToClass(refName);
+            }
+
+            var allOf = item["allOf"] as JArray;
+            if (allOf != null)
+            {
+                var allOfRef = allOf
+                    .OfType<JObject>()
+                    .Select(o => o["$ref"]?.ToString())
+                    .FirstOrDefault(r => !string.IsNullOrEmpty(r));
+
+                if (!string.IsNullOrEmpty(allOfRef))
+                {
+                    var refName = allOfRef.Split('/').Last();
+                    return NamingHelper.ConvertNameToClass(refName);
+                }
+            }
+
+            var typeToken = item["type"];
+            if (typeToken == null)
+            {
+                return null;
+            }
+
+            if (typeToken.Type == JTokenType.Array)
+            {
+                var typeArray = (JArray)typeToken;
+                if (typeArray.Any(t => t.ToString() == "null"))
+                {
+                    hasNullType = true;
+                }
+
+                var nonNullType = typeArray.FirstOrDefault(t => t.ToString() != "null")?.ToString();
+                if (!string.IsNullOrEmpty(nonNullType))
+                {
+                    return GetCSharpTypeForJsonType(nonNullType, item);
+                }
+
+                return null;
+            }
+
+            var typeName = typeToken.ToString();
+            if (typeName == "null")
+            {
+                hasNullType = true;
+                return null;
+            }
+
+            return GetCSharpTypeForJsonType(typeName, item);
+        }
+
+        private string GenerateUnionTypeStruct(string className, List<string> unionTypes, bool hasNullType, string description)
+        {
+            var sb = new StringBuilder();
+
+            var uniqueUnionTypes = unionTypes.Distinct().ToList();
+
+            AppendXmlDocs(sb, description);
+
+            sb.AppendLineLf($"[JsonConverter(typeof(UnionTypeConverter<{className}>))]");
+            sb.AppendLineLf($"public readonly struct {className} : IEquatable<{className}>");
+            sb.AppendLineLf("{");
+            sb.AppendLineLf("    private readonly object _value;");
+            sb.AppendLineLf("    private readonly int _typeIndex;");
+
+            if (hasNullType)
+            {
+                sb.AppendLineLf("    private readonly bool _isNull;");
+            }
+
+            sb.AppendLineLf();
+
+            for (int i = 0; i < uniqueUnionTypes.Count; i++)
+            {
+                var unionType = uniqueUnionTypes[i];
+                sb.AppendLineLf($"    public {className}({unionType} value)");
+                sb.AppendLineLf("    {");
+                sb.AppendLineLf("        _value = value;");
+                sb.AppendLineLf($"        _typeIndex = {i};");
+                if (hasNullType)
+                {
+                    sb.AppendLineLf("        _isNull = false;");
+                }
+                sb.AppendLineLf("    }");
+                sb.AppendLineLf();
+            }
+
+            if (hasNullType)
+            {
+                sb.AppendLineLf($"    private {className}(bool isNull)");
+                sb.AppendLineLf("    {");
+                sb.AppendLineLf("        _value = null;");
+                sb.AppendLineLf("        _typeIndex = -1;");
+                sb.AppendLineLf("        _isNull = isNull;");
+                sb.AppendLineLf("    }");
+                sb.AppendLineLf();
+                sb.AppendLineLf($"    public static {className} Null => new {className}(true);");
+                sb.AppendLineLf();
+            }
+
+            foreach (var unionType in uniqueUnionTypes)
+            {
+                sb.AppendLineLf($"    public static implicit operator {className}({unionType} value) => new {className}(value);");
+            }
+            sb.AppendLineLf();
+
+            if (hasNullType)
+            {
+                sb.AppendLineLf("    public bool IsNull => _isNull;");
+                sb.AppendLineLf();
+            }
+
+            foreach (var unionType in uniqueUnionTypes)
+            {
+                var cleanTypeName = unionType.Replace("<", "").Replace(">", "").Replace(",", "").Replace(" ", "").Replace("[", "").Replace("]", "");
+                var methodName = "TryGet" + char.ToUpper(cleanTypeName[0]) + cleanTypeName.Substring(1);
+
+                sb.AppendLineLf($"    public bool {methodName}(out {unionType} value)");
+                sb.AppendLineLf("    {");
+                if (hasNullType)
+                {
+                    sb.AppendLineLf("        if (_isNull)");
+                    sb.AppendLineLf("        {");
+                    sb.AppendLineLf("            value = default;");
+                    sb.AppendLineLf("            return false;");
+                    sb.AppendLineLf("        }");
+                }
+                sb.AppendLineLf($"        if (_value is {unionType} v)");
+                sb.AppendLineLf("        {");
+                sb.AppendLineLf("            value = v;");
+                sb.AppendLineLf("            return true;");
+                sb.AppendLineLf("        }");
+                sb.AppendLineLf("        value = default;");
+                sb.AppendLineLf("        return false;");
+                sb.AppendLineLf("    }");
+                sb.AppendLineLf();
+            }
+
+            if (hasNullType)
+            {
+                sb.AppendLineLf($"    public bool Equals({className} other) => _isNull == other._isNull && (_isNull || (Equals(_value, other._value) && _typeIndex == other._typeIndex));");
+                sb.AppendLineLf($"    public override bool Equals(object obj) => obj is {className} other && Equals(other);");
+                sb.AppendLineLf("    public override int GetHashCode()");
+                sb.AppendLineLf("    {");
+                sb.AppendLineLf("        if (_isNull) return 0;");
+                sb.AppendLineLf("        unchecked");
+                sb.AppendLineLf("        {");
+                sb.AppendLineLf("            int hash = 17;");
+                sb.AppendLineLf("            hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);");
+                sb.AppendLineLf("            hash = hash * 31 + _typeIndex;");
+                sb.AppendLineLf("            return hash;");
+                sb.AppendLineLf("        }");
+                sb.AppendLineLf("    }");
+                sb.AppendLineLf("    public override string ToString() => _isNull ? string.Empty : (_value?.ToString() ?? string.Empty);");
+            }
+            else
+            {
+                sb.AppendLineLf($"    public bool Equals({className} other) => Equals(_value, other._value) && _typeIndex == other._typeIndex;");
+                sb.AppendLineLf($"    public override bool Equals(object obj) => obj is {className} other && Equals(other);");
+                sb.AppendLineLf("    public override int GetHashCode()");
+                sb.AppendLineLf("    {");
+                sb.AppendLineLf("        unchecked");
+                sb.AppendLineLf("        {");
+                sb.AppendLineLf("            int hash = 17;");
+                sb.AppendLineLf("            hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);");
+                sb.AppendLineLf("            hash = hash * 31 + _typeIndex;");
+                sb.AppendLineLf("            return hash;");
+                sb.AppendLineLf("        }");
+                sb.AppendLineLf("    }");
+                sb.AppendLineLf("    public override string ToString() => _value?.ToString() ?? string.Empty;");
+            }
+
+            sb.Append("}");
+
+            return sb.ToString();
         }
     }
 }
