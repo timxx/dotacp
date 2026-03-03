@@ -73,11 +73,15 @@ namespace clientcli
             }
 
             Console.WriteLine($"Session: {session.SessionId}");
-            if (session.Modes != null)
+
+            bool hasModels = false;
+            if (session.Models != null)
             {
                 Console.WriteLine("Available models:");
                 foreach (var model in session.Models.AvailableModels)
                     Console.WriteLine($"  - {model.ModelId}: {model.Name} - {model.Description}");
+                hasModels = session.Models.AvailableModels.Length > 0;
+                Console.WriteLine("Current model: " + session.Models.CurrentModelId);
             }
 
             bool hasModes = false;
@@ -113,9 +117,9 @@ namespace clientcli
             Console.WriteLine("Commands:");
             Console.WriteLine("  /exit - Exit the client");
             if (hasModes)
-            {
                 Console.WriteLine("  /switchmode <modeId> - Switch mode");
-            }
+            if (hasModels)
+                Console.WriteLine("  /switchmodel <modelId> - Switch model");
 
             while (true)
             {
@@ -139,6 +143,17 @@ namespace clientcli
                     {
                         SessionId = session.SessionId,
                         ModeId = modeId
+                    });
+                    continue;
+                }
+
+                if (hasModels && input.StartsWith("/switchmodel "))
+                {
+                    var modelId = input.Split(' ')[1].Trim();
+                    await connection.SetSessionModelAsync(new SetSessionModelRequest()
+                    {
+                        SessionId = session.SessionId,
+                        ModelId = modelId
                     });
                     continue;
                 }
