@@ -8,6 +8,8 @@ namespace dotacp.generator
 {
     class Program
     {
+        private static Func<SchemaDownloader> _schemaDownloaderFactory = () => new SchemaDownloader();
+
         static async Task<int> Main(string[] args)
         {
             var rootCommand = new RootCommand("ACP Protocol Code Generator");
@@ -223,7 +225,7 @@ namespace dotacp.generator
                 // Handle schema download if needed
                 if (!string.IsNullOrEmpty(version) && !noDownload)
                 {
-                    var downloader = new SchemaDownloader();
+                    var downloader = _schemaDownloaderFactory();
                     var gitRef = downloader.ResolveRef(version);
                     var cachedRef = downloader.GetCachedRef(Path.Combine(schemaDir, "VERSION"));
 

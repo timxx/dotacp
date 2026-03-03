@@ -2,7 +2,10 @@ using dotacp.generator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace dotacp.unittest
@@ -20,6 +23,12 @@ namespace dotacp.unittest
         {
             var programType = GetProgramType();
             return programType.GetMethod("Main", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        }
+
+        private static FieldInfo GetSchemaDownloaderFactoryField()
+        {
+            var programType = GetProgramType();
+            return programType.GetField("_schemaDownloaderFactory", BindingFlags.Static | BindingFlags.NonPublic);
         }
 
         private async Task<int> InvokeMainAsync(string[] args)
@@ -541,6 +550,12 @@ namespace dotacp.unittest
             Directory.CreateDirectory(agentDir);
             Directory.CreateDirectory(clientDir);
 
+            var factoryField = GetSchemaDownloaderFactoryField();
+            var oldFactory = factoryField.GetValue(null);
+            HttpClient downloadClient = FakeHttpMessageHandler.CreateHttpClient();
+            Func<SchemaDownloader> fakeFactory = () => new SchemaDownloader(downloadClient);
+            factoryField.SetValue(null, fakeFactory);
+
             try
             {
                 File.WriteAllText(Path.Combine(schemaDir, "VERSION"), "refs/tags/v0.9.0");
@@ -548,27 +563,18 @@ namespace dotacp.unittest
                 var args = new[] { "all", "--version", "main", "--force", "--schema-dir", schemaDir, "--output-dir", outputDir };
 
                 // Act
-                // Note: This test requires network access to GitHub
-                try
-                {
-                    var result = await InvokeMainAsync(args);
+                var result = await InvokeMainAsync(args);
 
-                    // Assert
-                    // If successful, schema files should be downloaded
-                    if (result == 0)
-                    {
-                        Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "schema.json")));
-                        Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "meta.json")));
-                    }
-                }
-                catch (Exception)
-                {
-                    // Network issues - test is inconclusive
-                    Assert.Inconclusive("Network unavailable or GitHub unreachable");
-                }
+                // Assert
+                Assert.AreEqual(0, result);
+                Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "schema.json")));
+                Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "meta.json")));
             }
             finally
             {
+                factoryField.SetValue(null, oldFactory);
+                downloadClient.Dispose();
+
                 if (Directory.Exists(tempDir))
                     Directory.Delete(tempDir, true);
             }
@@ -668,6 +674,12 @@ namespace dotacp.unittest
             Directory.CreateDirectory(agentDir);
             Directory.CreateDirectory(clientDir);
 
+            var factoryField = GetSchemaDownloaderFactoryField();
+            var oldFactory = factoryField.GetValue(null);
+            HttpClient downloadClient = FakeHttpMessageHandler.CreateHttpClient();
+            Func<SchemaDownloader> fakeFactory = () => new SchemaDownloader(downloadClient);
+            factoryField.SetValue(null, fakeFactory);
+
             try
             {
                 // Set up cached version that differs from requested
@@ -675,24 +687,18 @@ namespace dotacp.unittest
 
                 var args = new[] { "all", "--version", "main", "--schema-dir", schemaDir, "--output-dir", outputDir };
 
-                // Act - This will attempt to download from GitHub
-                try
-                {
-                    var result = await InvokeMainAsync(args);
-                    // If successful, files should be present
-                    if (result == 0)
-                    {
-                        Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "schema.json")));
-                    }
-                }
-                catch
-                {
-                    // Network issues - test is inconclusive
-                    Assert.Inconclusive("Network unavailable");
-                }
+                // Act
+                var result = await InvokeMainAsync(args);
+
+                // Assert
+                Assert.AreEqual(0, result);
+                Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "schema.json")));
             }
             finally
             {
+                factoryField.SetValue(null, oldFactory);
+                downloadClient.Dispose();
+
                 if (Directory.Exists(tempDir))
                     Directory.Delete(tempDir, true);
             }

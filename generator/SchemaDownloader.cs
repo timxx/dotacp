@@ -10,7 +10,18 @@ namespace dotacp.generator
     /// </summary>
     public class SchemaDownloader
     {
-        private static readonly HttpClient httpClient = new HttpClient();
+        private static HttpClient defaultHttpClient = new HttpClient();
+        private readonly HttpClient httpClient;
+
+        public SchemaDownloader()
+            : this(defaultHttpClient)
+        {
+        }
+
+        public SchemaDownloader(HttpClient httpClient)
+        {
+            this.httpClient = httpClient;
+        }
 
         /// <summary>
         /// Resolve a version string to a git ref

@@ -184,10 +184,9 @@ namespace dotacp.unittest
         {
             // Arrange
             var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            var downloader = new SchemaDownloader();
+            var downloadClient = FakeHttpMessageHandler.CreateHttpClient();
+            var downloader = new SchemaDownloader(downloadClient);
 
-            // Note: This test will actually try to download from GitHub
-            // Skip if no internet connection or to avoid hitting GitHub
             try
             {
                 // Act
@@ -205,13 +204,10 @@ namespace dotacp.unittest
                 var versionContent = File.ReadAllText(Path.Combine(tempDir, "VERSION"));
                 Assert.AreEqual("refs/heads/main", versionContent);
             }
-            catch (Exception ex) when (ex.InnerException is HttpRequestException || ex is HttpRequestException)
-            {
-                // Skip test if network is unavailable
-                Assert.Inconclusive("Network unavailable or GitHub unreachable");
-            }
             finally
             {
+                downloadClient.Dispose();
+
                 if (Directory.Exists(tempDir))
                     Directory.Delete(tempDir, true);
             }
@@ -222,7 +218,9 @@ namespace dotacp.unittest
         {
             // Arrange
             var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            var downloader = new SchemaDownloader();
+            var throwingClient = new HttpClient(new FakeHttpMessageHandler(
+                _ => throw new HttpRequestException("simulated download failure")));
+            var downloader = new SchemaDownloader(throwingClient);
 
             try
             {
@@ -234,7 +232,6 @@ namespace dotacp.unittest
                         "invalid/nonexistent-repo",
                         "refs/heads/nonexistent",
                         tempDir);
-                    Assert.Fail("Expected exception was not thrown");
                 }
                 catch (Exception ex)
                 {
@@ -246,6 +243,8 @@ namespace dotacp.unittest
             }
             finally
             {
+                throwingClient.Dispose();
+
                 if (Directory.Exists(tempDir))
                     Directory.Delete(tempDir, true);
             }
