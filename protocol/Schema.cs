@@ -231,17 +231,35 @@ namespace dotacp.protocol
         private readonly object _value;
         private readonly int _typeIndex;
 
-        public SessionConfigSelectOptions(object[] value)
+        public SessionConfigSelectOptions(SessionConfigSelectOption[] value)
         {
             _value = value;
             _typeIndex = 0;
         }
 
-        public static implicit operator SessionConfigSelectOptions(object[] value) => new SessionConfigSelectOptions(value);
-
-        public bool TryGetObject(out object[] value)
+        public SessionConfigSelectOptions(SessionConfigSelectGroup[] value)
         {
-            if (_value is object[] v)
+            _value = value;
+            _typeIndex = 1;
+        }
+
+        public static implicit operator SessionConfigSelectOptions(SessionConfigSelectOption[] value) => new SessionConfigSelectOptions(value);
+        public static implicit operator SessionConfigSelectOptions(SessionConfigSelectGroup[] value) => new SessionConfigSelectOptions(value);
+
+        public bool TryGetSessionConfigSelectOption(out SessionConfigSelectOption[] value)
+        {
+            if (_value is SessionConfigSelectOption[] v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSessionConfigSelectGroup(out SessionConfigSelectGroup[] value)
+        {
+            if (_value is SessionConfigSelectGroup[] v)
             {
                 value = v;
                 return true;

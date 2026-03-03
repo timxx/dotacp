@@ -125,13 +125,13 @@ namespace clientcli
             Console.WriteLine("  /newsession [workingDir] - Start a new session");
             if (capabilities.LoadSession)
                 Console.WriteLine("  /loadsession <sessionId> - Load another session");
-            if (capabilities.SessionCapabilities  != null)
+            if (capabilities.SessionCapabilities != null)
             {
                 if (capabilities.SessionCapabilities.List != null)
                     Console.WriteLine("  /listsessions - List available sessions to load");
                 if (capabilities.SessionCapabilities.Fork != null)
                     Console.WriteLine("  /forksession - Fork the current session");
-                if (capabilities.SessionCapabilities.Resume  != null)
+                if (capabilities.SessionCapabilities.Resume != null)
                     Console.WriteLine("  /resumesession <sessionId> - Resume a suspended session");
             }
             Console.ResetColor();

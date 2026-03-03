@@ -278,6 +278,43 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public void AnyOfUnionDetection_GeneratesTypedArrayUnionStructForSessionConfigSelectOptions()
+        {
+            var defs = JObject.Parse(@"{
+  'SessionConfigSelectOption': {
+    'type': 'object',
+    'properties': { 'value': { 'type': 'string' }, 'name': { 'type': 'string' } },
+    'required': ['value', 'name']
+  },
+  'SessionConfigSelectGroup': {
+    'type': 'object',
+    'properties': {
+      'group': { 'type': 'string' },
+      'name': { 'type': 'string' },
+      'options': { 'type': 'array', 'items': { '$ref': '#/$defs/SessionConfigSelectOption' } }
+    },
+    'required': ['group', 'name', 'options']
+  },
+  'SessionConfigSelectOptions': {
+    'anyOf': [
+      { 'type': 'array', 'items': { '$ref': '#/$defs/SessionConfigSelectOption' } },
+      { 'type': 'array', 'items': { '$ref': '#/$defs/SessionConfigSelectGroup' } }
+    ]
+  }
+}");
+
+            var result = BuildModel("SessionConfigSelectOptions", defs);
+
+            StringAssert.Contains(result, "public SessionConfigSelectOptions(SessionConfigSelectOption[] value)");
+            StringAssert.Contains(result, "public SessionConfigSelectOptions(SessionConfigSelectGroup[] value)");
+            StringAssert.Contains(result, "public static implicit operator SessionConfigSelectOptions(SessionConfigSelectOption[] value)");
+            StringAssert.Contains(result, "public static implicit operator SessionConfigSelectOptions(SessionConfigSelectGroup[] value)");
+            StringAssert.Contains(result, "public bool TryGetSessionConfigSelectOption(out SessionConfigSelectOption[] value)");
+            StringAssert.Contains(result, "public bool TryGetSessionConfigSelectGroup(out SessionConfigSelectGroup[] value)");
+            Assert.DoesNotContain("SessionConfigSelectOptions(object[] value)", result);
+        }
+
+        [TestMethod]
         public void AnyOfVsDiscriminatedUnion_GeneratesClassWhenAnyOfHasProperties()
         {
             var defs = JObject.Parse(@"{

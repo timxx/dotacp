@@ -1,5 +1,8 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace dotacp.protocol
@@ -19,44 +22,22 @@ namespace dotacp.protocol
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            object value = null;
-            bool isNull = false;
+            var token = JToken.ReadFrom(reader);
 
-            switch (reader.TokenType)
+            if (token.Type == JTokenType.Null)
             {
-                case JsonToken.Null:
-                    if (_nullProperty != null)
-                        return _nullProperty.GetValue(null);
-                    isNull = true;
-                    break;
+                if (_nullProperty != null)
+                {
+                    return _nullProperty.GetValue(null);
+                }
 
-                case JsonToken.String:
-                    value = (string)reader.Value;
-                    break;
-
-                case JsonToken.Integer:
-                    // Newtonsoft reads integers as long by default
-                    value = (long)reader.Value;
-                    break;
-
-                case JsonToken.Float:
-                    value = (double)reader.Value;
-                    break;
-
-                case JsonToken.Boolean:
-                    value = (bool)reader.Value;
-                    break;
-
-                default:
-                    throw new JsonSerializationException(
-                        $"Unexpected token type {reader.TokenType} for union type {typeof(TUnion).Name}");
-            }
-
-            if (isNull)
                 throw new JsonSerializationException(
                     $"Union type {typeof(TUnion).Name} does not support null values");
+            }
 
             // Find a constructor that matches the value type
+            var candidates = new List<(object Value, int Score, ConstructorInfo Ctor)>();
+
             foreach (var ctor in typeof(TUnion).GetConstructors())
             {
                 var parameters = ctor.GetParameters();
@@ -64,30 +45,92 @@ namespace dotacp.protocol
                 {
                     var paramType = parameters[0].ParameterType;
 
-                    if (value == null)
+                    try
                     {
-                        if (!paramType.IsValueType || Nullable.GetUnderlyingType(paramType) != null)
-                            return ctor.Invoke(new object[] { null });
+                        var converted = token.ToObject(paramType, serializer);
+                        if (converted != null || !paramType.IsValueType || Nullable.GetUnderlyingType(paramType) != null)
+                        {
+                            var score = GetMatchScore(token, paramType);
+                            candidates.Add((converted, score, ctor));
+                        }
                     }
-                    else if (paramType.IsAssignableFrom(value.GetType()))
+                    catch (Exception)
                     {
-                        return ctor.Invoke(new object[] { value });
-                    }
-                    else if (paramType == typeof(long) && value is int intValue)
-                    {
-                        return ctor.Invoke(new object[] { (long)intValue });
-                    }
-                    else if (paramType == typeof(int) && value is long longValue
-                        && longValue >= int.MinValue && longValue <= int.MaxValue)
-                    {
-                        return ctor.Invoke(new object[] { (int)longValue });
+                        // Try next constructor type
                     }
                 }
             }
 
+            if (candidates.Count > 0)
+            {
+                var best = candidates
+                    .OrderByDescending(c => c.Score)
+                    .ThenBy(c => c.Ctor.GetParameters()[0].ParameterType.FullName, StringComparer.Ordinal)
+                    .First();
+
+                return best.Ctor.Invoke(new[] { best.Value });
+            }
+
             throw new JsonSerializationException(
                 $"No suitable constructor found for union type {typeof(TUnion).Name} " +
-                $"with value type {value?.GetType().Name ?? "null"}");
+                $"for JSON token type {token.Type}");
+        }
+
+        private static int GetMatchScore(JToken token, Type paramType)
+        {
+            if (token.Type == JTokenType.Array && paramType.IsArray)
+            {
+                var elementType = paramType.GetElementType();
+                var tokenArray = (JArray)token;
+                if (elementType != null && tokenArray.Count > 0 && tokenArray[0] is JObject firstObject)
+                {
+                    return 100 + GetObjectPropertyMatchScore(firstObject, elementType);
+                }
+
+                return 100;
+            }
+
+            if (token.Type == JTokenType.Object)
+            {
+                if (token is JObject tokenObject)
+                {
+                    return 100 + GetObjectPropertyMatchScore(tokenObject, paramType);
+                }
+
+                return 100;
+            }
+
+            return 10;
+        }
+
+        private static int GetObjectPropertyMatchScore(JObject tokenObject, Type targetType)
+        {
+            var targetNames = new HashSet<string>(
+                targetType
+                    .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Select(p => p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName ?? ToCamelCase(p.Name)),
+                StringComparer.Ordinal);
+
+            var score = 0;
+            foreach (var prop in tokenObject.Properties())
+            {
+                if (targetNames.Contains(prop.Name))
+                {
+                    score += 5;
+                }
+            }
+
+            return score;
+        }
+
+        private static string ToCamelCase(string value)
+        {
+            if (string.IsNullOrEmpty(value) || char.IsLower(value[0]))
+            {
+                return value;
+            }
+
+            return char.ToLowerInvariant(value[0]) + value.Substring(1);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

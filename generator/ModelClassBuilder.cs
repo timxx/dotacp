@@ -555,6 +555,30 @@ namespace dotacp.generator
                     break;
                 }
 
+                var itemRef = itemObj["$ref"]?.ToString();
+                if (!string.IsNullOrEmpty(itemRef))
+                {
+                    var refName = itemRef.Split('/').Last();
+                    unionTypes.Add(NamingHelper.ConvertNameToClass(refName));
+                    continue;
+                }
+
+                var allOf = itemObj["allOf"] as JArray;
+                if (allOf != null)
+                {
+                    var allOfRef = allOf
+                        .OfType<JObject>()
+                        .Select(o => o["$ref"]?.ToString())
+                        .FirstOrDefault(r => !string.IsNullOrEmpty(r));
+
+                    if (!string.IsNullOrEmpty(allOfRef))
+                    {
+                        var refName = allOfRef.Split('/').Last();
+                        unionTypes.Add(NamingHelper.ConvertNameToClass(refName));
+                        continue;
+                    }
+                }
+
                 var itemTypeToken = itemObj["type"];
                 if (itemTypeToken != null)
                 {
@@ -598,6 +622,11 @@ namespace dotacp.generator
 
         private string GetCSharpTypeForJsonType(string jsonType, JObject item)
         {
+            if (jsonType == "array")
+            {
+                return typeResolver.GetPropertyType(item);
+            }
+
             if (jsonType == "integer" && item["format"] != null)
             {
                 var format = item["format"]!.ToString();

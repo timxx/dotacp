@@ -313,6 +313,52 @@ namespace dotacp.unittest
             Assert.AreEqual(string.Empty, nullId.ToString());
         }
 
+        [TestMethod]
+        public void SessionConfigSelectOptions_CanHoldUngroupedOptionsArray()
+        {
+            // Arrange
+            var optionValues = new[]
+            {
+                new SessionConfigSelectOption { Value = "v1", Name = "Option 1" }
+            };
+
+            // Act
+            SessionConfigSelectOptions options = optionValues;
+
+            // Assert
+            Assert.IsTrue(options.TryGetSessionConfigSelectOption(out var ungrouped));
+            Assert.HasCount(1, ungrouped);
+            Assert.AreEqual("v1", (string)ungrouped[0].Value);
+            Assert.IsFalse(options.TryGetSessionConfigSelectGroup(out _));
+        }
+
+        [TestMethod]
+        public void SessionConfigSelectOptions_CanHoldGroupedOptionsArray()
+        {
+            // Arrange
+            var groupedValues = new[]
+            {
+                new SessionConfigSelectGroup
+                {
+                    Group = "g1",
+                    Name = "Group 1",
+                    Options = new[]
+                    {
+                        new SessionConfigSelectOption { Value = "v1", Name = "Option 1" }
+                    }
+                }
+            };
+
+            // Act
+            SessionConfigSelectOptions options = groupedValues;
+
+            // Assert
+            Assert.IsTrue(options.TryGetSessionConfigSelectGroup(out var grouped));
+            Assert.HasCount(1, grouped);
+            Assert.AreEqual("g1", (string)grouped[0].Group);
+            Assert.IsFalse(options.TryGetSessionConfigSelectOption(out _));
+        }
+
         #endregion
 
         #region Integration Tests
@@ -374,6 +420,59 @@ namespace dotacp.unittest
                     Assert.AreEqual(stringVal, deserializedString);
                 }
             }
+        }
+
+        [TestMethod]
+        public void SessionConfigSelectOptions_RoundTripSerialization_WorksForUngroupedAndGrouped()
+        {
+            // Arrange
+            var ungroupedSelect = new SessionConfigSelect
+            {
+                CurrentValue = "v1",
+                Id = "opt1",
+                Name = "Option",
+                Options = new[]
+                {
+                    new SessionConfigSelectOption { Value = "v1", Name = "Option 1" }
+                }
+            };
+
+            var groupedSelect = new SessionConfigSelect
+            {
+                CurrentValue = "v1",
+                Id = "opt2",
+                Name = "Grouped Option",
+                Options = new[]
+                {
+                    new SessionConfigSelectGroup
+                    {
+                        Group = "g1",
+                        Name = "Group 1",
+                        Options = new[]
+                        {
+                            new SessionConfigSelectOption { Value = "v1", Name = "Option 1" }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            var ungroupedJson = JsonConvert.SerializeObject(ungroupedSelect);
+            var groupedJson = JsonConvert.SerializeObject(groupedSelect);
+
+            var ungroupedRoundTrip = JsonConvert.DeserializeObject<SessionConfigSelect>(ungroupedJson);
+            var groupedRoundTrip = JsonConvert.DeserializeObject<SessionConfigSelect>(groupedJson);
+
+            // Assert
+            Assert.IsNotNull(ungroupedRoundTrip);
+            Assert.IsTrue(ungroupedRoundTrip.Options.TryGetSessionConfigSelectOption(out var ungroupedOptions));
+            Assert.HasCount(1, ungroupedOptions);
+            Assert.AreEqual("v1", (string)ungroupedOptions[0].Value);
+
+            Assert.IsNotNull(groupedRoundTrip);
+            Assert.IsTrue(groupedRoundTrip.Options.TryGetSessionConfigSelectGroup(out var groupedOptions));
+            Assert.HasCount(1, groupedOptions);
+            Assert.AreEqual("g1", (string)groupedOptions[0].Group);
         }
 
         #endregion
