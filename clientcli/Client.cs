@@ -41,11 +41,16 @@ namespace clientcli
             if (update is AvailableCommandsUpdate commands)
             {
                 _lastMessage = MessageType.AvaiableCommands;
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 await Console.Out.WriteLineAsync($"Available commands:");
                 foreach (var command in commands.AvailableCommands)
                 {
-                    await Console.Out.WriteLineAsync($"  - /{command.Name}: {command.Description}");
+                    await Console.Out.WriteAsync($"  /{command.Name}");
+                    if (command.Input is UnstructuredCommandInput input)
+                        await Console.Out.WriteAsync($" <{input.Hint}>");
+                    await Console.Out.WriteLineAsync($" - {command.Description}");
                 }
+                Console.ResetColor();
             }
             else if (update is SessionUpdateAgentMessageChunk agentMessage)
             {

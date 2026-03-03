@@ -115,12 +115,14 @@ namespace clientcli
                 Console.WriteLine($"Extension method/notification call failed: {ex}");
             }
 
-            Console.WriteLine("Commands:");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Available commands:");
             Console.WriteLine("  /exit - Exit the client");
             if (hasModes)
                 Console.WriteLine("  /switchmode <modeId> - Switch mode");
             if (hasModels)
                 Console.WriteLine("  /switchmodel <modelId> - Switch model");
+            Console.WriteLine("  /newsession [workingDir] - Start a new session");
             if (capabilities.LoadSession)
                 Console.WriteLine("  /loadsession <sessionId> - Load another session");
             if (capabilities.SessionCapabilities  != null)
@@ -132,6 +134,7 @@ namespace clientcli
                 if (capabilities.SessionCapabilities.Resume  != null)
                     Console.WriteLine("  /resumesession <sessionId> - Resume a suspended session");
             }
+            Console.ResetColor();
 
             while (true)
             {
@@ -179,6 +182,23 @@ namespace clientcli
                         Cwd = Environment.CurrentDirectory,
                         McpServers = Array.Empty<McpServer>()
                     });
+                    continue;
+                }
+
+                if (input.StartsWith("/newsession"))
+                {
+                    var pos = input.IndexOf(' ');
+                    string? workingDir = null;
+                    if (pos >= 0)
+                        workingDir = input.Substring(pos + 1).Trim();
+
+                    var newSessionResp = await connection.NewSessionAsync(new NewSessionRequest()
+                    {
+                        Cwd = workingDir ?? Environment.CurrentDirectory,
+                        McpServers = Array.Empty<McpServer>()
+                    });
+                    session = newSessionResp;
+                    Console.WriteLine($"New session: {session.SessionId}");
                     continue;
                 }
 
