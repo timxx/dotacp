@@ -456,13 +456,8 @@ namespace dotacp.generator
                     if (constValue != null)
                     {
                         enumEntry.Append($"    {enumName} = {constValue}");
+                        enumValues.Add(enumEntry.ToString());
                     }
-                    else
-                    {
-                        enumEntry.Append($"    {enumName} = 0");
-                    }
-
-                    enumValues.Add(enumEntry.ToString());
                 }
 
                 sb.Append(string.Join(",\n\n", enumValues));

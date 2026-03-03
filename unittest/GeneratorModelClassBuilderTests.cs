@@ -227,7 +227,7 @@ namespace dotacp.unittest
             StringAssert.Contains(result, ": int");
             StringAssert.Contains(result, "ParseError = -32700");
             StringAssert.Contains(result, "InvalidRequest = -32600");
-            StringAssert.Contains(result, "Other = 0");
+            Assert.DoesNotContain("Other = 0", result);
         }
 
         [TestMethod]

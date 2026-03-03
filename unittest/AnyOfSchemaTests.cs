@@ -19,12 +19,12 @@ namespace dotacp.unittest
             // Arrange & Act
             ErrorCode parseError = ErrorCode.ParseError;
             ErrorCode invalidRequest = ErrorCode.InvalidRequest;
-            ErrorCode other = ErrorCode.Other;
+            ErrorCode unknown = (ErrorCode)(-32055);
 
             // Assert
             Assert.AreEqual(-32700, (int)parseError);
             Assert.AreEqual(-32600, (int)invalidRequest);
-            Assert.AreEqual(0, (int)other);
+            Assert.AreEqual(-32055, (int)unknown);
         }
 
         [TestMethod]
@@ -44,6 +44,16 @@ namespace dotacp.unittest
             // Integer enums serialize as numbers, not strings
             Assert.Contains("-32600", json, $"Should serialize as integer value, got: {json}");
             Assert.Contains("Test error", json);
+
+            var unknownError = new Error
+            {
+                Code = (ErrorCode)(-42055),
+                Message = "Unknown error"
+            };
+
+            json = JsonConvert.SerializeObject(unknownError);
+            Assert.Contains("-42055", json, $"Should serialize as integer value, got: {json}");
+            Assert.Contains("Unknown error", json);
         }
 
         [TestMethod]
@@ -59,6 +69,11 @@ namespace dotacp.unittest
             Assert.IsNotNull(error);
             Assert.AreEqual(ErrorCode.MethodNotFound, error.Code);
             Assert.AreEqual("Method not found", error.Message);
+
+            json = "{\"code\":-42055,\"message\":\"Unknown error\"}";
+            error = JsonConvert.DeserializeObject<Error>(json);
+            Assert.IsNotNull(error);
+            Assert.AreEqual((ErrorCode)(-42055), error.Code);
         }
 
         [TestMethod]

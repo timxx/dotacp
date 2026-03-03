@@ -431,12 +431,7 @@ namespace dotacp.protocol
         /// <summary>
         /// **Resource not found**: A given resource, such as a file, was not found.
         /// </summary>
-        ResourceNotFound = -32002,
-
-        /// <summary>
-        /// Other undefined error code.
-        /// </summary>
-        Other = 0
+        ResourceNotFound = -32002
     }
 
     /// <summary>
