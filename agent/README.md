@@ -317,5 +317,5 @@ Licensed under the Apache License 2.0. See the [LICENSE](../LICENSE) file for de
 ## See Also
 
 - [dotacp.protocol](../protocol/README.md) - Protocol definitions
-- [dotacp.client](../client/README.md) - Client implementation guid
+- [dotacp.client](../client/README.md) - Client implementation guide
 - [Agent Client Protocol Specification](https://agentclientprotocol.com/)

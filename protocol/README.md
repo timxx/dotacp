@@ -135,7 +135,7 @@ The generated code includes:
 This package implements **ACP Protocol Version 1** based on the **ACP v0.10.8** specification.
 
 ## See Also
-- [dotacp.client](../client/README.md) - Client implementation guid
+- [dotacp.client](../client/README.md) - Client implementation guide
 - [dotacp.agent](../agent/README.md) - Agent implementation guide
 - [Agent Client Protocol Specification](https://agentclientprotocol.com/)
 
