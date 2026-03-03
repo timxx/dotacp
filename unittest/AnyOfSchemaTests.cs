@@ -173,67 +173,64 @@ namespace dotacp.unittest
         public void RequestId_SerializeLongValue()
         {
             // Arrange
-            var request = new ClientRequest
+            var request = new CancelRequestNotification
             {
-                Id = 42L,
-                Method = "test"
+                RequestId = 42L,
             };
 
             // Act
             string json = JsonConvert.SerializeObject(request);
 
             // Assert
-            Assert.Contains("\"id\":42", json, $"Expected id:42 but got {json}");
+            Assert.Contains("\"requestId\":42", json, $"Expected requestId:42 but got {json}");
         }
 
         [TestMethod]
         public void RequestId_SerializeStringValue()
         {
             // Arrange
-            var request = new ClientRequest
+            var request = new CancelRequestNotification
             {
-                Id = "request-123",
-                Method = "test"
+                RequestId = "request-123",
             };
 
             // Act
             string json = JsonConvert.SerializeObject(request);
 
             // Assert
-            Assert.Contains("\"id\":\"request-123\"",
-                json, $"Expected id:\"request-123\" but got {json}");
+            Assert.Contains("\"requestId\":\"request-123\"",
+                json, $"Expected requestId:\"request-123\" but got {json}");
         }
 
         [TestMethod]
         public void RequestId_SerializeNullValue()
         {
             // Arrange
-            var request = new ClientRequest
+            var request = new CancelRequestNotification
             {
-                Id = RequestId.Null,
-                Method = "test"
+                RequestId = RequestId.Null,
             };
 
             // Act
             string json = JsonConvert.SerializeObject(request);
 
             // Assert
-            Assert.Contains("\"id\":null",
-                json, $"Expected id:null but got {json}");
+            Assert.Contains("\"requestId\":null",
+                json, $"Expected requestId:null but got {json}");
         }
 
         [TestMethod]
         public void RequestId_DeserializeLongValue()
         {
             // Arrange
-            string json = "{\"id\":100,\"method\":\"test\"}";
+            string json = "{\"requestId\":100}";
 
             // Act
-            var request = JsonConvert.DeserializeObject<ClientRequest>(json);
+            var request = JsonConvert.DeserializeObject<CancelRequestNotification>(json);
 
             // Assert
             Assert.IsNotNull(request);
-            Assert.IsTrue(request.Id.TryGetLong(out long value));
+            Assert.IsTrue(request.RequestId.TryGetLong(out long value));
             Assert.AreEqual(100L, value);
         }
 
@@ -241,14 +238,13 @@ namespace dotacp.unittest
         public void RequestId_DeserializeStringValue()
         {
             // Arrange
-            string json = "{\"id\":\"test-id\",\"method\":\"test\"}";
-
+            string json = "{\"requestId\":\"test-id\"}";
             // Act
-            var request = JsonConvert.DeserializeObject<ClientRequest>(json);
+            var request = JsonConvert.DeserializeObject<CancelRequestNotification>(json);
 
             // Assert
             Assert.IsNotNull(request);
-            Assert.IsTrue(request.Id.TryGetString(out string value));
+            Assert.IsTrue(request.RequestId.TryGetString(out string value));
             Assert.AreEqual("test-id", value);
         }
 
@@ -256,14 +252,14 @@ namespace dotacp.unittest
         public void RequestId_DeserializeNullValue()
         {
             // Arrange
-            string json = "{\"id\":null,\"method\":\"test\"}";
+            string json = "{\"requestId\":null}";
 
             // Act
-            var request = JsonConvert.DeserializeObject<ClientRequest>(json);
+            var request = JsonConvert.DeserializeObject<CancelRequestNotification>(json);
 
             // Assert
             Assert.IsNotNull(request);
-            Assert.IsTrue(request.Id.IsNull);
+            Assert.IsTrue(request.RequestId.IsNull);
         }
 
         [TestMethod]
@@ -390,33 +386,32 @@ namespace dotacp.unittest
             // Arrange
             var requests = new[]
             {
-                new ClientRequest { Id = 1L, Method = "method1" },
-                new ClientRequest { Id = "string-id", Method = "method2" },
-                new ClientRequest { Id = RequestId.Null, Method = "method3" }
+                new CancelRequestNotification { RequestId = 1L},
+                new CancelRequestNotification { RequestId = "string-id" },
+                new CancelRequestNotification { RequestId = RequestId.Null}
             };
 
             foreach (var originalRequest in requests)
             {
                 // Act
                 string json = JsonConvert.SerializeObject(originalRequest);
-                var deserializedRequest = JsonConvert.DeserializeObject<ClientRequest>(json);
+                var deserializedRequest = JsonConvert.DeserializeObject<CancelRequestNotification>(json);
 
                 // Assert
                 Assert.IsNotNull(deserializedRequest);
-                Assert.AreEqual(originalRequest.Method, deserializedRequest.Method);
 
-                if (originalRequest.Id.IsNull)
+                if (originalRequest.RequestId.IsNull)
                 {
-                    Assert.IsTrue(deserializedRequest.Id.IsNull);
+                    Assert.IsTrue(deserializedRequest.RequestId.IsNull);
                 }
-                else if (originalRequest.Id.TryGetLong(out long longVal))
+                else if (originalRequest.RequestId.TryGetLong(out long longVal))
                 {
-                    Assert.IsTrue(deserializedRequest.Id.TryGetLong(out long deserializedLong));
+                    Assert.IsTrue(deserializedRequest.RequestId.TryGetLong(out long deserializedLong));
                     Assert.AreEqual(longVal, deserializedLong);
                 }
-                else if (originalRequest.Id.TryGetString(out string stringVal))
+                else if (originalRequest.RequestId.TryGetString(out string stringVal))
                 {
-                    Assert.IsTrue(deserializedRequest.Id.TryGetString(out string deserializedString));
+                    Assert.IsTrue(deserializedRequest.RequestId.TryGetString(out string deserializedString));
                     Assert.AreEqual(stringVal, deserializedString);
                 }
             }

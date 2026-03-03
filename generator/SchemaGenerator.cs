@@ -68,6 +68,9 @@ namespace dotacp.generator
                 if (def == null)
                     continue;
 
+                if (IsDocsIgnored(def))
+                    continue;
+
                 var classCode = GenerateModelClass(defName, def);
 
                 // Check type of generated code
@@ -124,6 +127,14 @@ namespace dotacp.generator
             sb.AppendLineLf("#pragma warning restore CS1591");
 
             return sb.ToString();
+        }
+
+        private static bool IsDocsIgnored(JObject definition)
+        {
+            var ignoreToken = definition["x-docs-ignore"];
+            return ignoreToken != null
+                && ignoreToken.Type == JTokenType.Boolean
+                && ignoreToken.Value<bool>();
         }
 
         private string GenerateModelClass(string name, JObject definition)

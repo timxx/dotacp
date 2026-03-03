@@ -780,47 +780,6 @@ namespace dotacp.protocol
         public SessionCapabilities SessionCapabilities { get; set; }
     }
 
-    public class AgentNotification
-    {
-        [JsonProperty("method")]
-        public string Method { get; set; } = null!;
-
-        [JsonProperty("params")]
-        public object Params { get; set; }
-    }
-
-    public class AgentRequest
-    {
-        [JsonProperty("id")]
-        public RequestId Id { get; set; }
-
-        [JsonProperty("method")]
-        public string Method { get; set; } = null!;
-
-        [JsonProperty("params")]
-        public object Params { get; set; }
-    }
-
-    public class AgentResponse
-    {
-        [JsonProperty("error")]
-        public Error Error { get; set; }
-
-        [JsonProperty("id")]
-        public RequestId Id { get; set; }
-
-        /// <summary>
-        /// All possible responses that an agent can send to a client.
-        ///
-        /// This enum is used internally for routing RPC responses. You typically won't need
-        /// to use this directly - the responses are handled automatically by the connection.
-        ///
-        /// These are responses to the corresponding `ClientRequest` variants.
-        /// </summary>
-        [JsonProperty("result")]
-        public object Result { get; set; }
-    }
-
     /// <summary>
     /// Optional annotations for the client. The client can use annotations to inform how objects are used or displayed
     /// </summary>
@@ -1127,47 +1086,6 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("terminal")]
         public bool Terminal { get; set; } = false;
-    }
-
-    public class ClientNotification
-    {
-        [JsonProperty("method")]
-        public string Method { get; set; } = null!;
-
-        [JsonProperty("params")]
-        public object Params { get; set; }
-    }
-
-    public class ClientRequest
-    {
-        [JsonProperty("id")]
-        public RequestId Id { get; set; }
-
-        [JsonProperty("method")]
-        public string Method { get; set; } = null!;
-
-        [JsonProperty("params")]
-        public object Params { get; set; }
-    }
-
-    public class ClientResponse
-    {
-        [JsonProperty("error")]
-        public Error Error { get; set; }
-
-        [JsonProperty("id")]
-        public RequestId Id { get; set; }
-
-        /// <summary>
-        /// All possible responses that a client can send to an agent.
-        ///
-        /// This enum is used internally for routing RPC responses. You typically won't need
-        /// to use this directly - the responses are handled automatically by the connection.
-        ///
-        /// These are responses to the corresponding `AgentRequest` variants.
-        /// </summary>
-        [JsonProperty("result")]
-        public object Result { get; set; }
     }
 
     /// <summary>
