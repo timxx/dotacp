@@ -31,8 +31,8 @@ namespace dotacp.shared
             var message = await _innerHandler.ReadAsync(cancellationToken);
 
             // Only intercept extension method calls (those starting with "_")
-            if (message is JsonRpcRequest request && !string.IsNullOrEmpty(request.Method)
-                && request.Method!.StartsWith("_", StringComparison.Ordinal))
+            if (message is JsonRpcRequest request && request.Method != null
+                && request.Method.StartsWith("_", StringComparison.Ordinal))
             {
                 var wrappedRequest = new JsonRpcRequest()
                 {

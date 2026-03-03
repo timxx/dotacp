@@ -1,5 +1,7 @@
 using dotacp.protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -337,6 +339,33 @@ namespace dotacp.unittest
                 Assert.IsNotNull(pair.Client.LastExtMethodRequest);
 
                 Assert.IsNotNull(response);
+            }
+        }
+
+        [TestMethod]
+        public async Task ExtMethodNoArgAsync()
+        {
+            using (var pair = ConnectionPair.Create())
+            {
+                pair.Client.ExtMethodResponseToReturn = new Dictionary<string, object>
+                {
+                    { "resultKey", "resultValue" }
+                };
+
+                var agentConn = pair.Agent.ReceivedConnection!;
+                var response = await agentConn.ExtMethodAsync("client_custom", null!);
+
+                Assert.IsNotNull(pair.Client.LastExtMethodName);
+                Assert.AreEqual("client_custom", pair.Client.LastExtMethodName);
+                Assert.IsNotNull(pair.Client.LastExtMethodRequest);
+
+                Assert.IsNotNull(response);
+                Assert.IsTrue(response is JObject);
+
+                var dict = ((JObject)response).ToObject<Dictionary<string, string>>();
+                Assert.IsNotNull(dict);
+                Assert.IsTrue(dict.ContainsKey("resultKey"));
+                Assert.AreEqual("resultValue", dict["resultKey"]);
             }
         }
 

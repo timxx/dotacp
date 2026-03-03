@@ -390,6 +390,24 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public async Task ExtNotificationNoArgAsync()
+        {
+            using (var pair = ConnectionPair.Create())
+            {
+                await pair.ClientConn.ExtNotificationAsync("custom_event", null!);
+
+                var received = await Task.WhenAny(
+                    pair.Agent.ExtNotificationReceivedSignal.Task,
+                    Task.Delay(5000));
+                Assert.AreEqual(pair.Agent.ExtNotificationReceivedSignal.Task, received,
+                    "Extension notification was not received within timeout");
+
+                Assert.AreEqual("custom_event", pair.Agent.LastExtNotificationName);
+                Assert.IsNotNull(pair.Agent.LastExtNotificationPayload);
+            }
+        }
+
+        [TestMethod]
         public async Task TestCancelAsync()
         {
             using (var pair = ConnectionPair.Create())
