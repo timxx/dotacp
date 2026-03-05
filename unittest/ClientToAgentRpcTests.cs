@@ -744,6 +744,33 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public async Task StopAsync()
+        {
+            using (var pair = ConnectionPair.Create())
+            {
+                pair.Agent.StopSessionResponseToReturn = new StopSessionResponse
+                {
+                    Meta = new Dictionary<string, object> { { "stopped", true } }
+                };
+
+                var request = new StopSessionRequest
+                {
+                    Meta = new Dictionary<string, object> { { "traceId", "stop-1" } },
+                    SessionId = "session-1"
+                };
+                var response = await pair.ClientConn.StopAsync(request);
+
+                Assert.IsNotNull(pair.Agent.LastStopSessionRequest);
+                Assert.AreEqual("session-1", (string)pair.Agent.LastStopSessionRequest!.SessionId);
+                Assert.AreEqual("stop-1", pair.Agent.LastStopSessionRequest.Meta["traceId"].ToString());
+
+                Assert.IsNotNull(response);
+                Assert.IsNotNull(response.Meta);
+                Assert.IsTrue((bool)response.Meta["stopped"]);
+            }
+        }
+
+        [TestMethod]
         public async Task ExtMethodAsync()
         {
             using (var pair = ConnectionPair.Create())
