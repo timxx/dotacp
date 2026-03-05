@@ -29,20 +29,30 @@ namespace dotacp.protocol
             var jsonObject = JObject.Load(reader);
             var info = _info.Value;
 
+            Type targetType;
             if (!jsonObject.TryGetValue(info.PropertyName, StringComparison.Ordinal, out var discriminatorToken))
             {
-                throw new JsonSerializationException(
-                    $"Missing discriminator property '{info.PropertyName}' for {typeof(TBase).Name}.");
+                if (info.DefaultTypeWhenDiscriminatorMissing != null)
+                {
+                    targetType = info.DefaultTypeWhenDiscriminatorMissing;
+                }
+                else
+                {
+                    throw new JsonSerializationException(
+                        $"Missing discriminator property '{info.PropertyName}' for {typeof(TBase).Name}.");
+                }
             }
-
-            var discriminatorValue = discriminatorToken.Type == JTokenType.String
-                ? discriminatorToken.Value<string>()
-                : discriminatorToken.ToString();
-
-            if (!info.Mapping.TryGetValue(discriminatorValue, out var targetType))
+            else
             {
-                throw new JsonSerializationException(
-                    $"Unknown discriminator value '{discriminatorValue}' for {typeof(TBase).Name}.");
+                var discriminatorValue = discriminatorToken.Type == JTokenType.String
+                    ? discriminatorToken.Value<string>()
+                    : discriminatorToken.ToString();
+
+                if (!info.Mapping.TryGetValue(discriminatorValue, out targetType))
+                {
+                    throw new JsonSerializationException(
+                        $"Unknown discriminator value '{discriminatorValue}' for {typeof(TBase).Name}.");
+                }
             }
 
             var target = Activator.CreateInstance(targetType);
@@ -64,6 +74,7 @@ namespace dotacp.protocol
             var baseType = typeof(TBase);
             var propertyField = baseType.GetField("DiscriminatorPropertyName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
             var mappingField = baseType.GetField("DiscriminatorMapping", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            var defaultTypeField = baseType.GetField("DefaultTypeWhenDiscriminatorMissing", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
             if (propertyField == null || mappingField == null)
             {
@@ -74,6 +85,7 @@ namespace dotacp.protocol
 
             var propertyName = propertyField.GetValue(null) as string;
             var mapping = mappingField.GetValue(null) as Dictionary<string, Type>;
+            var defaultType = defaultTypeField?.GetValue(null) as Type;
 
             if (string.IsNullOrWhiteSpace(propertyName) || mapping == null)
             {
@@ -82,19 +94,21 @@ namespace dotacp.protocol
                 );
             }
 
-            return new DiscriminatorInfo(propertyName, mapping);
+            return new DiscriminatorInfo(propertyName, mapping, defaultType);
         }
 
         private sealed class DiscriminatorInfo
         {
-            public DiscriminatorInfo(string propertyName, Dictionary<string, Type> mapping)
+            public DiscriminatorInfo(string propertyName, Dictionary<string, Type> mapping, Type defaultTypeWhenDiscriminatorMissing = null)
             {
                 PropertyName = propertyName;
                 Mapping = mapping;
+                DefaultTypeWhenDiscriminatorMissing = defaultTypeWhenDiscriminatorMissing;
             }
 
             public string PropertyName { get; }
             public Dictionary<string, Type> Mapping { get; }
+            public Type DefaultTypeWhenDiscriminatorMissing { get; }
         }
     }
 }

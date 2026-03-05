@@ -18,6 +18,12 @@ namespace dotacp.generator
         public HashSet<string> AbstractBases { get; } = new HashSet<string>();
         public Dictionary<string, string> ChildToAbstractBase { get; } = new Dictionary<string, string>();
 
+        /// <summary>
+        /// anyOf/oneOf unions where no variant has a const discriminator in JSON (e.g. only titles).
+        /// Like Python's plain union (A | B). We generate an abstract base with ObjectUnionConverter.
+        /// </summary>
+        public Dictionary<string, List<string>> UnionWithoutDiscriminator { get; } = new Dictionary<string, List<string>>();
+
         public DiscriminatorAnalyzer(JObject definitions)
         {
             this.definitions = definitions;
@@ -252,7 +258,7 @@ namespace dotacp.generator
 
                 // Try to detect discriminator property from first variant
                 string discriminatorProperty = null;
-                var variants = new List<(string RefName, string ConstValue, string Title, JObject Item)>();
+                var variants = new List<(string RefName, string ConstValue, string Title, JObject Item, bool HadConstInProperties)>();
 
                 foreach (var item in anyOf)
                 {
@@ -263,6 +269,7 @@ namespace dotacp.generator
                     string refName = null;
                     string constValue = null;
                     string title = itemObj["title"]?.ToString();
+                    bool hadConstInProperties = false;
 
                     // Get $ref from allOf
                     var allOf = itemObj["allOf"] as JArray;
@@ -290,12 +297,13 @@ namespace dotacp.generator
                             {
                                 discriminatorProperty = prop.Name;
                                 constValue = propObj["const"]?.ToString();
+                                hadConstInProperties = true;
                                 break;
                             }
                         }
                     }
 
-                    // If no const value but we have a title, use title as the value
+                    // If no const value but we have a title, use title as the value (variant has no discriminator in JSON)
                     if (constValue == null && !string.IsNullOrEmpty(title))
                     {
                         if (discriminatorProperty == null)
@@ -305,16 +313,41 @@ namespace dotacp.generator
 
                     if (!string.IsNullOrEmpty(constValue))
                     {
-                        variants.Add((refName, constValue, title, itemObj));
+                        variants.Add((refName, constValue, title, itemObj, hadConstInProperties));
                     }
                 }
 
-                // Need at least 2 variants with discriminator info
-                if (variants.Count < 2 || discriminatorProperty == null)
+                // Need at least 2 variants
+                if (variants.Count < 2)
                     continue;
 
                 // Skip if already in BaseInfo
                 if (BaseInfo.ContainsKey(defName))
+                    continue;
+
+                bool anyVariantHasConst = variants.Any(v => v.HadConstInProperties);
+
+                // No variant has a const discriminator in JSON (e.g. EmbeddedResourceResource: only titles).
+                // Generate as union without discriminator (like Python A | B); do not require a "type" field.
+                if (!anyVariantHasConst)
+                {
+                    var variantClassNames = new List<string>();
+                    foreach (var variant in variants)
+                    {
+                        var refName = variant.RefName;
+                        var constValue = variant.ConstValue ?? "";
+                        var className = !string.IsNullOrEmpty(refName)
+                            ? NamingHelper.ConvertNameToClass(refName)
+                            : NamingHelper.ConvertNameToClass(defName) + NamingHelper.ConvertPropertyName(constValue);
+                        variantClassNames.Add(className);
+                        if (!string.IsNullOrEmpty(refName))
+                            ChildToAbstractBase[refName] = defName;
+                    }
+                    UnionWithoutDiscriminator[defName] = variantClassNames;
+                    continue;
+                }
+
+                if (discriminatorProperty == null)
                     continue;
 
                 var baseClassName = NamingHelper.ConvertNameToClass(defName);
@@ -333,10 +366,20 @@ namespace dotacp.generator
                     }
                 }
 
+                string defaultTypeWhenMissing = null;
                 foreach (var variant in variants)
                 {
                     var refName = variant.RefName;
                     var constValue = variant.ConstValue ?? "";
+
+                    // Variants with no const in properties (title-only) are the default when discriminator is missing
+                    if (!variant.HadConstInProperties && string.IsNullOrEmpty(defaultTypeWhenMissing))
+                    {
+                        var defaultClassName = !string.IsNullOrEmpty(refName)
+                            ? NamingHelper.ConvertNameToClass(refName)
+                            : baseClassName + NamingHelper.ConvertPropertyName(constValue);
+                        defaultTypeWhenMissing = defaultClassName;
+                    }
 
                     var globalRefCount = 0;
                     var localRefCount = 0;
@@ -406,7 +449,8 @@ namespace dotacp.generator
                     PropertyName = discriminatorProperty,
                     PropertyCsName = discInfo.CsName,
                     PropertyJsonName = discInfo.JsonName,
-                    Mapping = mapping
+                    Mapping = mapping,
+                    DefaultTypeWhenDiscriminatorMissing = defaultTypeWhenMissing
                 };
             }
         }

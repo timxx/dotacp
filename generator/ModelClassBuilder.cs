@@ -47,10 +47,16 @@ namespace dotacp.generator
                 return GenerateSimpleEnum();
             }
 
-            // Handle discriminated unions with discriminator
+            // Handle discriminated unions with discriminator (at least one variant has const in JSON)
             if (discriminatorAnalyzer.BaseInfo.ContainsKey(name))
             {
                 return GenerateDiscriminatorBaseClass();
+            }
+
+            // Handle unions without discriminator (no variant has const; like Python A | B)
+            if (discriminatorAnalyzer.UnionWithoutDiscriminator.TryGetValue(name, out var unionVariantTypes))
+            {
+                return GenerateUnionWithoutDiscriminatorBaseClass(unionVariantTypes);
             }
 
             // Handle abstract base classes (anyOf with allOf refs)
@@ -276,6 +282,14 @@ namespace dotacp.generator
             sb.AppendLineLf();
 
             sb.AppendLineLf("    };");
+
+            if (!string.IsNullOrEmpty(baseInfo.DefaultTypeWhenDiscriminatorMissing))
+            {
+                sb.AppendLineLf();
+                sb.AppendLineLf($"    /// <summary>When the discriminator property is missing in JSON, deserialize as this type.</summary>");
+                sb.AppendLineLf($"    internal static readonly Type DefaultTypeWhenDiscriminatorMissing = typeof({baseInfo.DefaultTypeWhenDiscriminatorMissing});");
+            }
+
             sb.AppendLineLf();
 
             // Add discriminator property
@@ -303,6 +317,29 @@ namespace dotacp.generator
                     sb.Append(GenerateVariantClass(variant));
                 }
             }
+
+            return sb.ToString();
+        }
+
+        private string GenerateUnionWithoutDiscriminatorBaseClass(List<string> variantClassNames)
+        {
+            var className = NamingHelper.ConvertNameToClass(name);
+            var sb = new StringBuilder();
+
+            AppendXmlDocs(sb, definition["description"]?.ToString());
+
+            sb.AppendLineLf($"[JsonConverter(typeof(ObjectUnionConverter<{className}>))]");
+            sb.AppendLineLf($"public abstract class {className}");
+            sb.AppendLineLf("{");
+            sb.AppendLineLf("    /// <summary>Variant types for union deserialization (no discriminator in JSON).</summary>");
+            sb.AppendLineLf("    internal static readonly Type[] UnionVariantTypes = new Type[]");
+            sb.AppendLineLf("    {");
+            foreach (var variantName in variantClassNames)
+            {
+                sb.AppendLineLf($"        typeof({variantName}),");
+            }
+            sb.AppendLineLf("    };");
+            sb.AppendLineLf("}");
 
             return sb.ToString();
         }
@@ -822,11 +859,14 @@ namespace dotacp.generator
             var classDeclaration = $"public class {className}";
 
             // Check if this inherits from an abstract base
+            string baseNameForUnion = null;
             if (discriminatorAnalyzer.ChildToAbstractBase.ContainsKey(name))
             {
                 var baseName = discriminatorAnalyzer.ChildToAbstractBase[name];
                 var baseClassName = NamingHelper.ConvertNameToClass(baseName);
                 classDeclaration = $"public class {className} : {baseClassName}";
+                if (discriminatorAnalyzer.UnionWithoutDiscriminator.ContainsKey(baseName))
+                    baseNameForUnion = baseName;
             }
             else if (discriminatorAnalyzer.DerivedInfo.ContainsKey(name))
             {
@@ -844,6 +884,18 @@ namespace dotacp.generator
             }
 
             var properties = new List<string>();
+
+            // For union-without-discriminator variants, add required JSON keys so the converter can try the right type first
+            if (baseNameForUnion != null)
+            {
+                var required = definition["required"] as JArray;
+                if (required != null && required.Count > 0)
+                {
+                    var jsonKeys = required.Select(r => "\"" + r.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"").ToList();
+                    properties.Add("    /// <summary>Required JSON keys for union variant matching (no discriminator).</summary>");
+                    properties.Add("    internal static readonly string[] UnionVariantRequiredJsonKeys = new string[] { " + string.Join(", ", jsonKeys) + " };");
+                }
+            }
 
             // Add discriminator override if needed
             if (discriminatorAnalyzer.DerivedInfo.ContainsKey(name) &&

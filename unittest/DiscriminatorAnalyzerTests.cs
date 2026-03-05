@@ -185,5 +185,40 @@ namespace dotacp.unittest
             Assert.IsTrue(analyzer.ChildToAbstractBase.ContainsKey("ResponseA"));
             Assert.AreEqual("Response", analyzer.ChildToAbstractBase["ResponseA"]);
         }
+
+        /// <summary>
+        /// anyOf with one variant that has const in properties and one that has only title (no type in JSON)
+        /// should set DefaultTypeWhenDiscriminatorMissing to the title-only variant's type.
+        /// </summary>
+        [TestMethod]
+        public void DiscriminatorAnalyzer_AnyOfWithTitleOnlyVariant_SetsDefaultTypeWhenDiscriminatorMissing()
+        {
+            var defs = JObject.Parse(@"{
+  'AuthMethodAgent': { 'type': 'object', 'properties': { 'id': { 'type': 'string' }, 'name': { 'type': 'string' } }, 'required': ['id', 'name'] },
+  'AuthMethodEnvVar': { 'type': 'object', 'properties': { 'id': { 'type': 'string' }, 'name': { 'type': 'string' }, 'vars': { 'type': 'array' } }, 'required': ['id', 'name', 'vars'] },
+  'AuthMethod': {
+    'anyOf': [
+      {
+        'allOf': [ { '$ref': '#/$defs/AuthMethodEnvVar' } ],
+        'properties': { 'type': { 'const': 'env_var', 'type': 'string' } },
+        'required': ['type'],
+        'type': 'object'
+      },
+      {
+        'allOf': [ { '$ref': '#/$defs/AuthMethodAgent' } ],
+        'description': 'Agent handles authentication itself.',
+        'title': 'agent'
+      }
+    ]
+  }
+}");
+
+            var analyzer = new DiscriminatorAnalyzer(defs);
+
+            Assert.IsTrue(analyzer.BaseInfo.ContainsKey("AuthMethod"));
+            Assert.AreEqual("AuthMethodAgent", analyzer.BaseInfo["AuthMethod"].DefaultTypeWhenDiscriminatorMissing);
+            Assert.IsTrue(analyzer.BaseInfo["AuthMethod"].Mapping.ContainsKey("agent"));
+            Assert.IsTrue(analyzer.BaseInfo["AuthMethod"].Mapping.ContainsKey("env_var"));
+        }
     }
 }

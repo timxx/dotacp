@@ -12,6 +12,13 @@ namespace dotacp.generator
         public string PropertyCsName { get; set; } = "";
         public string PropertyJsonName { get; set; } = "";
         public Dictionary<string, string> Mapping { get; set; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// When set, the discriminator property is optional: if missing in JSON, deserialize as this type.
+        /// Used for schema variants that have no const (e.g. identified by title only, like AuthMethodAgent).
+        /// Enables compatibility with agents that omit the discriminator field.
+        /// </summary>
+        public string DefaultTypeWhenDiscriminatorMissing { get; set; }
     }
 
     /// <summary>

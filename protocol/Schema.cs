@@ -967,6 +967,9 @@ namespace dotacp.protocol
             { "terminal", typeof(AuthMethodTerminal) }
         };
 
+        /// <summary>When the discriminator property is missing in JSON, deserialize as this type.</summary>
+        internal static readonly Type DefaultTypeWhenDiscriminatorMissing = typeof(AuthMethodAgent);
+
         [JsonProperty("type")]
         public abstract string Type { get; }
     }
@@ -1191,8 +1194,9 @@ namespace dotacp.protocol
     /// </summary>
     public class BlobResourceContents : EmbeddedResourceResource
     {
-        [JsonProperty("type")]
-        public override string Type => "BlobResourceContents";
+        /// <summary>Required JSON keys for union variant matching (no discriminator).</summary>
+
+        internal static readonly string[] UnionVariantRequiredJsonKeys = new string[] { "blob", "uri" };
 
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
@@ -1630,19 +1634,17 @@ namespace dotacp.protocol
     /// <summary>
     /// Resource content that can be embedded in a message.
     /// </summary>
-    [JsonConverter(typeof(DiscriminatorConverter<EmbeddedResourceResource>))]
+    [JsonConverter(typeof(ObjectUnionConverter<EmbeddedResourceResource>))]
     public abstract class EmbeddedResourceResource
     {
-        internal const string DiscriminatorPropertyName = "type";
-        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        /// <summary>Variant types for union deserialization (no discriminator in JSON).</summary>
+        internal static readonly Type[] UnionVariantTypes = new Type[]
         {
-            { "BlobResourceContents", typeof(BlobResourceContents) },
-            { "TextResourceContents", typeof(TextResourceContents) }
+            typeof(TextResourceContents),
+            typeof(BlobResourceContents),
         };
-
-        [JsonProperty("type")]
-        public abstract string Type { get; }
     }
+
 
     /// <summary>
     /// An environment variable to set when launching an MCP server.
@@ -2296,6 +2298,9 @@ namespace dotacp.protocol
             { "sse", typeof(McpServerSse) },
             { "stdio", typeof(McpServerStdio) }
         };
+
+        /// <summary>When the discriminator property is missing in JSON, deserialize as this type.</summary>
+        internal static readonly Type DefaultTypeWhenDiscriminatorMissing = typeof(McpServerStdio);
 
         [JsonProperty("type")]
         public abstract string Type { get; }
@@ -4196,8 +4201,9 @@ namespace dotacp.protocol
     /// </summary>
     public class TextResourceContents : EmbeddedResourceResource
     {
-        [JsonProperty("type")]
-        public override string Type => "TextResourceContents";
+        /// <summary>Required JSON keys for union variant matching (no discriminator).</summary>
+
+        internal static readonly string[] UnionVariantRequiredJsonKeys = new string[] { "text", "uri" };
 
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional

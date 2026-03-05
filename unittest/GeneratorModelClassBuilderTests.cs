@@ -100,6 +100,26 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public void DiscriminatorHandling_GeneratesDefaultTypeWhenDiscriminatorMissing_ForTitleOnlyVariant()
+        {
+            var defs = JObject.Parse(@"{
+  'AuthMethodAgent': { 'type': 'object', 'properties': { 'id': { 'type': 'string' }, 'name': { 'type': 'string' } }, 'required': ['id', 'name'] },
+  'AuthMethodEnvVar': { 'type': 'object', 'properties': { 'id': { 'type': 'string' }, 'name': { 'type': 'string' }, 'vars': { 'type': 'array' } }, 'required': ['id', 'name', 'vars'] },
+  'AuthMethod': {
+    'anyOf': [
+      { 'allOf': [ { '$ref': '#/$defs/AuthMethodEnvVar' } ], 'properties': { 'type': { 'const': 'env_var', 'type': 'string' } }, 'required': ['type'], 'type': 'object' },
+      { 'allOf': [ { '$ref': '#/$defs/AuthMethodAgent' } ], 'title': 'agent' }
+    ]
+  }
+}");
+
+            var result = BuildModel("AuthMethod", defs);
+
+            StringAssert.Contains(result, "DefaultTypeWhenDiscriminatorMissing");
+            StringAssert.Contains(result, "typeof(AuthMethodAgent)");
+        }
+
+        [TestMethod]
         public void TypeAliasStruct_GeneratesStringAliasStruct()
         {
             var defs = JObject.Parse(@"{ 'TestId': { 'type': 'string', 'description': 'Test string alias' } }");

@@ -179,5 +179,75 @@ namespace dotacp.unittest
             Assert.IsInstanceOfType(stdioServer, typeof(McpServerStdio));
             Assert.AreEqual("stdio", stdioServer.Type);
         }
+
+        /// <summary>
+        /// When an agent omits the "type" discriminator (e.g. legacy/pre-0.11 schema),
+        /// AuthMethod deserializes as AuthMethodAgent per spec: "When no type is present, the method is treated as agent."
+        /// </summary>
+        [TestMethod]
+        public void AuthMethod_DeserializesWithoutDiscriminator_AsAuthMethodAgent()
+        {
+            string json = @"{
+                ""id"": ""oauth"",
+                ""name"": ""OAuth 2.0"",
+                ""description"": ""Browser-based OAuth flow""
+            }";
+
+            var method = JsonConvert.DeserializeObject<AuthMethod>(json);
+
+            Assert.IsNotNull(method);
+            Assert.IsInstanceOfType(method, typeof(AuthMethodAgent));
+            var agent = (AuthMethodAgent)method;
+            Assert.AreEqual("oauth", agent.Id);
+            Assert.AreEqual("OAuth 2.0", agent.Name);
+            Assert.AreEqual("Browser-based OAuth flow", agent.Description);
+            Assert.AreEqual("agent", agent.Type);
+        }
+
+        [TestMethod]
+        public void AuthMethod_DeserializesWithDiscriminator_AsCorrectType()
+        {
+            string json = @"{
+                ""type"": ""env_var"",
+                ""id"": ""env-auth"",
+                ""name"": ""Env Auth"",
+                ""vars"": []
+            }";
+
+            var method = JsonConvert.DeserializeObject<AuthMethod>(json);
+
+            Assert.IsNotNull(method);
+            Assert.IsInstanceOfType(method, typeof(AuthMethodEnvVar));
+            Assert.AreEqual("env_var", method.Type);
+        }
+
+        /// <summary>
+        /// EmbeddedResourceResource has no discriminator in JSON; converter matches by required keys (text vs blob).
+        /// </summary>
+        [TestMethod]
+        public void EmbeddedResourceResource_DeserializesWithoutDiscriminator_ByRequiredKeys()
+        {
+            var textJson = @"{
+                ""text"": ""# Hello"",
+                ""uri"": ""file:///doc.md"",
+                ""mimeType"": ""text/markdown""
+            }";
+            var textResource = JsonConvert.DeserializeObject<EmbeddedResourceResource>(textJson);
+            Assert.IsNotNull(textResource);
+            Assert.IsInstanceOfType(textResource, typeof(TextResourceContents));
+            Assert.AreEqual("# Hello", ((TextResourceContents)textResource).Text);
+            Assert.AreEqual("file:///doc.md", ((TextResourceContents)textResource).Uri);
+
+            var blobJson = @"{
+                ""blob"": ""base64data"",
+                ""uri"": ""file:///img.png"",
+                ""mimeType"": ""image/png""
+            }";
+            var blobResource = JsonConvert.DeserializeObject<EmbeddedResourceResource>(blobJson);
+            Assert.IsNotNull(blobResource);
+            Assert.IsInstanceOfType(blobResource, typeof(BlobResourceContents));
+            Assert.AreEqual("base64data", ((BlobResourceContents)blobResource).Blob);
+            Assert.AreEqual("file:///img.png", ((BlobResourceContents)blobResource).Uri);
+        }
     }
 }
