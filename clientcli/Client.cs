@@ -148,8 +148,8 @@ namespace clientcli
             throw new NotImplementedException();
         }
 
-        public Task<KillTerminalCommandResponse> KillTerminalAsync(
-            KillTerminalCommandRequest request, CancellationToken cancellationToken = default)
+        public Task<KillTerminalResponse> KillTerminalAsync(
+            KillTerminalRequest request, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

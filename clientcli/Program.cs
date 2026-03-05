@@ -1,4 +1,4 @@
-﻿using dotacp.client;
+using dotacp.client;
 using dotacp.protocol;
 using StreamJsonRpc;
 using System;
@@ -307,7 +307,7 @@ namespace clientcli
                 {
                     ClientCapabilities = new ClientCapabilities()
                     {
-                        Fs = new FileSystemCapability()
+                        Fs = new FileSystemCapabilities()
                         {
                             ReadTextFile = true,
                             WriteTextFile = true,
@@ -329,17 +329,20 @@ namespace clientcli
                 {
                     foreach (var method in response.AuthMethods)
                     {
+                        var (id, name) = GetAuthMethodIdAndName(method);
+                        if (id == null)
+                            continue;
                         try
                         {
                             var authResp = await connection.AuthenticateAsync(
                                 new AuthenticateRequest()
                                 {
-                                    MethodId = method.Id,
+                                    MethodId = id,
                                 });
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Auth with method `{method.Name}` failed: {ex.Message}");
+                            Console.WriteLine($"Auth with method `{name ?? id}` failed: {ex.Message}");
                         }
                     }
                 }
@@ -352,6 +355,17 @@ namespace clientcli
             }
 
             return null;
+        }
+
+        static (string? id, string? name) GetAuthMethodIdAndName(AuthMethod method)
+        {
+            switch (method)
+            {
+                case AuthMethodAgent a: return (a.Id, a.Name);
+                case AuthMethodEnvVar e: return (e.Id, e.Name);
+                case AuthMethodTerminal t: return (t.Id, t.Name);
+                default: return (null, null);
+            }
         }
 
         static void PrintAgentCapabilities(AgentCapabilities caps)

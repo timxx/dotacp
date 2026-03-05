@@ -13,7 +13,7 @@ This package provides the tools needed to integrate ACP agent support into edito
 ## Dependencies
 
 - **.NET Standard 2.0** or higher
-- `dotacp.protocol` - Protocol type definitions
+- `dotacp.protocol` - Protocol type definitions (ACP schema 0.11.0)
 - `StreamJsonRpc` (v2.7.76+) - JSON-RPC communication
 
 ## Installation
@@ -176,12 +176,12 @@ public class MyAcpClient : IAcpClient
         return new WaitForTerminalExitResponse { ExitCode = 0 };
     }
 
-    public async Task<KillTerminalCommandResponse> KillTerminalAsync(
-        KillTerminalCommandRequest request,
+    public async Task<KillTerminalResponse> KillTerminalAsync(
+        KillTerminalRequest request,
         CancellationToken cancellationToken = default)
     {
         // Kill/terminate a terminal process
-        return new KillTerminalCommandResponse { };
+        return new KillTerminalResponse { };
     }
 
     public async Task<object> ExtMethodAsync(

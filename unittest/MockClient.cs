@@ -1,4 +1,4 @@
-﻿using dotacp.protocol;
+using dotacp.protocol;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +15,7 @@ namespace dotacp.unittest
         public RequestPermissionRequest? LastRequestPermissionRequest { get; private set; }
         public SessionNotification? LastSessionNotification { get; private set; }
         public CreateTerminalRequest? LastCreateTerminalRequest { get; private set; }
-        public KillTerminalCommandRequest? LastKillTerminalRequest { get; private set; }
+        public KillTerminalRequest? LastKillTerminalRequest { get; private set; }
         public TerminalOutputRequest? LastTerminalOutputRequest { get; private set; }
         public ReleaseTerminalRequest? LastReleaseTerminalRequest { get; private set; }
         public WaitForTerminalExitRequest? LastWaitForTerminalExitRequest { get; private set; }
@@ -29,7 +29,7 @@ namespace dotacp.unittest
         public WriteTextFileResponse WriteTextFileResponseToReturn { get; set; } = new WriteTextFileResponse();
         public RequestPermissionResponse RequestPermissionResponseToReturn { get; set; } = new RequestPermissionResponse { Outcome = new RequestPermissionOutcomeCancelled() };
         public CreateTerminalResponse CreateTerminalResponseToReturn { get; set; } = new CreateTerminalResponse { TerminalId = "" };
-        public KillTerminalCommandResponse KillTerminalResponseToReturn { get; set; } = new KillTerminalCommandResponse();
+        public KillTerminalResponse KillTerminalResponseToReturn { get; set; } = new KillTerminalResponse();
         public TerminalOutputResponse TerminalOutputResponseToReturn { get; set; } = new TerminalOutputResponse { Output = "" };
         public ReleaseTerminalResponse ReleaseTerminalResponseToReturn { get; set; } = new ReleaseTerminalResponse();
         public WaitForTerminalExitResponse WaitForTerminalExitResponseToReturn { get; set; } = new WaitForTerminalExitResponse();
@@ -70,7 +70,7 @@ namespace dotacp.unittest
             return Task.FromResult(CreateTerminalResponseToReturn);
         }
 
-        public Task<KillTerminalCommandResponse> KillTerminalAsync(KillTerminalCommandRequest request, CancellationToken cancellationToken = default)
+        public Task<KillTerminalResponse> KillTerminalAsync(KillTerminalRequest request, CancellationToken cancellationToken = default)
         {
             LastKillTerminalRequest = request;
             return Task.FromResult(KillTerminalResponseToReturn);

@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.10.8
+// Schema ref: refs/tags/v0.11.0
 
 using dotacp.protocol;
 using dotacp.shared;
@@ -59,8 +59,8 @@ namespace dotacp.client
         }
 
         [JsonRpcMethod(ClientMethods.TerminalKill, UseSingleObjectParameterDeserialization = true)]
-        public Task<KillTerminalCommandResponse> KillTerminalAsync(
-            KillTerminalCommandRequest request,
+        public Task<KillTerminalResponse> KillTerminalAsync(
+            KillTerminalRequest request,
             CancellationToken cancellationToken = default)
         {
             return _client.KillTerminalAsync(request, cancellationToken);

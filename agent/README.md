@@ -13,7 +13,7 @@ This package provides the tools needed to build ACP agent implementations in .NE
 ## Dependencies
 
 - **.NET Standard 2.0** or higher
-- `dotacp.protocol` - Protocol type definitions
+- `dotacp.protocol` - Protocol type definitions (ACP schema 0.11.0)
 - `StreamJsonRpc` (v2.7.76+) - JSON-RPC communication
 
 ## Installation
@@ -149,6 +149,13 @@ public class MyAcpAgent : IAcpAgent
     {
         // Handle custom extension methods
         throw new NotImplementedException($"Unknown extension method: {method}");
+    }
+
+    Task<StopSessionResponse> StopAsync(StopSessionRequest request,
+            CancellationToken cancellationToken = default)
+    {
+        // Handle session stop requests
+        return Task.FromResult(new StopSessionResponse { });
     }
 }
 ```

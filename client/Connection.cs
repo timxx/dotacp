@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.10.8
+// Schema ref: refs/tags/v0.11.0
 
 using dotacp.protocol;
 using dotacp.shared;
@@ -237,6 +237,20 @@ namespace dotacp.client
         {
             return SendRequestAsync<SetSessionModelRequest, SetSessionModelResponse>(
                 AgentMethods.SessionSetModel, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/stop</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<StopSessionResponse> StopAsync(
+            StopSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<StopSessionRequest, StopSessionResponse>(
+                AgentMethods.SessionStop, request, cancellationToken);
         }
 
         /// <summary>

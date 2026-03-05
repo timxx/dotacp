@@ -1,5 +1,5 @@
 // Generated from schema/meta.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.10.8
+// Schema ref: refs/tags/v0.11.0
 
 #pragma warning disable CS1591
 
@@ -33,6 +33,7 @@ namespace dotacp.protocol
         public const string SessionSetConfigOption = "session/set_config_option";
         public const string SessionSetMode = "session/set_mode";
         public const string SessionSetModel = "session/set_model";
+        public const string SessionStop = "session/stop";
     }
 
     /// <summary>

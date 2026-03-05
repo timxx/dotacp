@@ -1,4 +1,4 @@
-﻿using dotacp.agent;
+using dotacp.agent;
 using dotacp.protocol;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +25,7 @@ namespace dotacp.unittest
         public SetSessionConfigOptionRequest? LastSetSessionConfigOptionRequest { get; private set; }
         public SetSessionModeRequest? LastSetSessionModeRequest { get; private set; }
         public SetSessionModelRequest? LastSetSessionModelRequest { get; private set; }
+        public StopSessionRequest? LastStopSessionRequest { get; private set; }
         public string? LastExtMethodName { get; private set; }
         public object? LastExtMethodRequest { get; private set; }
         public string? LastExtNotificationName { get; private set; }
@@ -42,6 +43,7 @@ namespace dotacp.unittest
         public SetSessionConfigOptionResponse SetSessionConfigOptionResponseToReturn { get; set; } = new SetSessionConfigOptionResponse { ConfigOptions = new SessionConfigOption[0] };
         public SetSessionModeResponse SetSessionModeResponseToReturn { get; set; } = new SetSessionModeResponse();
         public SetSessionModelResponse SetSessionModelResponseToReturn { get; set; } = new SetSessionModelResponse();
+        public StopSessionResponse StopSessionResponseToReturn { get; set; } = new StopSessionResponse();
         public object ExtMethodResponseToReturn { get; set; } = new object();
 
         // Notification signal
@@ -135,6 +137,12 @@ namespace dotacp.unittest
         {
             LastSetSessionModelRequest = request;
             return Task.FromResult(SetSessionModelResponseToReturn);
+        }
+
+        public Task<StopSessionResponse> StopAsync(StopSessionRequest request, CancellationToken cancellationToken = default)
+        {
+            LastStopSessionRequest = request;
+            return Task.FromResult(StopSessionResponseToReturn);
         }
 
         public Task<object> ExtMethodAsync(string method, object request, CancellationToken cancellationToken = default)

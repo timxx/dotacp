@@ -1,4 +1,4 @@
-﻿using dotacp.protocol;
+using dotacp.protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -94,9 +94,9 @@ namespace dotacp.unittest
                             }
                         }
                     },
-                    AuthMethods = new[]
+                    AuthMethods = new AuthMethod[]
                     {
-                        new AuthMethod
+                        new AuthMethodAgent
                         {
                             Meta = new Dictionary<string, object> { { "priority", 1L } },
                             Id = "oauth",
@@ -120,7 +120,7 @@ namespace dotacp.unittest
                     ClientCapabilities = new ClientCapabilities
                     {
                         Meta = new Dictionary<string, object> { { "clientCaps", true } },
-                        Fs = new FileSystemCapability
+                        Fs = new FileSystemCapabilities
                         {
                             Meta = new Dictionary<string, object> { { "fs", "enabled" } },
                             ReadTextFile = true,
@@ -148,9 +148,11 @@ namespace dotacp.unittest
                 Assert.IsTrue(response.AgentCapabilities.McpCapabilities.Http);
                 Assert.IsTrue(response.AgentCapabilities.PromptCapabilities.Image);
                 Assert.HasCount(1, response.AuthMethods);
-                Assert.AreEqual("oauth", response.AuthMethods[0].Id);
-                Assert.AreEqual("OAuth 2.0", response.AuthMethods[0].Name);
-                Assert.AreEqual("Browser-based OAuth flow", response.AuthMethods[0].Description);
+                var authMethod = response.AuthMethods[0] as AuthMethodAgent;
+                Assert.IsNotNull(authMethod);
+                Assert.AreEqual("oauth", authMethod!.Id);
+                Assert.AreEqual("OAuth 2.0", authMethod.Name);
+                Assert.AreEqual("Browser-based OAuth flow", authMethod.Description);
             }
         }
 

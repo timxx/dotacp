@@ -488,12 +488,12 @@ namespace dotacp.unittest
         {
             using (var pair = ConnectionPair.Create())
             {
-                pair.Client.KillTerminalResponseToReturn = new KillTerminalCommandResponse
+                pair.Client.KillTerminalResponseToReturn = new KillTerminalResponse
                 {
                     Meta = new Dictionary<string, object> { { "killed", true } }
                 };
 
-                var request = new KillTerminalCommandRequest
+                var request = new KillTerminalRequest
                 {
                     Meta = new Dictionary<string, object> { { "traceId", "kill-1" } },
                     SessionId = "session-1",
