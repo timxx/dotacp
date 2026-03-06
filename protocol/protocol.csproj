@@ -20,6 +20,7 @@
     <RootNamespace>dotacp.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <PackageId>dotacp.protocol</PackageId>
     <Title>Type-safe .NET protocol definitions for the Agent Client Protocol (ACP).</Title>
+    <Description>This package contains the core protocol definitions and data models for the Agent Client Protocol (ACP), auto-generated from the official ACP schema.</Description>
   </PropertyGroup>
 
   <ItemGroup>

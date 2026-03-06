@@ -8,6 +8,7 @@
     <Nullable>enable</Nullable>
     <PackageId>dotacp.client</PackageId>
     <Title>.NET library for implementing Agent Client Protocol (ACP) clients (editors/IDEs).</Title>
+    <Description>This package provides the tools needed to integrate Agent Client Protocol (ACP) agent support into editors, IDEs, and other client applications.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
