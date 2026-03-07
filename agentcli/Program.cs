@@ -15,7 +15,7 @@ internal class Program
             var inputStream = Console.OpenStandardInput();
             var outputStream = Console.OpenStandardOutput();
 
-            var connection = Connection.RunAgent(
+            using var connection = Connection.RunAgent(
                 agent,
                 outputStream,
                 inputStream,

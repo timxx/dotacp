@@ -306,6 +306,7 @@ namespace dotacp.generator
             sb.AppendLineLf("using dotacp.protocol;");
             sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
+            sb.AppendLineLf("using System;");
             sb.AppendLineLf("using System.Diagnostics;");
             sb.AppendLineLf("using System.IO;");
             sb.AppendLineLf("using System.Threading;");
@@ -317,7 +318,7 @@ namespace dotacp.generator
             sb.AppendLineLf("    /// Manages a JSON-RPC connection between an ACP agent and an ACP client.");
             sb.AppendLineLf("    /// The agent can use this connection to communicate with the Client so it behaves like a Client.");
             sb.AppendLineLf("    /// </summary>");
-            sb.AppendLineLf("    public class Connection");
+            sb.AppendLineLf("    public class Connection : IDisposable");
             sb.AppendLineLf("    {");
             sb.AppendLineLf("        private JsonRpc _rpc;");
             sb.AppendLineLf();
@@ -409,8 +410,18 @@ namespace dotacp.generator
                 sb.AppendLineLf();
             }
 
+            GenerateCommonMethods(sb, true);
+            sb.AppendLineLf("    }");
+            sb.AppendLineLf("}");
+
+            File.WriteAllText(outputPath, sb.ToString());
+        }
+
+        private void GenerateCommonMethods(StringBuilder sb, bool isAgent)
+        {
+            var side = isAgent ? "a client" : "an agent";
             sb.AppendLineLf("        /// <summary>");
-            sb.AppendLineLf("        /// Calls a client extension method.");
+            sb.AppendLineLf($"        /// Calls {side} extension method.");
             sb.AppendLineLf("        /// </summary>");
             sb.AppendLineLf("        /// <param name=\"method\">The extension method name.</param>");
             sb.AppendLineLf("        /// <param name=\"request\">The request payload.</param>");
@@ -424,7 +435,7 @@ namespace dotacp.generator
             sb.AppendLineLf("        }");
             sb.AppendLineLf();
             sb.AppendLineLf("        /// <summary>");
-            sb.AppendLineLf("        /// Sends a client extension notification.");
+            sb.AppendLineLf($"        /// Sends {side} extension notification.");
             sb.AppendLineLf("        /// </summary>");
             sb.AppendLineLf("        /// <param name=\"method\">The extension notification name.</param>");
             sb.AppendLineLf("        /// <param name=\"notification\">The notification payload.</param>");
@@ -436,10 +447,14 @@ namespace dotacp.generator
             sb.AppendLineLf("            return SendNotificationAsync(");
             sb.AppendLineLf("                \"_\" + method, notification, cancellationToken);");
             sb.AppendLineLf("        }");
-            sb.AppendLineLf("    }");
-            sb.AppendLineLf("}");
-
-            File.WriteAllText(outputPath, sb.ToString());
+            sb.AppendLineLf();
+            sb.AppendLineLf("        /// <summary>");
+            sb.AppendLineLf("        /// Releases all resources used by the current instance of the class.");
+            sb.AppendLineLf("        /// </summary>");
+            sb.AppendLineLf("        public void Dispose()");
+            sb.AppendLineLf("        {");
+            sb.AppendLineLf("            _rpc.Dispose();");
+            sb.AppendLineLf("        }");
         }
 
         private void GenerateIAcpClient(string outputPath, string gitRef)
@@ -592,6 +607,7 @@ namespace dotacp.generator
             sb.AppendLineLf("using dotacp.protocol;");
             sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
+            sb.AppendLineLf("using System;");
             sb.AppendLineLf("using System.Diagnostics;");
             sb.AppendLineLf("using System.IO;");
             sb.AppendLineLf("using System.Threading;");
@@ -603,7 +619,7 @@ namespace dotacp.generator
             sb.AppendLineLf("    /// Manages a JSON-RPC connection between an ACP client and an ACP agent.");
             sb.AppendLineLf("    /// The client can use this connection to communicate with the Agent.");
             sb.AppendLineLf("    /// </summary>");
-            sb.AppendLineLf("    public class Connection");
+            sb.AppendLineLf("    public class Connection : IDisposable");
             sb.AppendLineLf("    {");
             sb.AppendLineLf("        private JsonRpc _rpc;");
             sb.AppendLineLf();
@@ -692,33 +708,7 @@ namespace dotacp.generator
                 sb.AppendLineLf();
             }
 
-            sb.AppendLineLf("        /// <summary>");
-            sb.AppendLineLf("        /// Calls an agent extension method.");
-            sb.AppendLineLf("        /// </summary>");
-            sb.AppendLineLf("        /// <param name=\"method\">The extension method name.</param>");
-            sb.AppendLineLf("        /// <param name=\"request\">The request payload.</param>");
-            sb.AppendLineLf("        /// <param name=\"cancellationToken\">A token that cancels the operation.</param>");
-            sb.AppendLineLf("        /// <returns>The response object.</returns>");
-            sb.AppendLineLf("        public Task<object> ExtMethodAsync(string method, object request,");
-            sb.AppendLineLf("            CancellationToken cancellationToken = default)");
-            sb.AppendLineLf("        {");
-            sb.AppendLineLf("            return SendRequestAsync<object, object>(");
-            sb.AppendLineLf("                \"_\" + method, request, cancellationToken);");
-            sb.AppendLineLf("        }");
-            sb.AppendLineLf();
-            sb.AppendLineLf("        /// <summary>");
-            sb.AppendLineLf("        /// Sends an agent extension notification.");
-            sb.AppendLineLf("        /// </summary>");
-            sb.AppendLineLf("        /// <param name=\"method\">The extension notification name.</param>");
-            sb.AppendLineLf("        /// <param name=\"notification\">The notification payload.</param>");
-            sb.AppendLineLf("        /// <param name=\"cancellationToken\">A token that cancels the operation.</param>");
-            sb.AppendLineLf("        /// <returns>A task that completes when the notification is sent.</returns>");
-            sb.AppendLineLf("        public Task ExtNotificationAsync(string method, object notification,");
-            sb.AppendLineLf("            CancellationToken cancellationToken = default)");
-            sb.AppendLineLf("        {");
-            sb.AppendLineLf("            return SendNotificationAsync(");
-            sb.AppendLineLf("                \"_\" + method, notification, cancellationToken);");
-            sb.AppendLineLf("        }");
+            GenerateCommonMethods(sb, false);
             sb.AppendLineLf("    }");
             sb.AppendLineLf("}");
 

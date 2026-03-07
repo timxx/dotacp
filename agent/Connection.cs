@@ -4,6 +4,7 @@
 using dotacp.protocol;
 using dotacp.shared;
 using StreamJsonRpc;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -15,7 +16,7 @@ namespace dotacp.agent
     /// Manages a JSON-RPC connection between an ACP agent and an ACP client.
     /// The agent can use this connection to communicate with the Client so it behaves like a Client.
     /// </summary>
-    public class Connection
+    public class Connection : IDisposable
     {
         private JsonRpc _rpc;
 
@@ -225,6 +226,14 @@ namespace dotacp.agent
         {
             return SendNotificationAsync(
                 "_" + method, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Releases all resources used by the current instance of the class.
+        /// </summary>
+        public void Dispose()
+        {
+            _rpc.Dispose();
         }
     }
 }

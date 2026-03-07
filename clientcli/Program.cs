@@ -37,7 +37,7 @@ namespace clientcli
 
             var client = new Client();
 
-            var connection = Connection.RunClient(
+            using var connection = Connection.RunClient(
                 client,
                 process.StandardInput.BaseStream,
                 process.StandardOutput.BaseStream,
