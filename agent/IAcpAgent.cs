@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.0
+// Schema ref: refs/tags/v0.11.1
 
 using dotacp.protocol;
 using System.Threading;
@@ -43,6 +43,15 @@ namespace dotacp.agent
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>A task that completes when handling is finished.</returns>
         Task CancelAsync(CancelNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/close</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -124,15 +133,6 @@ namespace dotacp.agent
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
         Task<SetSessionModelResponse> SetSessionModelAsync(SetSessionModelRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>session/stop</c> request.
-        /// </summary>
-        /// <param name="request">The request payload.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The response.</returns>
-        Task<StopSessionResponse> StopAsync(StopSessionRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>

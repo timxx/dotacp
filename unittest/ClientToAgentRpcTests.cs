@@ -744,25 +744,25 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
-        public async Task StopAsync()
+        public async Task CloseAsync()
         {
             using (var pair = ConnectionPair.Create())
             {
-                pair.Agent.StopSessionResponseToReturn = new StopSessionResponse
+                pair.Agent.CloseSessionResponseToReturn = new CloseSessionResponse
                 {
                     Meta = new Dictionary<string, object> { { "stopped", true } }
                 };
 
-                var request = new StopSessionRequest
+                var request = new CloseSessionRequest
                 {
                     Meta = new Dictionary<string, object> { { "traceId", "stop-1" } },
                     SessionId = "session-1"
                 };
-                var response = await pair.ClientConn.StopAsync(request);
+                var response = await pair.ClientConn.CloseAsync(request);
 
-                Assert.IsNotNull(pair.Agent.LastStopSessionRequest);
-                Assert.AreEqual("session-1", (string)pair.Agent.LastStopSessionRequest!.SessionId);
-                Assert.AreEqual("stop-1", pair.Agent.LastStopSessionRequest.Meta["traceId"].ToString());
+                Assert.IsNotNull(pair.Agent.LastCloseSessionRequest);
+                Assert.AreEqual("session-1", (string)pair.Agent.LastCloseSessionRequest!.SessionId);
+                Assert.AreEqual("stop-1", pair.Agent.LastCloseSessionRequest.Meta["traceId"].ToString());
 
                 Assert.IsNotNull(response);
                 Assert.IsNotNull(response.Meta);

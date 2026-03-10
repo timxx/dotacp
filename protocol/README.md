@@ -4,7 +4,7 @@ Type-safe .NET protocol definitions for the [Agent Client Protocol (ACP)](https:
 
 ## What is dotacp.protocol?
 
-This package contains the core protocol definitions and data models for ACP, auto-generated from the official ACP schema (v0.11.0). It provides:
+This package contains the core protocol definitions and data models for ACP, auto-generated from the official ACP schema. It provides:
 
 - **Type-safe Protocol Models**: Complete C# representations of all ACP request/response types
 - **Type Aliases & Enums**: Domain-specific types for protocol identifiers, modes, and options
@@ -132,7 +132,7 @@ The generated code includes:
 
 ## Protocol Version
 
-This package implements **ACP Protocol Version 1** based on the **ACP v0.11.0** specification.
+This package implements **ACP Protocol Version 1** based on the **ACP v0.11.1** specification.
 
 ## See Also
 - [dotacp.client](../client/README.md) - Client implementation guide

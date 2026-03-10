@@ -1,5 +1,5 @@
 // Generated from schema/meta.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.0
+// Schema ref: refs/tags/v0.11.1
 
 #pragma warning disable CS1591
 
@@ -24,6 +24,7 @@ namespace dotacp.protocol
         public const string Authenticate = "authenticate";
         public const string Initialize = "initialize";
         public const string SessionCancel = "session/cancel";
+        public const string SessionClose = "session/close";
         public const string SessionFork = "session/fork";
         public const string SessionList = "session/list";
         public const string SessionLoad = "session/load";
@@ -33,7 +34,6 @@ namespace dotacp.protocol
         public const string SessionSetConfigOption = "session/set_config_option";
         public const string SessionSetMode = "session/set_mode";
         public const string SessionSetModel = "session/set_model";
-        public const string SessionStop = "session/stop";
     }
 
     /// <summary>

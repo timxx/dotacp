@@ -31,7 +31,7 @@ This repository contains a complete .NET SDK implementation with the following c
 ### Core Projects
 
 - **[`protocol/`](protocol/README.md)** - Protocol definitions and data models
-  - Auto-generated schema from the ACP specification (v0.11.0)
+  - Auto-generated schema from the ACP specification
   - Type-safe request/response types and enums
   - See [protocol README](protocol/README.md) for usage details
 

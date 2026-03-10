@@ -1,5 +1,5 @@
 // Generated from schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.0
+// Schema ref: refs/tags/v0.11.1
 
 #pragma warning disable CS1591
 
@@ -1317,6 +1317,58 @@ namespace dotacp.protocol
     }
 
     /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// Request parameters for closing an active session.
+    ///
+    /// If supported, the agent **must** cancel any ongoing work related to the session
+    /// (treat it as if `session/cancel` was called) and then free up any resources
+    /// associated with the session.
+    ///
+    /// Only available if the Agent supports the `session.close` capability.
+    /// </summary>
+    public class CloseSessionRequest
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The ID of the session to close.
+        /// </summary>
+        [JsonProperty("sessionId")]
+        public SessionId SessionId { get; set; }
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// Response from closing a session.
+    /// </summary>
+    public class CloseSessionResponse
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+    }
+
+    /// <summary>
     /// Session configuration options have been updated.
     /// </summary>
     public class ConfigOptionUpdate : SessionUpdate
@@ -1684,18 +1736,6 @@ namespace dotacp.protocol
     /// </summary>
     public class Error
     {
-        /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// Authentication methods relevant to this error.
-        /// Typically included with `AUTH_REQUIRED` errors to narrow down which
-        /// authentication methods are applicable from those shared during initialization.
-        /// </summary>
-        [JsonProperty("authMethods")]
-        public AuthMethod[] AuthMethods { get; set; }
-
         /// <summary>
         /// A number indicating the error type that occurred.
         /// This must be an integer as defined in the JSON-RPC specification.
@@ -2108,13 +2148,9 @@ namespace dotacp.protocol
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Request parameters for listing existing sessions.
     ///
-    /// Only available if the Agent supports the `listSessions` capability.
+    /// Only available if the Agent supports the `sessionCapabilities.list` capability.
     /// </summary>
     public class ListSessionsRequest
     {
@@ -2142,10 +2178,6 @@ namespace dotacp.protocol
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Response from listing sessions.
     /// </summary>
     public class ListSessionsResponse
@@ -3185,10 +3217,6 @@ namespace dotacp.protocol
         public SessionForkCapabilities Fork { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// Whether the agent supports `session/list`.
         /// </summary>
         [JsonProperty("list")]
@@ -3209,10 +3237,51 @@ namespace dotacp.protocol
         ///
         /// This capability is not part of the spec yet, and may be removed or changed at any point.
         ///
-        /// Whether the agent supports `session/stop`.
+        /// Whether the agent supports `session/close`.
         /// </summary>
         [JsonProperty("stop")]
-        public SessionStopCapabilities Stop { get; set; }
+        public SessionCloseCapabilities Stop { get; set; }
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// Capabilities for the `session/close` method.
+    ///
+    /// By supplying `{}` it means that the agent supports closing of sessions.
+    /// </summary>
+    public class SessionCloseCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// A boolean on/off toggle session configuration option payload.
+    /// </summary>
+    public class SessionConfigBoolean : SessionConfigOption
+    {
+        [JsonProperty("type")]
+        public override string Type => "boolean";
+
+        /// <summary>
+        /// The current value of the boolean option.
+        /// </summary>
+        [JsonProperty("currentValue")]
+        public bool CurrentValue { get; set; }
     }
 
     /// <summary>
@@ -3224,6 +3293,7 @@ namespace dotacp.protocol
         internal const string DiscriminatorPropertyName = "type";
         internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
         {
+            { "boolean", typeof(SessionConfigBoolean) },
             { "select", typeof(SessionConfigSelect) }
         };
 
@@ -3377,10 +3447,6 @@ namespace dotacp.protocol
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Information about a session returned by session/list
     /// </summary>
     public class SessionInfo
@@ -3458,8 +3524,6 @@ namespace dotacp.protocol
     /// Capabilities for the `session/list` method.
     ///
     /// By supplying `{}` it means that the agent supports listing of sessions.
-    ///
-    /// Further capabilities can be added in the future for other means of filtering or searching the list.
     /// </summary>
     public class SessionListCapabilities
     {
@@ -3603,28 +3667,6 @@ namespace dotacp.protocol
     /// By supplying `{}` it means that the agent supports resuming of sessions.
     /// </summary>
     public class SessionResumeCapabilities
-    {
-        /// <summary>
-        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
-        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
-        /// these keys.
-        ///
-        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
-        /// </summary>
-        [JsonProperty("_meta")]
-        public Dictionary<string, object> Meta { get; set; }
-    }
-
-    /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// Capabilities for the `session/stop` method.
-    ///
-    /// By supplying `{}` it means that the agent supports stopping of sessions.
-    /// </summary>
-    public class SessionStopCapabilities
     {
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
@@ -3856,30 +3898,11 @@ namespace dotacp.protocol
     /// </summary>
     public class SetSessionConfigOptionRequest
     {
-        /// <summary>
-        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
-        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
-        /// these keys.
-        ///
-        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
-        /// </summary>
-        [JsonProperty("_meta")]
-        public Dictionary<string, object> Meta { get; set; }
+        [JsonProperty("type")]
+        public string Type { get; set; }
 
         /// <summary>
-        /// The ID of the configuration option to set.
-        /// </summary>
-        [JsonProperty("configId")]
-        public SessionConfigId ConfigId { get; set; }
-
-        /// <summary>
-        /// The ID of the session to set the configuration option for.
-        /// </summary>
-        [JsonProperty("sessionId")]
-        public SessionId SessionId { get; set; }
-
-        /// <summary>
-        /// The ID of the configuration option value to set.
+        /// The value ID.
         /// </summary>
         [JsonProperty("value")]
         public SessionConfigValueId Value { get; set; }
@@ -3991,58 +4014,6 @@ namespace dotacp.protocol
     /// Response to `session/set_mode` method.
     /// </summary>
     public class SetSessionModeResponse
-    {
-        /// <summary>
-        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
-        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
-        /// these keys.
-        ///
-        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
-        /// </summary>
-        [JsonProperty("_meta")]
-        public Dictionary<string, object> Meta { get; set; }
-    }
-
-    /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// Request parameters for stopping an active session.
-    ///
-    /// If supported, the agent **must** cancel any ongoing work related to the session
-    /// (treat it as if `session/cancel` was called) and then free up any resources
-    /// associated with the session.
-    ///
-    /// Only available if the Agent supports the `session.stop` capability.
-    /// </summary>
-    public class StopSessionRequest
-    {
-        /// <summary>
-        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
-        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
-        /// these keys.
-        ///
-        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
-        /// </summary>
-        [JsonProperty("_meta")]
-        public Dictionary<string, object> Meta { get; set; }
-
-        /// <summary>
-        /// The ID of the session to stop.
-        /// </summary>
-        [JsonProperty("sessionId")]
-        public SessionId SessionId { get; set; }
-    }
-
-    /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// Response from stopping a session.
-    /// </summary>
-    public class StopSessionResponse
     {
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional

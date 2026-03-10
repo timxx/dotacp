@@ -206,10 +206,10 @@ namespace agentcli
                 throw new Exception($"Notification method not found: {method}");
         }
 
-        public async Task<StopSessionResponse> StopAsync(StopSessionRequest request, CancellationToken cancellationToken = default)
+        public async Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request, CancellationToken cancellationToken = default)
         {
-            await Console.Error.WriteLineAsync($"Stop operation received for session {request.SessionId}");
-            return new StopSessionResponse();
+            await Console.Error.WriteLineAsync($"Close operation received for session {request.SessionId}");
+            return new CloseSessionResponse();
         }
 
         private class Session

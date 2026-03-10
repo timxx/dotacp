@@ -25,7 +25,7 @@ namespace dotacp.unittest
         public SetSessionConfigOptionRequest? LastSetSessionConfigOptionRequest { get; private set; }
         public SetSessionModeRequest? LastSetSessionModeRequest { get; private set; }
         public SetSessionModelRequest? LastSetSessionModelRequest { get; private set; }
-        public StopSessionRequest? LastStopSessionRequest { get; private set; }
+        public CloseSessionRequest? LastCloseSessionRequest { get; private set; }
         public string? LastExtMethodName { get; private set; }
         public object? LastExtMethodRequest { get; private set; }
         public string? LastExtNotificationName { get; private set; }
@@ -43,7 +43,7 @@ namespace dotacp.unittest
         public SetSessionConfigOptionResponse SetSessionConfigOptionResponseToReturn { get; set; } = new SetSessionConfigOptionResponse { ConfigOptions = new SessionConfigOption[0] };
         public SetSessionModeResponse SetSessionModeResponseToReturn { get; set; } = new SetSessionModeResponse();
         public SetSessionModelResponse SetSessionModelResponseToReturn { get; set; } = new SetSessionModelResponse();
-        public StopSessionResponse StopSessionResponseToReturn { get; set; } = new StopSessionResponse();
+        public CloseSessionResponse CloseSessionResponseToReturn { get; set; } = new CloseSessionResponse();
         public object ExtMethodResponseToReturn { get; set; } = new object();
 
         // Notification signal
@@ -139,10 +139,10 @@ namespace dotacp.unittest
             return Task.FromResult(SetSessionModelResponseToReturn);
         }
 
-        public Task<StopSessionResponse> StopAsync(StopSessionRequest request, CancellationToken cancellationToken = default)
+        public Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request, CancellationToken cancellationToken = default)
         {
-            LastStopSessionRequest = request;
-            return Task.FromResult(StopSessionResponseToReturn);
+            LastCloseSessionRequest = request;
+            return Task.FromResult(CloseSessionResponseToReturn);
         }
 
         public Task<object> ExtMethodAsync(string method, object request, CancellationToken cancellationToken = default)
