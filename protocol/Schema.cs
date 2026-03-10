@@ -3896,16 +3896,96 @@ namespace dotacp.protocol
     /// <summary>
     /// Request parameters for setting a session configuration option.
     /// </summary>
+    [JsonConverter(typeof(UnionTypeConverter<SetSessionConfigOptionRequestValue>))]
+    public readonly struct SetSessionConfigOptionRequestValue : IEquatable<SetSessionConfigOptionRequestValue>
+    {
+        private readonly object _value;
+        private readonly int _typeIndex;
+
+        public SetSessionConfigOptionRequestValue(bool value)
+        {
+            _value = value;
+            _typeIndex = 0;
+        }
+
+        public SetSessionConfigOptionRequestValue(SessionConfigValueId value)
+        {
+            _value = value;
+            _typeIndex = 1;
+        }
+
+        public static implicit operator SetSessionConfigOptionRequestValue(bool value) => new SetSessionConfigOptionRequestValue(value);
+        public static implicit operator SetSessionConfigOptionRequestValue(SessionConfigValueId value) => new SetSessionConfigOptionRequestValue(value);
+
+        public bool TryGetBool(out bool value)
+        {
+            if (_value is bool v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSessionConfigValueId(out SessionConfigValueId value)
+        {
+            if (_value is SessionConfigValueId v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool Equals(SetSessionConfigOptionRequestValue other) => Equals(_value, other._value) && _typeIndex == other._typeIndex;
+        public override bool Equals(object obj) => obj is SetSessionConfigOptionRequestValue other && Equals(other);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);
+                hash = hash * 31 + _typeIndex;
+                return hash;
+            }
+        }
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
     public class SetSessionConfigOptionRequest
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The ID of the configuration option to set.
+        /// </summary>
+        [JsonProperty("configId")]
+        public SessionConfigId ConfigId { get; set; }
+
+        /// <summary>
+        /// The ID of the session to set the configuration option for.
+        /// </summary>
+        [JsonProperty("sessionId")]
+        public SessionId SessionId { get; set; }
+
         [JsonProperty("type")]
         public string Type { get; set; }
 
         /// <summary>
-        /// The value ID.
+        /// The boolean value.
         /// </summary>
         [JsonProperty("value")]
-        public SessionConfigValueId Value { get; set; }
+        public SetSessionConfigOptionRequestValue Value { get; set; }
     }
 
     /// <summary>

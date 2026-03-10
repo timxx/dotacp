@@ -74,13 +74,20 @@ namespace dotacp.generator
                 var classCode = GenerateModelClass(defName, def);
 
                 // Check type of generated code
-                if (classCode.Contains("IEquatable<"))
-                {
-                    typeAliases.Add(classCode);
-                }
-                else if (classCode.Contains("public enum ") || classCode.Contains("public abstract enum "))
+                var hasEnum = classCode.Contains("public enum ") || classCode.Contains("public abstract enum ");
+                var hasClass = classCode.Contains("public class ") || classCode.Contains("public abstract class ");
+
+                if (hasEnum)
                 {
                     enumDefinitions.Add(classCode);
+                }
+                else if (hasClass)
+                {
+                    recordClasses.Add(classCode);
+                }
+                else if (classCode.Contains("IEquatable<"))
+                {
+                    typeAliases.Add(classCode);
                 }
                 else
                 {

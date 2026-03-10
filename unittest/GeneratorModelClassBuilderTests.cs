@@ -120,6 +120,51 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public void AnyOfWithBaseProperties_MergesAndGeneratesUnionPropertyType()
+        {
+            var defs = JObject.Parse(@"{
+  'SessionId': { 'type': 'string' },
+  'SessionConfigId': { 'type': 'string' },
+  'SessionConfigValueId': { 'type': 'string' },
+  'SetSessionConfigOptionRequest': {
+    'anyOf': [
+      {
+        'properties': {
+          'type': { 'const': 'boolean', 'type': 'string' },
+          'value': { 'type': 'boolean' }
+        },
+        'required': ['type', 'value'],
+        'type': 'object'
+      },
+      {
+        'properties': {
+          'value': { 'allOf': [ { '$ref': '#/$defs/SessionConfigValueId' } ] }
+        },
+        'required': ['value'],
+        'type': 'object'
+      }
+    ],
+    'properties': {
+      '_meta': { 'type': ['object', 'null'], 'additionalProperties': true },
+      'configId': { '$ref': '#/$defs/SessionConfigId' },
+      'sessionId': { '$ref': '#/$defs/SessionId' }
+    },
+    'required': ['sessionId', 'configId'],
+    'type': 'object'
+  }
+}");
+
+            var result = BuildModel("SetSessionConfigOptionRequest", defs);
+
+            StringAssert.Contains(result, "public readonly struct SetSessionConfigOptionRequestValue");
+            StringAssert.Contains(result, "public SetSessionConfigOptionRequestValue Value");
+            StringAssert.Contains(result, "public SessionId SessionId");
+            StringAssert.Contains(result, "public SessionConfigId ConfigId");
+            StringAssert.Contains(result, "TryGetBool");
+            StringAssert.Contains(result, "TryGetSessionConfigValueId");
+        }
+
+        [TestMethod]
         public void TypeAliasStruct_GeneratesStringAliasStruct()
         {
             var defs = JObject.Parse(@"{ 'TestId': { 'type': 'string', 'description': 'Test string alias' } }");

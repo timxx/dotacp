@@ -16,6 +16,19 @@ namespace dotacp.generator
         private readonly JObject allDefinitions;
         private readonly PropertyTypeResolver typeResolver;
         private readonly DiscriminatorAnalyzer discriminatorAnalyzer;
+        private readonly Dictionary<string, PropertyUnionInfo> propertyUnionInfo = new Dictionary<string, PropertyUnionInfo>(StringComparer.Ordinal);
+
+        private sealed class PropertyUnionInfo
+        {
+            public PropertyUnionInfo(string typeName, List<string> unionTypes)
+            {
+                TypeName = typeName;
+                UnionTypes = unionTypes;
+            }
+
+            public string TypeName { get; }
+            public List<string> UnionTypes { get; }
+        }
 
         public ModelClassBuilder(
             string name,
@@ -820,6 +833,16 @@ namespace dotacp.generator
         private JObject MergeUnionProperties(JArray items)
         {
             var mergedProperties = new JObject();
+            var variantPropertyDefinitions = new Dictionary<string, List<JObject>>(StringComparer.Ordinal);
+
+            var baseProperties = definition["properties"] as JObject;
+            if (baseProperties != null)
+            {
+                foreach (var prop in baseProperties.Properties())
+                {
+                    mergedProperties[prop.Name] = prop.Value;
+                }
+            }
 
             foreach (var item in items)
             {
@@ -832,19 +855,138 @@ namespace dotacp.generator
                 {
                     foreach (var prop in properties.Properties())
                     {
-                        mergedProperties[prop.Name] = prop.Value;
+                        if (prop.Value is JObject propObj)
+                        {
+                            if (!variantPropertyDefinitions.TryGetValue(prop.Name, out var defs))
+                            {
+                                defs = new List<JObject>();
+                                variantPropertyDefinitions[prop.Name] = defs;
+                            }
+                            defs.Add(propObj);
+                        }
+
+                        if (mergedProperties[prop.Name] == null)
+                        {
+                            mergedProperties[prop.Name] = prop.Value;
+                        }
                     }
                 }
             }
+
+            CollectPropertyUnionInfo(variantPropertyDefinitions);
 
             if (mergedProperties.Count > 0)
             {
                 var newDef = new JObject(definition);
                 newDef["properties"] = mergedProperties;
+                MergeRequiredProperties(newDef, items);
                 return newDef;
             }
 
             return definition;
+        }
+
+        private void CollectPropertyUnionInfo(Dictionary<string, List<JObject>> variantPropertyDefinitions)
+        {
+            foreach (var entry in variantPropertyDefinitions)
+            {
+                if (entry.Value.Count < 2)
+                {
+                    continue;
+                }
+
+                var unionTypes = new List<string>();
+                foreach (var propDef in entry.Value)
+                {
+                    var csType = typeResolver.GetPropertyType(propDef, entry.Key);
+                    if (!string.IsNullOrEmpty(csType))
+                    {
+                        unionTypes.Add(csType);
+                    }
+                }
+
+                var distinctTypes = unionTypes.Distinct().ToList();
+                if (distinctTypes.Count < 2 || distinctTypes.Contains("object"))
+                {
+                    continue;
+                }
+
+                var unionTypeName = NamingHelper.ConvertNameToClass(name) + NamingHelper.ConvertPropertyName(entry.Key);
+                propertyUnionInfo[entry.Key] = new PropertyUnionInfo(unionTypeName, distinctTypes);
+            }
+        }
+
+        private void MergeRequiredProperties(JObject newDef, JArray items)
+        {
+            var baseRequired = definition["required"] as JArray;
+            var requiredList = new List<string>();
+            var requiredSet = new HashSet<string>(StringComparer.Ordinal);
+
+            if (baseRequired != null)
+            {
+                foreach (var item in baseRequired)
+                {
+                    var value = item.ToString();
+                    if (requiredSet.Add(value))
+                    {
+                        requiredList.Add(value);
+                    }
+                }
+            }
+
+            var variantRequiredSets = new List<HashSet<string>>();
+            foreach (var item in items)
+            {
+                var itemObj = item as JObject;
+                if (itemObj == null)
+                {
+                    continue;
+                }
+
+                var required = itemObj["required"] as JArray;
+                if (required == null)
+                {
+                    variantRequiredSets.Add(new HashSet<string>(StringComparer.Ordinal));
+                    continue;
+                }
+
+                var set = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var req in required)
+                {
+                    set.Add(req.ToString());
+                }
+                variantRequiredSets.Add(set);
+            }
+
+            if (variantRequiredSets.Count > 0)
+            {
+                var intersection = new HashSet<string>(variantRequiredSets[0], StringComparer.Ordinal);
+                for (var i = 1; i < variantRequiredSets.Count; i++)
+                {
+                    intersection.IntersectWith(variantRequiredSets[i]);
+                }
+
+                if (intersection.Count > 0)
+                {
+                    var firstRequired = (items[0] as JObject)?["required"] as JArray;
+                    if (firstRequired != null)
+                    {
+                        foreach (var req in firstRequired)
+                        {
+                            var value = req.ToString();
+                            if (intersection.Contains(value) && requiredSet.Add(value))
+                            {
+                                requiredList.Add(value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (requiredList.Count > 0)
+            {
+                newDef["required"] = new JArray(requiredList);
+            }
         }
 
         private string GenerateRegularClass()
@@ -854,6 +996,16 @@ namespace dotacp.generator
 
             // XML documentation
             AppendXmlDocs(sb, definition["description"]?.ToString());
+
+            if (propertyUnionInfo.Count > 0)
+            {
+                foreach (var unionInfo in propertyUnionInfo.Values.OrderBy(info => info.TypeName))
+                {
+                    sb.Append(GeneratePropertyUnionTypeStruct(unionInfo.TypeName, unionInfo.UnionTypes));
+                    sb.AppendLineLf();
+                    sb.AppendLineLf();
+                }
+            }
 
             // Determine class type
             var classDeclaration = $"public class {className}";
@@ -956,7 +1108,9 @@ namespace dotacp.generator
                 if (prop == null)
                     continue;
 
-                var csType = typeResolver.GetPropertyType(prop, propName);
+                var csType = propertyUnionInfo.TryGetValue(propName, out var unionInfo)
+                    ? unionInfo.TypeName
+                    : typeResolver.GetPropertyType(prop, propName);
                 var csPropName = NamingHelper.ConvertPropertyName(propName);
                 var propIsRequired = requiredProps.Contains(propName);
                 var needsJsonPropertyName = false;
@@ -1002,7 +1156,8 @@ namespace dotacp.generator
 
                 if (propIsRequired && !csType.EndsWith("?"))
                 {
-                    var isReferenceType = TypeMapper.IsReferenceType(csType);
+                    var isUnionValueType = propertyUnionInfo.ContainsKey(propName);
+                    var isReferenceType = !isUnionValueType && TypeMapper.IsReferenceType(csType);
 
                     if (isReferenceType)
                     {
@@ -1027,6 +1182,71 @@ namespace dotacp.generator
             }
 
             return properties;
+        }
+
+        private string GeneratePropertyUnionTypeStruct(string unionTypeName, List<string> unionTypes)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLineLf($"[JsonConverter(typeof(UnionTypeConverter<{unionTypeName}>))]");
+            sb.AppendLineLf($"public readonly struct {unionTypeName} : IEquatable<{unionTypeName}>");
+            sb.AppendLineLf("{");
+            sb.AppendLineLf("    private readonly object _value;");
+            sb.AppendLineLf("    private readonly int _typeIndex;");
+            sb.AppendLineLf();
+
+            for (int i = 0; i < unionTypes.Count; i++)
+            {
+                var unionType = unionTypes[i];
+                sb.AppendLineLf($"    public {unionTypeName}({unionType} value)");
+                sb.AppendLineLf("    {");
+                sb.AppendLineLf("        _value = value;");
+                sb.AppendLineLf($"        _typeIndex = {i};");
+                sb.AppendLineLf("    }");
+                sb.AppendLineLf();
+            }
+
+            foreach (var unionType in unionTypes)
+            {
+                sb.AppendLineLf($"    public static implicit operator {unionTypeName}({unionType} value) => new {unionTypeName}(value);");
+            }
+            sb.AppendLineLf();
+
+            foreach (var unionType in unionTypes)
+            {
+                var cleanTypeName = unionType.Replace("<", "").Replace(">", "").Replace(",", "").Replace(" ", "").Replace("[", "").Replace("]", "");
+                var methodName = "TryGet" + char.ToUpper(cleanTypeName[0]) + cleanTypeName.Substring(1);
+
+                sb.AppendLineLf($"    public bool {methodName}(out {unionType} value)");
+                sb.AppendLineLf("    {");
+                sb.AppendLineLf($"        if (_value is {unionType} v)");
+                sb.AppendLineLf("        {");
+                sb.AppendLineLf("            value = v;");
+                sb.AppendLineLf("            return true;");
+                sb.AppendLineLf("        }");
+                sb.AppendLineLf("        value = default;");
+                sb.AppendLineLf("        return false;");
+                sb.AppendLineLf("    }");
+                sb.AppendLineLf();
+            }
+
+            sb.AppendLineLf($"    public bool Equals({unionTypeName} other) => Equals(_value, other._value) && _typeIndex == other._typeIndex;");
+            sb.AppendLineLf($"    public override bool Equals(object obj) => obj is {unionTypeName} other && Equals(other);");
+            sb.AppendLineLf("    public override int GetHashCode()");
+            sb.AppendLineLf("    {");
+            sb.AppendLineLf("        unchecked");
+            sb.AppendLineLf("        {");
+            sb.AppendLineLf("            int hash = 17;");
+            sb.AppendLineLf("            hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);");
+            sb.AppendLineLf("            hash = hash * 31 + _typeIndex;");
+            sb.AppendLineLf("            return hash;");
+            sb.AppendLineLf("        }");
+            sb.AppendLineLf("    }");
+            sb.AppendLineLf("    public override string ToString() => _value?.ToString() ?? string.Empty;");
+
+            sb.Append("}");
+
+            return sb.ToString();
         }
 
         private void AppendXmlDocs(StringBuilder sb, string description, string indent = "")

@@ -678,15 +678,67 @@ namespace dotacp.unittest
                     Meta = new Dictionary<string, object> { { "traceId", "set-config-1" } },
                     SessionId = "session-1",
                     ConfigId = "config-opt-1",
-                    Value = "value-1"
+                    Value = (SessionConfigValueId)"value-1"
                 };
                 var response = await pair.ClientConn.SetSessionConfigOptionAsync(request);
 
                 Assert.IsNotNull(pair.Agent.LastSetSessionConfigOptionRequest);
                 Assert.AreEqual("session-1", (string)pair.Agent.LastSetSessionConfigOptionRequest!.SessionId);
                 Assert.AreEqual("config-opt-1", (string)pair.Agent.LastSetSessionConfigOptionRequest.ConfigId);
-                Assert.AreEqual("value-1", (string)pair.Agent.LastSetSessionConfigOptionRequest.Value);
+                Assert.IsTrue(pair.Agent.LastSetSessionConfigOptionRequest.Value.TryGetSessionConfigValueId(out var requestValueId));
+                Assert.AreEqual("value-1", (string)requestValueId);
                 Assert.AreEqual("set-config-1", pair.Agent.LastSetSessionConfigOptionRequest.Meta["traceId"].ToString());
+
+                Assert.IsNotNull(response);
+                Assert.IsNotNull(response.ConfigOptions);
+                Assert.HasCount(1, response.ConfigOptions);
+                Assert.IsInstanceOfType(response.ConfigOptions[0], typeof(SessionConfigSelect));
+            }
+        }
+
+        [TestMethod]
+        public async Task SetSessionConfigOptionAsync_WithBooleanValue()
+        {
+            using (var pair = ConnectionPair.Create())
+            {
+                pair.Agent.SetSessionConfigOptionResponseToReturn = new SetSessionConfigOptionResponse
+                {
+                    Meta = new Dictionary<string, object> { { "updated", true } },
+                    ConfigOptions = new SessionConfigOption[]
+                    {
+                        new SessionConfigSelect
+                        {
+                            Id = "config-opt-1",
+                            Name = "Mode",
+                            Description = "Execution mode",
+                            Category = SessionConfigOptionCategory.Mode,
+                            CurrentValue = "value-1",
+                            Options = new SessionConfigSelectOption[]
+                            {
+                                new SessionConfigSelectOption { Name = "Value 1", Value = "value-1", Description = "Default" },
+                                new SessionConfigSelectOption { Name = "Value 2", Value = "value-2", Description = "Alternative" }
+                            }
+                        }
+                    }
+                };
+
+                var request = new SetSessionConfigOptionRequest
+                {
+                    Meta = new Dictionary<string, object> { { "traceId", "set-config-boolean-1" } },
+                    SessionId = "session-1",
+                    ConfigId = "config-opt-1",
+                    Type = "boolean",
+                    Value = true
+                };
+                var response = await pair.ClientConn.SetSessionConfigOptionAsync(request);
+
+                Assert.IsNotNull(pair.Agent.LastSetSessionConfigOptionRequest);
+                Assert.AreEqual("session-1", (string)pair.Agent.LastSetSessionConfigOptionRequest!.SessionId);
+                Assert.AreEqual("config-opt-1", (string)pair.Agent.LastSetSessionConfigOptionRequest.ConfigId);
+                Assert.IsTrue(pair.Agent.LastSetSessionConfigOptionRequest.Value.TryGetBool(out var requestValueBoolean));
+                Assert.IsTrue(requestValueBoolean);
+                Assert.IsFalse(pair.Agent.LastSetSessionConfigOptionRequest.Value.TryGetSessionConfigValueId(out _));
+                Assert.AreEqual("set-config-boolean-1", pair.Agent.LastSetSessionConfigOptionRequest.Meta["traceId"].ToString());
 
                 Assert.IsNotNull(response);
                 Assert.IsNotNull(response.ConfigOptions);
