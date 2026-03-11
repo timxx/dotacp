@@ -1,5 +1,5 @@
 // Generated from schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.1
+// Schema ref: refs/tags/v0.11.2
 
 #pragma warning disable CS1591
 
@@ -3211,6 +3211,16 @@ namespace dotacp.protocol
         ///
         /// This capability is not part of the spec yet, and may be removed or changed at any point.
         ///
+        /// Whether the agent supports `session/close`.
+        /// </summary>
+        [JsonProperty("close")]
+        public SessionCloseCapabilities Close { get; set; }
+
+        /// <summary>
+        /// **UNSTABLE**
+        ///
+        /// This capability is not part of the spec yet, and may be removed or changed at any point.
+        ///
         /// Whether the agent supports `session/fork`.
         /// </summary>
         [JsonProperty("fork")]
@@ -3231,16 +3241,6 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("resume")]
         public SessionResumeCapabilities Resume { get; set; }
-
-        /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// Whether the agent supports `session/close`.
-        /// </summary>
-        [JsonProperty("stop")]
-        public SessionCloseCapabilities Stop { get; set; }
     }
 
     /// <summary>

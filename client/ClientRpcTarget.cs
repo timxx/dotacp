@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.1
+// Schema ref: refs/tags/v0.11.2
 
 using dotacp.protocol;
 using dotacp.shared;

@@ -132,7 +132,7 @@ The generated code includes:
 
 ## Protocol Version
 
-This package implements **ACP Protocol Version 1** based on the **ACP v0.11.1** specification.
+This package implements **ACP Protocol Version 1** based on the **ACP v0.11.2** specification.
 
 ## See Also
 - [dotacp.client](../client/README.md) - Client implementation guide

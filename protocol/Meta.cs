@@ -1,5 +1,5 @@
 // Generated from schema/meta.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.1
+// Schema ref: refs/tags/v0.11.2
 
 #pragma warning disable CS1591
 
