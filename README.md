@@ -135,7 +135,7 @@ pwsh ./scripts/build-ci.ps1 -EnableModernTargetFrameworks:$false
 ### Target Frameworks
 
 - **Local/VS2019 default**: `netstandard2.0;net472` (unchanged, no new SDK required)
-- **CI builds**: Adds `net10.0;net9.0;net8.0` for `client` and `protocol` only
+- **CI builds**: Adds `net10.0;net9.0;net8.0` for `client`, `agent` and `protocol` only
 - **Activation**: Set `/p:EnableCiTargetFrameworks=true` in MSBuild or use the script above
 
 ## References
