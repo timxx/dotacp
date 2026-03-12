@@ -219,6 +219,87 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public void Generate_WithCustomNamespaces_UsesCustomAgentClientAndProtocolNamespaces()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            var schemaDir = Path.Combine(tempDir, "schema");
+            var agentDir = Path.Combine(tempDir, "agent", "unstable");
+            var clientDir = Path.Combine(tempDir, "client", "unstable");
+
+            Directory.CreateDirectory(schemaDir);
+            Directory.CreateDirectory(agentDir);
+            Directory.CreateDirectory(clientDir);
+
+            try
+            {
+                var metaJsonPath = Path.Combine(schemaDir, "meta.json");
+                var schemaJsonPath = Path.Combine(schemaDir, "schema.json");
+                var versionFilePath = Path.Combine(schemaDir, "VERSION");
+
+                File.WriteAllText(metaJsonPath, @"{
+                    ""agentMethods"": {
+                        ""initialize"": ""initialize""
+                    },
+                    ""clientMethods"": {
+                        ""read_text_file"": ""fs/read_text_file""
+                    }
+                }");
+
+                File.WriteAllText(schemaJsonPath, @"{
+                    ""$defs"": {
+                        ""InitializeRequest"": {
+                            ""x-method"": ""initialize"",
+                            ""x-side"": ""agent""
+                        },
+                        ""InitializeResponse"": {
+                            ""x-method"": ""initialize"",
+                            ""x-side"": ""agent""
+                        },
+                        ""ReadTextFileRequest"": {
+                            ""x-method"": ""fs/read_text_file"",
+                            ""x-side"": ""client""
+                        },
+                        ""ReadTextFileResponse"": {
+                            ""x-method"": ""fs/read_text_file"",
+                            ""x-side"": ""client""
+                        }
+                    }
+                }");
+
+                File.WriteAllText(versionFilePath, "v0.10.8");
+
+                var generator = new InterfaceGenerator();
+
+                generator.Generate(
+                    metaJsonPath,
+                    schemaJsonPath,
+                    versionFilePath,
+                    agentDir,
+                    clientDir,
+                    "dotacp.protocol.unstable",
+                    "dotacp.agent.unstable",
+                    "dotacp.client.unstable");
+
+                var agentInterface = File.ReadAllText(Path.Combine(agentDir, "IAcpAgent.cs"));
+                var clientInterface = File.ReadAllText(Path.Combine(clientDir, "IAcpClient.cs"));
+                var agentConnection = File.ReadAllText(Path.Combine(agentDir, "Connection.cs"));
+                var clientConnection = File.ReadAllText(Path.Combine(clientDir, "Connection.cs"));
+
+                Assert.Contains("namespace dotacp.agent.unstable", agentInterface);
+                Assert.Contains("using dotacp.protocol.unstable;", agentInterface);
+                Assert.Contains("namespace dotacp.client.unstable", clientInterface);
+                Assert.Contains("using dotacp.protocol.unstable;", clientInterface);
+                Assert.Contains("namespace dotacp.agent.unstable", agentConnection);
+                Assert.Contains("namespace dotacp.client.unstable", clientConnection);
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
         public void Generate_AgentConnection_ContainsExpectedMethods()
         {
             // Arrange

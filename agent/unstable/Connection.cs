@@ -1,7 +1,7 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
 // Schema ref: refs/tags/v0.11.2
 
-using dotacp.protocol;
+using dotacp.protocol.unstable;
 using dotacp.shared;
 using StreamJsonRpc;
 using System;
@@ -10,11 +10,11 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace dotacp.client
+namespace dotacp.agent.unstable
 {
     /// <summary>
-    /// Manages a JSON-RPC connection between an ACP client and an ACP agent.
-    /// The client can use this connection to communicate with the Agent.
+    /// Manages a JSON-RPC connection between an ACP agent and an ACP client.
+    /// The agent can use this connection to communicate with the Client so it behaves like a Client.
     /// </summary>
     public class Connection : IDisposable
     {
@@ -25,7 +25,7 @@ namespace dotacp.client
         /// </summary>
         public Task Completion => _rpc.Completion;
 
-        private Connection(IAcpClient client, Stream inputStream, Stream outputStream,
+        private Connection(IAcpAgent agent, Stream inputStream, Stream outputStream,
             TraceSource? traceSource = null)
         {
             var handler = new NewLineDelimitedMessageHandler(
@@ -35,8 +35,10 @@ namespace dotacp.client
             if (traceSource != null)
                 _rpc.TraceSource = traceSource;
 
-            _rpc.AddLocalRpcTarget(new ClientRpcTarget(client));
+            _rpc.AddLocalRpcTarget(new AgentRpcTarget(agent));
             _rpc.StartListening();
+
+            agent.OnClientConnected(this);
         }
 
         private Task<TResponse> SendRequestAsync<TRequest, TResponse>(
@@ -54,152 +56,152 @@ namespace dotacp.client
         }
 
         /// <summary>
-        /// Create a Connection to an ACP agent over the given streams.
+        /// Create a Connection to an ACP client over the given streams.
         /// </summary>
-        /// <param name="client">The client implementation that handles incoming RPC calls.</param>
-        /// <param name="inputStream">The (agent) input stream to write to.</param>
-        /// <param name="outputStream">The (agent) output stream to read from.</param>
+        /// <param name="agent">The agent implementation that handles incoming RPC calls.</param>
+        /// <param name="inputStream">The (client) input stream to write to.</param>
+        /// <param name="outputStream">The (client) output stream to read from.</param>
         /// <param name="traceSource">Optional trace source used for StreamJsonRpc diagnostics.</param>
         /// <returns>
         /// A running <see cref="Connection"/> instance, or <see langword="null"/> when a required argument is <see langword="null"/>.
         /// </returns>
-        public static Connection? RunClient(IAcpClient client,
+        public static Connection? RunAgent(IAcpAgent agent,
             Stream inputStream, Stream outputStream,
             TraceSource? traceSource = null)
         {
-            if (client == null || inputStream == null || outputStream == null)
+            if (agent == null || inputStream == null || outputStream == null)
                 return null;
 
-            return new Connection(client, inputStream, outputStream, traceSource);
+            return new Connection(agent, inputStream, outputStream, traceSource);
         }
 
         /// <summary>
-        /// Calls the agent <c>authenticate</c> method.
+        /// Calls the client <c>fs/read_text_file</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<AuthenticateResponse> AuthenticateAsync(
-            AuthenticateRequest request,
+        public Task<ReadTextFileResponse> ReadTextFileAsync(
+            ReadTextFileRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<AuthenticateRequest, AuthenticateResponse>(
-                AgentMethods.Authenticate, request, cancellationToken);
+            return SendRequestAsync<ReadTextFileRequest, ReadTextFileResponse>(
+                ClientMethods.FsReadTextFile, request, cancellationToken);
         }
 
         /// <summary>
-        /// Calls the agent <c>initialize</c> method.
+        /// Calls the client <c>fs/write_text_file</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<InitializeResponse> InitializeAsync(
-            InitializeRequest request,
+        public Task<WriteTextFileResponse> WriteTextFileAsync(
+            WriteTextFileRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<InitializeRequest, InitializeResponse>(
-                AgentMethods.Initialize, request, cancellationToken);
+            return SendRequestAsync<WriteTextFileRequest, WriteTextFileResponse>(
+                ClientMethods.FsWriteTextFile, request, cancellationToken);
         }
 
         /// <summary>
-        /// Sends the agent <c>session/cancel</c> notification.
+        /// Calls the client <c>session/request_permission</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<RequestPermissionResponse> RequestPermissionAsync(
+            RequestPermissionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<RequestPermissionRequest, RequestPermissionResponse>(
+                ClientMethods.SessionRequestPermission, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the client <c>session/update</c> notification.
         /// </summary>
         /// <param name="notification">The notification payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>A task that completes when the notification is sent.</returns>
-        public Task CancelAsync(
-            CancelNotification notification,
+        public Task SessionUpdateAsync(
+            SessionNotification notification,
             CancellationToken cancellationToken = default)
         {
-            return SendNotificationAsync(AgentMethods.SessionCancel, notification, cancellationToken);
+            return SendNotificationAsync(ClientMethods.SessionUpdate, notification, cancellationToken);
         }
 
         /// <summary>
-        /// Calls the agent <c>session/list</c> method.
+        /// Calls the client <c>terminal/create</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<ListSessionsResponse> ListSessionsAsync(
-            ListSessionsRequest request,
+        public Task<CreateTerminalResponse> CreateTerminalAsync(
+            CreateTerminalRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<ListSessionsRequest, ListSessionsResponse>(
-                AgentMethods.SessionList, request, cancellationToken);
+            return SendRequestAsync<CreateTerminalRequest, CreateTerminalResponse>(
+                ClientMethods.TerminalCreate, request, cancellationToken);
         }
 
         /// <summary>
-        /// Calls the agent <c>session/load</c> method.
+        /// Calls the client <c>terminal/kill</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<LoadSessionResponse> LoadSessionAsync(
-            LoadSessionRequest request,
+        public Task<KillTerminalResponse> KillTerminalAsync(
+            KillTerminalRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<LoadSessionRequest, LoadSessionResponse>(
-                AgentMethods.SessionLoad, request, cancellationToken);
+            return SendRequestAsync<KillTerminalRequest, KillTerminalResponse>(
+                ClientMethods.TerminalKill, request, cancellationToken);
         }
 
         /// <summary>
-        /// Calls the agent <c>session/new</c> method.
+        /// Calls the client <c>terminal/output</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<NewSessionResponse> NewSessionAsync(
-            NewSessionRequest request,
+        public Task<TerminalOutputResponse> TerminalOutputAsync(
+            TerminalOutputRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<NewSessionRequest, NewSessionResponse>(
-                AgentMethods.SessionNew, request, cancellationToken);
+            return SendRequestAsync<TerminalOutputRequest, TerminalOutputResponse>(
+                ClientMethods.TerminalOutput, request, cancellationToken);
         }
 
         /// <summary>
-        /// Calls the agent <c>session/prompt</c> method.
+        /// Calls the client <c>terminal/release</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<PromptResponse> PromptAsync(
-            PromptRequest request,
+        public Task<ReleaseTerminalResponse> ReleaseTerminalAsync(
+            ReleaseTerminalRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<PromptRequest, PromptResponse>(
-                AgentMethods.SessionPrompt, request, cancellationToken);
+            return SendRequestAsync<ReleaseTerminalRequest, ReleaseTerminalResponse>(
+                ClientMethods.TerminalRelease, request, cancellationToken);
         }
 
         /// <summary>
-        /// Calls the agent <c>session/set_config_option</c> method.
+        /// Calls the client <c>terminal/wait_for_exit</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(
-            SetSessionConfigOptionRequest request,
+        public Task<WaitForTerminalExitResponse> WaitForTerminalExitAsync(
+            WaitForTerminalExitRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<SetSessionConfigOptionRequest, SetSessionConfigOptionResponse>(
-                AgentMethods.SessionSetConfigOption, request, cancellationToken);
+            return SendRequestAsync<WaitForTerminalExitRequest, WaitForTerminalExitResponse>(
+                ClientMethods.TerminalWaitForExit, request, cancellationToken);
         }
 
         /// <summary>
-        /// Calls the agent <c>session/set_mode</c> method.
-        /// </summary>
-        /// <param name="request">The request payload.</param>
-        /// <param name="cancellationToken">A token that cancels the operation.</param>
-        /// <returns>The response.</returns>
-        public Task<SetSessionModeResponse> SetSessionModeAsync(
-            SetSessionModeRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return SendRequestAsync<SetSessionModeRequest, SetSessionModeResponse>(
-                AgentMethods.SessionSetMode, request, cancellationToken);
-        }
-
-        /// <summary>
-        /// Calls an agent extension method.
+        /// Calls a client extension method.
         /// </summary>
         /// <param name="method">The extension method name.</param>
         /// <param name="request">The request payload.</param>
@@ -213,7 +215,7 @@ namespace dotacp.client
         }
 
         /// <summary>
-        /// Sends an agent extension notification.
+        /// Sends a client extension notification.
         /// </summary>
         /// <param name="method">The extension notification name.</param>
         /// <param name="notification">The notification payload.</param>

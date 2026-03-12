@@ -2,8 +2,8 @@
 using System;
 using System.IO;
 
-using AgentConnection = dotacp.agent.Connection;
-using ClientConnection = dotacp.client.Connection;
+using AgentConnection = dotacp.agent.unstable.Connection;
+using ClientConnection = dotacp.client.unstable.Connection;
 
 namespace dotacp.unittest
 {

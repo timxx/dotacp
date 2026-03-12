@@ -65,18 +65,33 @@ namespace dotacp.generator
         }
 
         /// <summary>
-        /// Download schema files from GitHub
+        /// Download unstable schema files from GitHub.
         /// </summary>
         public void DownloadSchema(string repository, string gitRef, string outputDir)
+        {
+            DownloadSchemaVariant(repository, gitRef, outputDir, unstable: true);
+        }
+
+        /// <summary>
+        /// Download both stable and unstable schema files from GitHub.
+        /// </summary>
+        public void DownloadSchemaSet(string repository, string gitRef, string stableOutputDir, string unstableOutputDir)
+        {
+            DownloadSchemaVariant(repository, gitRef, stableOutputDir, unstable: false);
+            DownloadSchemaVariant(repository, gitRef, unstableOutputDir, unstable: true);
+        }
+
+        private void DownloadSchemaVariant(string repository, string gitRef, string outputDir, bool unstable)
         {
             Directory.CreateDirectory(outputDir);
 
             var refDisplay = gitRef.Replace("refs/tags/", "").Replace("refs/heads/", "");
-            Console.WriteLine($"  Fetching from: {repository}@{refDisplay}");
+            var variant = unstable ? "unstable" : "stable";
+            Console.WriteLine($"  Fetching {variant} schema from: {repository}@{refDisplay}");
 
             var baseUrl = $"https://raw.githubusercontent.com/{repository}/{gitRef}/schema";
-            var schemaUrl = $"{baseUrl}/schema.unstable.json";
-            var metaUrl = $"{baseUrl}/meta.unstable.json";
+            var schemaUrl = unstable ? $"{baseUrl}/schema.unstable.json" : $"{baseUrl}/schema.json";
+            var metaUrl = unstable ? $"{baseUrl}/meta.unstable.json" : $"{baseUrl}/meta.json";
 
             try
             {
@@ -89,11 +104,11 @@ namespace dotacp.generator
                 // Write VERSION file
                 File.WriteAllText(Path.Combine(outputDir, "VERSION"), gitRef, System.Text.Encoding.UTF8);
 
-                Console.WriteLine("  [OK] Schema and meta files downloaded");
+                Console.WriteLine($"  [OK] {variant} schema and meta files downloaded");
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to download schema: {ex.Message}", ex);
+                throw new Exception($"Failed to download {variant} schema: {ex.Message}", ex);
             }
         }
 

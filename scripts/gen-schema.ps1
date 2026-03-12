@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Generate all code (Schema.cs and Meta.cs)
+    Generate all code (stable and unstable Schema.cs/Meta.cs plus interfaces)
 
 .DESCRIPTION
     Wrapper script that calls the C# implementation to generate all code artifacts.

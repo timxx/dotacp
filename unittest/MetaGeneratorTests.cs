@@ -164,6 +164,37 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public void Generate_WithCustomNamespace_UsesNamespace()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDir);
+
+            try
+            {
+                var metaJsonPath = Path.Combine(tempDir, "meta.json");
+                var versionFilePath = Path.Combine(tempDir, "VERSION");
+
+                File.WriteAllText(metaJsonPath, @"{
+                    ""version"": 1,
+                    ""agentMethods"": {},
+                    ""clientMethods"": {}
+                }");
+
+                File.WriteAllText(versionFilePath, "v1.0.0");
+
+                var generator = new MetaGenerator();
+                var result = generator.Generate(metaJsonPath, versionFilePath, "dotacp.protocol.unstable");
+
+                Assert.Contains("namespace dotacp.protocol.unstable", result);
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
         public void Generate_WithEmptyAgentMethods_GeneratesEmptyClass()
         {
             // Arrange

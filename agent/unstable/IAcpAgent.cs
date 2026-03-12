@@ -1,11 +1,11 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
 // Schema ref: refs/tags/v0.11.2
 
-using dotacp.protocol;
+using dotacp.protocol.unstable;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace dotacp.agent
+namespace dotacp.agent.unstable
 {
     /// <summary>
     /// Defines the methods an ACP agent implementation must provide to handle protocol requests.
@@ -46,6 +46,24 @@ namespace dotacp.agent
             CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Handles the protocol <c>session/close</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/fork</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<ForkSessionResponse> ForkSessionAsync(ForkSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Handles the protocol <c>session/list</c> request.
         /// </summary>
         /// <param name="request">The request payload.</param>
@@ -82,6 +100,15 @@ namespace dotacp.agent
             CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Handles the protocol <c>session/resume</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Handles the protocol <c>session/set_config_option</c> request.
         /// </summary>
         /// <param name="request">The request payload.</param>
@@ -97,6 +124,15 @@ namespace dotacp.agent
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
         Task<SetSessionModeResponse> SetSessionModeAsync(SetSessionModeRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/set_model</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<SetSessionModelResponse> SetSessionModelAsync(SetSessionModelRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>

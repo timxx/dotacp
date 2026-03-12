@@ -36,6 +36,16 @@ namespace dotacp.unittest
             return await task;
         }
 
+        private static void WriteUnstableSchemaFiles(string schemaDir, string schemaJson, string metaJson, string version)
+        {
+            var unstableDir = Path.Combine(schemaDir, "unstable");
+            Directory.CreateDirectory(unstableDir);
+
+            File.WriteAllText(Path.Combine(unstableDir, "schema.json"), schemaJson);
+            File.WriteAllText(Path.Combine(unstableDir, "meta.json"), metaJson);
+            File.WriteAllText(Path.Combine(unstableDir, "VERSION"), version);
+        }
+
         [TestMethod]
         public async Task Main_SchemaCommand_WithValidSchema_ReturnsZero()
         {
@@ -310,6 +320,28 @@ namespace dotacp.unittest
                 }");
 
                 File.WriteAllText(Path.Combine(schemaDir, "VERSION"), "v1.0.0");
+                WriteUnstableSchemaFiles(
+                    schemaDir,
+                    @"{
+                    ""$defs"": {
+                        ""InitializeRequest"": {
+                            ""x-method"": ""initialize"",
+                            ""x-side"": ""agent""
+                        },
+                        ""InitializeResponse"": {
+                            ""x-method"": ""initialize"",
+                            ""x-side"": ""agent""
+                        }
+                    }
+                }",
+                    @"{
+                    ""version"": 1,
+                    ""agentMethods"": {
+                        ""initialize"": ""initialize""
+                    },
+                    ""clientMethods"": {}
+                }",
+                    "v1.0.0");
 
                 var args = new[] { "all", "--no-download", "--schema-dir", schemaDir, "--output-dir", outputDir };
 
@@ -320,7 +352,11 @@ namespace dotacp.unittest
                 Assert.AreEqual(0, result);
                 Assert.IsTrue(File.Exists(Path.Combine(outputDir, "Schema.cs")));
                 Assert.IsTrue(File.Exists(Path.Combine(outputDir, "Meta.cs")));
+                Assert.IsTrue(File.Exists(Path.Combine(outputDir, "unstable", "Schema.cs")));
+                Assert.IsTrue(File.Exists(Path.Combine(outputDir, "unstable", "Meta.cs")));
                 Assert.IsTrue(File.Exists(Path.Combine(agentDir, "IAcpAgent.cs")));
+                Assert.IsTrue(File.Exists(Path.Combine(agentDir, "unstable", "IAcpAgent.cs")));
+                Assert.IsTrue(File.Exists(Path.Combine(clientDir, "unstable", "IAcpClient.cs")));
             }
             finally
             {
@@ -365,6 +401,11 @@ namespace dotacp.unittest
                 }");
 
                 File.WriteAllText(Path.Combine(schemaDir, "VERSION"), "refs/tags/v1.0.0");
+                WriteUnstableSchemaFiles(
+                    schemaDir,
+                    @"{ ""$defs"": {} }",
+                    @"{ ""version"": 1, ""agentMethods"": {}, ""clientMethods"": {} }",
+                    "refs/tags/v1.0.0");
 
                 var args = new[] { "all", "--version", "v1.0.0", "--schema-dir", schemaDir, "--output-dir", outputDir };
 
@@ -401,6 +442,11 @@ namespace dotacp.unittest
                     ""agentMethods"": {},
                     ""clientMethods"": {}
                 }");
+                WriteUnstableSchemaFiles(
+                    schemaDir,
+                    @"{ ""$defs"": {} }",
+                    @"{ ""version"": 1, ""agentMethods"": {}, ""clientMethods"": {} }",
+                    "v1.0.0");
 
                 var args = new[] { "all", "--no-download", "--schema-dir", schemaDir, "--output-dir", outputDir };
 
@@ -432,6 +478,11 @@ namespace dotacp.unittest
                 File.WriteAllText(Path.Combine(schemaDir, "schema.json"), @"{
                     ""$defs"": {}
                 }");
+                WriteUnstableSchemaFiles(
+                    schemaDir,
+                    @"{ ""$defs"": {} }",
+                    @"{ ""version"": 1, ""agentMethods"": {}, ""clientMethods"": {} }",
+                    "v1.0.0");
 
                 // meta.json is missing - will cause error
 
@@ -567,6 +618,8 @@ namespace dotacp.unittest
                 Assert.AreEqual(0, result);
                 Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "schema.json")));
                 Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "meta.json")));
+                Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "unstable", "schema.json")));
+                Assert.IsTrue(File.Exists(Path.Combine(schemaDir, "unstable", "meta.json")));
             }
             finally
             {
@@ -598,6 +651,11 @@ namespace dotacp.unittest
                 File.WriteAllText(Path.Combine(schemaDir, "schema.json"), @"{""$defs"":{}}");
                 File.WriteAllText(Path.Combine(schemaDir, "meta.json"), @"{""version"":1,""agentMethods"":{},""clientMethods"":{}}");
                 File.WriteAllText(Path.Combine(schemaDir, "VERSION"), "v1.0.0");
+                WriteUnstableSchemaFiles(
+                    schemaDir,
+                    @"{ ""$defs"": {} }",
+                    @"{ ""version"": 1, ""agentMethods"": {}, ""clientMethods"": {} }",
+                    "v1.0.0");
 
                 var args = new[] {
                     "all",
@@ -682,6 +740,11 @@ namespace dotacp.unittest
             {
                 // Set up cached version that differs from requested
                 File.WriteAllText(Path.Combine(schemaDir, "VERSION"), "refs/tags/v0.9.0");
+                WriteUnstableSchemaFiles(
+                    schemaDir,
+                    @"{ ""$defs"": {} }",
+                    @"{ ""version"": 1, ""agentMethods"": {}, ""clientMethods"": {} }",
+                    "refs/tags/v0.9.0");
 
                 var args = new[] { "all", "--version", "main", "--schema-dir", schemaDir, "--output-dir", outputDir };
 
@@ -722,6 +785,11 @@ namespace dotacp.unittest
                 File.WriteAllText(Path.Combine(schemaDir, "schema.json"), @"{""$defs"":{}}");
                 File.WriteAllText(Path.Combine(schemaDir, "meta.json"),
                     @"{""version"":1,""agentMethods"":{},""clientMethods"":{}}");
+                WriteUnstableSchemaFiles(
+                    schemaDir,
+                    @"{ ""$defs"": {} }",
+                    @"{ ""version"": 1, ""agentMethods"": {}, ""clientMethods"": {} }",
+                    "v1.0.0");
 
                 var args = new[] { "all", "--no-download", "--schema-dir", schemaDir, "--output-dir", outputDir };
 

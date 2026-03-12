@@ -1,7 +1,7 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
 // Schema ref: refs/tags/v0.11.2
 
-using dotacp.protocol;
+using dotacp.protocol.unstable;
 using dotacp.shared;
 using StreamJsonRpc;
 using System;
@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace dotacp.client
+namespace dotacp.client.unstable
 {
     /// <summary>
     /// Manages a JSON-RPC connection between an ACP client and an ACP agent.
@@ -115,6 +115,34 @@ namespace dotacp.client
         }
 
         /// <summary>
+        /// Calls the agent <c>session/close</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<CloseSessionResponse> CloseAsync(
+            CloseSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<CloseSessionRequest, CloseSessionResponse>(
+                AgentMethods.SessionClose, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/fork</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<ForkSessionResponse> ForkSessionAsync(
+            ForkSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<ForkSessionRequest, ForkSessionResponse>(
+                AgentMethods.SessionFork, request, cancellationToken);
+        }
+
+        /// <summary>
         /// Calls the agent <c>session/list</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
@@ -171,6 +199,20 @@ namespace dotacp.client
         }
 
         /// <summary>
+        /// Calls the agent <c>session/resume</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<ResumeSessionResponse> ResumeSessionAsync(
+            ResumeSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<ResumeSessionRequest, ResumeSessionResponse>(
+                AgentMethods.SessionResume, request, cancellationToken);
+        }
+
+        /// <summary>
         /// Calls the agent <c>session/set_config_option</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
@@ -196,6 +238,20 @@ namespace dotacp.client
         {
             return SendRequestAsync<SetSessionModeRequest, SetSessionModeResponse>(
                 AgentMethods.SessionSetMode, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/set_model</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<SetSessionModelResponse> SetSessionModelAsync(
+            SetSessionModelRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<SetSessionModelRequest, SetSessionModelResponse>(
+                AgentMethods.SessionSetModel, request, cancellationToken);
         }
 
         /// <summary>

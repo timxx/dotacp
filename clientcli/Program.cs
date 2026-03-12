@@ -1,5 +1,5 @@
-using dotacp.client;
-using dotacp.protocol;
+using dotacp.client.unstable;
+using dotacp.protocol.unstable;
 using StreamJsonRpc;
 using System;
 using System.Diagnostics;

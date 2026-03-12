@@ -19,7 +19,7 @@ namespace dotacp.generator
         /// <summary>
         /// Generate Schema.cs from schema.json
         /// </summary>
-        public string Generate(string schemaJsonPath, string versionFilePath)
+        public string Generate(string schemaJsonPath, string versionFilePath, string targetNamespace = "dotacp.protocol")
         {
             var schemaJson = File.ReadAllText(schemaJsonPath);
             var schema = JObject.Parse(schemaJson);
@@ -50,10 +50,14 @@ namespace dotacp.generator
             sb.AppendLineLf("using Newtonsoft.Json;");
             sb.AppendLineLf("using System;");
             sb.AppendLineLf("using System.Collections.Generic;");
+            if (!string.Equals(targetNamespace, "dotacp.protocol", StringComparison.Ordinal))
+            {
+                sb.AppendLineLf("using dotacp.protocol;");
+            }
             sb.AppendLineLf();
 
             // Start namespace
-            sb.AppendLineLf("namespace dotacp.protocol");
+            sb.AppendLineLf($"namespace {targetNamespace}");
             sb.AppendLineLf("{");
 
             // Separate definitions by type

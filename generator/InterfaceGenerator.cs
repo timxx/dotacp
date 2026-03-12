@@ -24,7 +24,9 @@ namespace dotacp.generator
         private Dictionary<string, MethodInfo> _agentMethods = new Dictionary<string, MethodInfo>();
         private Dictionary<string, MethodInfo> _clientMethods = new Dictionary<string, MethodInfo>();
 
-        public void Generate(string metaJsonPath, string schemaJsonPath, string versionFilePath, string agentDir, string clientDir)
+        public void Generate(string metaJsonPath, string schemaJsonPath, string versionFilePath, string agentDir, string clientDir,
+            string protocolNamespace = "dotacp.protocol", string agentNamespace = "dotacp.agent",
+            string clientNamespace = "dotacp.client")
         {
             ParseMetaAndSchema(metaJsonPath, schemaJsonPath);
 
@@ -35,14 +37,14 @@ namespace dotacp.generator
             }
 
             // Generate agent files
-            GenerateIAcpAgent(Path.Combine(agentDir, "IAcpAgent.cs"), gitRef);
-            GenerateAgentRpcTarget(Path.Combine(agentDir, "AgentRpcTarget.cs"), gitRef);
-            GenerateAgentConnection(Path.Combine(agentDir, "Connection.cs"), gitRef);
+            GenerateIAcpAgent(Path.Combine(agentDir, "IAcpAgent.cs"), gitRef, protocolNamespace, agentNamespace);
+            GenerateAgentRpcTarget(Path.Combine(agentDir, "AgentRpcTarget.cs"), gitRef, protocolNamespace, agentNamespace);
+            GenerateAgentConnection(Path.Combine(agentDir, "Connection.cs"), gitRef, protocolNamespace, agentNamespace);
 
             // Generate client files
-            GenerateIAcpClient(Path.Combine(clientDir, "IAcpClient.cs"), gitRef);
-            GenerateClientRpcTarget(Path.Combine(clientDir, "ClientRpcTarget.cs"), gitRef);
-            GenerateClientConnection(Path.Combine(clientDir, "Connection.cs"), gitRef);
+            GenerateIAcpClient(Path.Combine(clientDir, "IAcpClient.cs"), gitRef, protocolNamespace, clientNamespace);
+            GenerateClientRpcTarget(Path.Combine(clientDir, "ClientRpcTarget.cs"), gitRef, protocolNamespace, clientNamespace);
+            GenerateClientConnection(Path.Combine(clientDir, "Connection.cs"), gitRef, protocolNamespace, clientNamespace);
         }
 
         private void ParseMetaAndSchema(string metaJsonPath, string schemaJsonPath)
@@ -155,7 +157,7 @@ namespace dotacp.generator
             }
         }
 
-        private void GenerateIAcpAgent(string outputPath, string gitRef)
+        private void GenerateIAcpAgent(string outputPath, string gitRef, string protocolNamespace, string agentNamespace)
         {
             var sb = new StringBuilder();
             sb.AppendLineLf("// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.");
@@ -164,11 +166,11 @@ namespace dotacp.generator
                 sb.AppendLineLf($"// Schema ref: {gitRef}");
             }
             sb.AppendLineLf();
-            sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf($"using {protocolNamespace};");
             sb.AppendLineLf("using System.Threading;");
             sb.AppendLineLf("using System.Threading.Tasks;");
             sb.AppendLineLf();
-            sb.AppendLineLf("namespace dotacp.agent");
+            sb.AppendLineLf($"namespace {agentNamespace}");
             sb.AppendLineLf("{");
             sb.AppendLineLf("    /// <summary>");
             sb.AppendLineLf("    /// Defines the methods an ACP agent implementation must provide to handle protocol requests.");
@@ -227,7 +229,7 @@ namespace dotacp.generator
             File.WriteAllText(outputPath, sb.ToString());
         }
 
-        private void GenerateAgentRpcTarget(string outputPath, string gitRef)
+        private void GenerateAgentRpcTarget(string outputPath, string gitRef, string protocolNamespace, string agentNamespace)
         {
             var sb = new StringBuilder();
             sb.AppendLineLf("// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.");
@@ -236,13 +238,13 @@ namespace dotacp.generator
                 sb.AppendLineLf($"// Schema ref: {gitRef}");
             }
             sb.AppendLineLf();
-            sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf($"using {protocolNamespace};");
             sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
             sb.AppendLineLf("using System.Threading;");
             sb.AppendLineLf("using System.Threading.Tasks;");
             sb.AppendLineLf();
-            sb.AppendLineLf("namespace dotacp.agent");
+            sb.AppendLineLf($"namespace {agentNamespace}");
             sb.AppendLineLf("{");
             sb.AppendLineLf("    internal sealed class AgentRpcTarget");
             sb.AppendLineLf("    {");
@@ -294,7 +296,7 @@ namespace dotacp.generator
             File.WriteAllText(outputPath, sb.ToString());
         }
 
-        private void GenerateAgentConnection(string outputPath, string gitRef)
+        private void GenerateAgentConnection(string outputPath, string gitRef, string protocolNamespace, string agentNamespace)
         {
             var sb = new StringBuilder();
             sb.AppendLineLf("// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.");
@@ -303,7 +305,7 @@ namespace dotacp.generator
                 sb.AppendLineLf($"// Schema ref: {gitRef}");
             }
             sb.AppendLineLf();
-            sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf($"using {protocolNamespace};");
             sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
             sb.AppendLineLf("using System;");
@@ -312,7 +314,7 @@ namespace dotacp.generator
             sb.AppendLineLf("using System.Threading;");
             sb.AppendLineLf("using System.Threading.Tasks;");
             sb.AppendLineLf();
-            sb.AppendLineLf("namespace dotacp.agent");
+            sb.AppendLineLf($"namespace {agentNamespace}");
             sb.AppendLineLf("{");
             sb.AppendLineLf("    /// <summary>");
             sb.AppendLineLf("    /// Manages a JSON-RPC connection between an ACP agent and an ACP client.");
@@ -457,7 +459,7 @@ namespace dotacp.generator
             sb.AppendLineLf("        }");
         }
 
-        private void GenerateIAcpClient(string outputPath, string gitRef)
+        private void GenerateIAcpClient(string outputPath, string gitRef, string protocolNamespace, string clientNamespace)
         {
             var sb = new StringBuilder();
             sb.AppendLineLf("// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.");
@@ -466,11 +468,11 @@ namespace dotacp.generator
                 sb.AppendLineLf($"// Schema ref: {gitRef}");
             }
             sb.AppendLineLf();
-            sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf($"using {protocolNamespace};");
             sb.AppendLineLf("using System.Threading;");
             sb.AppendLineLf("using System.Threading.Tasks;");
             sb.AppendLineLf();
-            sb.AppendLineLf("namespace dotacp.client");
+            sb.AppendLineLf($"namespace {clientNamespace}");
             sb.AppendLineLf("{");
             sb.AppendLineLf("    /// <summary>");
             sb.AppendLineLf("    /// Defines the methods an ACP client implementation must provide to handle protocol calls from an agent.");
@@ -528,7 +530,7 @@ namespace dotacp.generator
             File.WriteAllText(outputPath, sb.ToString());
         }
 
-        private void GenerateClientRpcTarget(string outputPath, string gitRef)
+        private void GenerateClientRpcTarget(string outputPath, string gitRef, string protocolNamespace, string clientNamespace)
         {
             var sb = new StringBuilder();
             sb.AppendLineLf("// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.");
@@ -537,13 +539,13 @@ namespace dotacp.generator
                 sb.AppendLineLf($"// Schema ref: {gitRef}");
             }
             sb.AppendLineLf();
-            sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf($"using {protocolNamespace};");
             sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
             sb.AppendLineLf("using System.Threading;");
             sb.AppendLineLf("using System.Threading.Tasks;");
             sb.AppendLineLf();
-            sb.AppendLineLf("namespace dotacp.client");
+            sb.AppendLineLf($"namespace {clientNamespace}");
             sb.AppendLineLf("{");
             sb.AppendLineLf("    internal sealed class ClientRpcTarget");
             sb.AppendLineLf("    {");
@@ -595,7 +597,7 @@ namespace dotacp.generator
             File.WriteAllText(outputPath, sb.ToString());
         }
 
-        private void GenerateClientConnection(string outputPath, string gitRef)
+        private void GenerateClientConnection(string outputPath, string gitRef, string protocolNamespace, string clientNamespace)
         {
             var sb = new StringBuilder();
             sb.AppendLineLf("// Generated from schema/meta.json and schema/schema.json. Do not edit by hand.");
@@ -604,7 +606,7 @@ namespace dotacp.generator
                 sb.AppendLineLf($"// Schema ref: {gitRef}");
             }
             sb.AppendLineLf();
-            sb.AppendLineLf("using dotacp.protocol;");
+            sb.AppendLineLf($"using {protocolNamespace};");
             sb.AppendLineLf("using dotacp.shared;");
             sb.AppendLineLf("using StreamJsonRpc;");
             sb.AppendLineLf("using System;");
@@ -613,7 +615,7 @@ namespace dotacp.generator
             sb.AppendLineLf("using System.Threading;");
             sb.AppendLineLf("using System.Threading.Tasks;");
             sb.AppendLineLf();
-            sb.AppendLineLf("namespace dotacp.client");
+            sb.AppendLineLf($"namespace {clientNamespace}");
             sb.AppendLineLf("{");
             sb.AppendLineLf("    /// <summary>");
             sb.AppendLineLf("    /// Manages a JSON-RPC connection between an ACP client and an ACP agent.");

@@ -13,7 +13,7 @@ namespace dotacp.generator
         /// <summary>
         /// Generate Meta.cs from meta.json
         /// </summary>
-        public string Generate(string metaJsonPath, string versionFilePath)
+        public string Generate(string metaJsonPath, string versionFilePath, string targetNamespace = "dotacp.protocol")
         {
             var metaJson = File.ReadAllText(metaJsonPath);
             var meta = JObject.Parse(metaJson);
@@ -35,7 +35,7 @@ namespace dotacp.generator
             sb.AppendLineLf();
             sb.AppendLineLf("#pragma warning disable CS1591");
             sb.AppendLineLf();
-            sb.AppendLineLf("namespace dotacp.protocol");
+            sb.AppendLineLf($"namespace {targetNamespace}");
             sb.AppendLineLf("{");
 
             // Generate ProtocolMeta class

@@ -1,4 +1,4 @@
-using dotacp.protocol;
+using dotacp.protocol.unstable;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;

@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nerdbank.Streams;
 using System.Diagnostics;
-using AgentConnection = dotacp.agent.Connection;
-using ClientConnection = dotacp.client.Connection;
+using AgentConnection = dotacp.agent.unstable.Connection;
+using ClientConnection = dotacp.client.unstable.Connection;
 
 namespace dotacp.unittest
 {

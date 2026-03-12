@@ -1,5 +1,5 @@
-﻿using dotacp.client;
-using dotacp.protocol;
+﻿using dotacp.client.unstable;
+using dotacp.protocol.unstable;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

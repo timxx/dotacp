@@ -214,6 +214,43 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public void DownloadSchemaSet_CreatesStableAndUnstableDirectories()
+        {
+            // Arrange
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            var stableDir = Path.Combine(tempDir, "stable");
+            var unstableDir = Path.Combine(tempDir, "unstable");
+            var downloadClient = FakeHttpMessageHandler.CreateHttpClient();
+            var downloader = new SchemaDownloader(downloadClient);
+
+            try
+            {
+                // Act
+                downloader.DownloadSchemaSet(
+                    "agentclientprotocol/agent-client-protocol",
+                    "refs/heads/main",
+                    stableDir,
+                    unstableDir);
+
+                // Assert
+                Assert.IsTrue(File.Exists(Path.Combine(stableDir, "schema.json")));
+                Assert.IsTrue(File.Exists(Path.Combine(stableDir, "meta.json")));
+                Assert.IsTrue(File.Exists(Path.Combine(stableDir, "VERSION")));
+
+                Assert.IsTrue(File.Exists(Path.Combine(unstableDir, "schema.json")));
+                Assert.IsTrue(File.Exists(Path.Combine(unstableDir, "meta.json")));
+                Assert.IsTrue(File.Exists(Path.Combine(unstableDir, "VERSION")));
+            }
+            finally
+            {
+                downloadClient.Dispose();
+
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
         public void DownloadSchema_WithInvalidUrl_ThrowsException()
         {
             // Arrange
@@ -239,7 +276,7 @@ namespace dotacp.unittest
                 }
 
                 Assert.IsNotNull(caughtException);
-                Assert.Contains("Failed to download schema", caughtException.Message);
+                Assert.Contains("Failed to download unstable schema", caughtException.Message);
             }
             finally
             {
