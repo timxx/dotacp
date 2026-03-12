@@ -10,7 +10,7 @@ namespace dotacp.unittest
     /// Tests Connection factory method null-argument handling.
     /// </summary>
     [TestClass]
-    public class ConnectionFactoryTests
+    public class ConnectionFactoryTests_Unstable
     {
         [TestMethod]
         public void RunAgent_NullAgent_ReturnsNull()
@@ -31,7 +31,7 @@ namespace dotacp.unittest
         [TestMethod]
         public void RunAgent_NullInputStream_ReturnsNull()
         {
-            var agent = new MockAgent();
+            var agent = new MockAgent_Unstable();
             var streams = FullDuplexStream.CreatePair();
             try
             {
@@ -48,7 +48,7 @@ namespace dotacp.unittest
         [TestMethod]
         public void RunAgent_NullOutputStream_ReturnsNull()
         {
-            var agent = new MockAgent();
+            var agent = new MockAgent_Unstable();
             var streams = FullDuplexStream.CreatePair();
             try
             {
@@ -68,7 +68,7 @@ namespace dotacp.unittest
             var streams = FullDuplexStream.CreatePair();
             try
             {
-                var agent = new MockAgent();
+                var agent = new MockAgent_Unstable();
                 var traceSource = new TraceSource("JsonRpc", SourceLevels.Verbose);
                 var result = AgentConnection.RunAgent(agent, streams.Item1, streams.Item1, traceSource);
                 Assert.IsNotNull(result);
@@ -100,7 +100,7 @@ namespace dotacp.unittest
         [TestMethod]
         public void RunClient_NullInputStream_ReturnsNull()
         {
-            var client = new MockClient();
+            var client = new MockClient_Unstable();
             var streams = FullDuplexStream.CreatePair();
             try
             {
@@ -117,7 +117,7 @@ namespace dotacp.unittest
         [TestMethod]
         public void RunClient_NullOutputStream_ReturnsNull()
         {
-            var client = new MockClient();
+            var client = new MockClient_Unstable();
             var streams = FullDuplexStream.CreatePair();
             try
             {
@@ -137,7 +137,7 @@ namespace dotacp.unittest
             var streams = FullDuplexStream.CreatePair();
             try
             {
-                var agent = new MockAgent();
+                var agent = new MockAgent_Unstable();
                 var result = AgentConnection.RunAgent(agent, streams.Item1, streams.Item1);
                 Assert.IsNotNull(result);
                 Assert.IsNotNull(agent.ReceivedConnection);
@@ -155,7 +155,7 @@ namespace dotacp.unittest
             var streams = FullDuplexStream.CreatePair();
             try
             {
-                var client = new MockClient();
+                var client = new MockClient_Unstable();
                 var result = ClientConnection.RunClient(client, streams.Item1, streams.Item1);
                 Assert.IsNotNull(result);
             }
@@ -172,7 +172,7 @@ namespace dotacp.unittest
             var streams = FullDuplexStream.CreatePair();
             try
             {
-                var client = new MockClient();
+                var client = new MockClient_Unstable();
                 var traceSource = new TraceSource("JsonRpc", SourceLevels.Verbose);
                 var result = ClientConnection.RunClient(client, streams.Item1, streams.Item1, traceSource);
                 Assert.IsNotNull(result);
@@ -190,7 +190,7 @@ namespace dotacp.unittest
             var streams = FullDuplexStream.CreatePair();
             try
             {
-                var client = new MockClient();
+                var client = new MockClient_Unstable();
                 var result = ClientConnection.RunClient(client, streams.Item1, streams.Item1);
                 Assert.IsNotNull(result);
                 Assert.IsNotNull(result.Completion);
@@ -208,7 +208,7 @@ namespace dotacp.unittest
             var streams = FullDuplexStream.CreatePair();
             try
             {
-                var agent = new MockAgent();
+                var agent = new MockAgent_Unstable();
                 var result = AgentConnection.RunAgent(agent, streams.Item1, streams.Item1);
                 Assert.IsNotNull(result);
                 Assert.IsNotNull(result.Completion);

@@ -1,14 +1,14 @@
-using dotacp.client;
-using dotacp.protocol;
+using dotacp.client.unstable;
+using dotacp.protocol.unstable;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace dotacp.unittest
 {
     /// <summary>
-    /// Mock IAcpClient (stable) that captures received requests and returns configured responses.
+    /// Mock IAcpClient (unstable) that captures received requests and returns configured responses.
     /// </summary>
-    internal sealed class MockClient : IAcpClient
+    internal sealed class MockClient_Unstable : IAcpClient
     {
         // Captured requests
         public ReadTextFileRequest? LastReadTextFileRequest { get; private set; }

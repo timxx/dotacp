@@ -1,4 +1,4 @@
-using dotacp.protocol.unstable;
+using dotacp.protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace dotacp.unittest
 {
     /// <summary>
-    /// Tests real RPC communication from agent to client.
+    /// Tests real RPC communication from agent to client using the stable API.
     /// Uses a real agent Connection sending to a real client Connection backed by a mock IAcpClient.
     /// Verifies request serialization and response deserialization through the actual JSON-RPC pipeline.
     /// </summary>
@@ -364,16 +364,6 @@ namespace dotacp.unittest
                     UpdatedAt = "2026-03-03T00:00:00Z"
                 },
                 "session_info_update");
-
-            await SendAndAssertAsync(
-                new UsageUpdate
-                {
-                    Meta = new Dictionary<string, object> { { "kind", "usage" } },
-                    Cost = new Cost { Amount = 1.23, Currency = "USD" },
-                    Size = 8192,
-                    Used = 2048
-                },
-                "usage_update");
 
             await SendAndAssertAsync(
                 new ConfigOptionUpdate
