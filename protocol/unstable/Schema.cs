@@ -6,7 +6,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using dotacp.protocol;
 
 namespace dotacp.protocol.unstable
 {

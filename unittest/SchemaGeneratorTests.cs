@@ -70,7 +70,6 @@ namespace dotacp.unittest
             var result = generator.Generate(schemaPath, versionPath, "dotacp.protocol.unstable");
 
             Assert.Contains("namespace dotacp.protocol.unstable", result);
-            Assert.Contains("using dotacp.protocol;", result);
 
             File.Delete(schemaPath);
             File.Delete(versionPath);

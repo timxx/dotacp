@@ -50,10 +50,6 @@ namespace dotacp.generator
             sb.AppendLineLf("using Newtonsoft.Json;");
             sb.AppendLineLf("using System;");
             sb.AppendLineLf("using System.Collections.Generic;");
-            if (!string.Equals(targetNamespace, "dotacp.protocol", StringComparison.Ordinal))
-            {
-                sb.AppendLineLf("using dotacp.protocol;");
-            }
             sb.AppendLineLf();
 
             // Start namespace
