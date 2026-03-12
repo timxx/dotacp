@@ -118,6 +118,9 @@ var requestIdNull = RequestId.Null;
 - `CancelNotification` - Cancellation notifications
 - Terminal output notifications
 
+### Exceptions
+- `AcpException` - Base exception for protocol errors
+
 ## Schema Generation
 
 This package is auto-generated from the official ACP schema. To update it:

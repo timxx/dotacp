@@ -31,7 +31,7 @@ namespace dotacp.agent
             var handler = new NewLineDelimitedMessageHandler(
                 inputStream, outputStream, new JsonMessageFormatter());
             var routingHandler = new ExtensionMethodRoutingMessageHandler(handler);
-            _rpc = new JsonRpc(routingHandler);
+            _rpc = new JsonRpcEx(routingHandler);
             if (traceSource != null)
                 _rpc.TraceSource = traceSource;
 

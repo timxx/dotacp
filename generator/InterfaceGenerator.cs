@@ -335,7 +335,7 @@ namespace dotacp.generator
             sb.AppendLineLf("            var handler = new NewLineDelimitedMessageHandler(");
             sb.AppendLineLf("                inputStream, outputStream, new JsonMessageFormatter());");
             sb.AppendLineLf("            var routingHandler = new ExtensionMethodRoutingMessageHandler(handler);");
-            sb.AppendLineLf("            _rpc = new JsonRpc(routingHandler);");
+            sb.AppendLineLf("            _rpc = new JsonRpcEx(routingHandler);");
             sb.AppendLineLf("            if (traceSource != null)");
             sb.AppendLineLf("                _rpc.TraceSource = traceSource;");
             sb.AppendLineLf();
@@ -636,7 +636,7 @@ namespace dotacp.generator
             sb.AppendLineLf("            var handler = new NewLineDelimitedMessageHandler(");
             sb.AppendLineLf("                inputStream, outputStream, new JsonMessageFormatter());");
             sb.AppendLineLf("            var routingHandler = new ExtensionMethodRoutingMessageHandler(handler);");
-            sb.AppendLineLf("            _rpc = new JsonRpc(routingHandler);");
+            sb.AppendLineLf("            _rpc = new JsonRpcEx(routingHandler);");
             sb.AppendLineLf("            if (traceSource != null)");
             sb.AppendLineLf("                _rpc.TraceSource = traceSource;");
             sb.AppendLineLf();

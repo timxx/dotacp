@@ -1,6 +1,7 @@
 using dotacp.protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
+using StreamJsonRpc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -49,6 +50,29 @@ namespace dotacp.unittest
                 Assert.IsNotNull(response.Meta);
                 Assert.AreEqual("mock-client", response.Meta["source"].ToString());
             }
+        }
+
+        [TestMethod]
+        public async Task ReadTextFileNonExistentAsync()
+        {
+            using var pair = ConnectionPair.Create();
+
+            var request = new ReadTextFileRequest
+            {
+                Meta = new Dictionary<string, object> { { "testNonExistent", true } },
+                SessionId = "session-1",
+                Path = "/home/user/file.txt",
+            };
+
+            var agentConn = pair.Agent.ReceivedConnection!;
+
+            var ex = await Assert.ThrowsAsync<RemoteInvocationException>(
+                async () => await agentConn.ReadTextFileAsync(request));
+
+            Assert.IsNotNull(ex);
+            Assert.AreEqual("File not found", ex.Message);
+            Assert.AreEqual((int)ErrorCode.ResourceNotFound, ex.ErrorCode);
+            Assert.IsNull(ex.ErrorData);
         }
 
         [TestMethod]

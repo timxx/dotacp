@@ -20,6 +20,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{F96F9CA9-225E-44FC-886E-D41B47F7845C}"
 	ProjectSection(SolutionItems) = preProject
 		shared\ExtensionMethodRoutingMessageHandler.cs = shared\ExtensionMethodRoutingMessageHandler.cs
+		shared\JsonRpcEx.cs = shared\JsonRpcEx.cs
 	EndProjectSection
 EndProject
 Global

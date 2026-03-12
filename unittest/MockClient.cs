@@ -42,6 +42,12 @@ namespace dotacp.unittest
 
         public Task<ReadTextFileResponse> ReadTextFileAsync(ReadTextFileRequest request, CancellationToken cancellationToken = default)
         {
+            if (request.Meta != null && request.Meta.TryGetValue("testNonExistent", out var testNonExistent)
+                && testNonExistent is bool testNonExistentBool && testNonExistentBool)
+            {
+                throw new AcpException((int)ErrorCode.ResourceNotFound, "File not found");
+            }
+
             LastReadTextFileRequest = request;
             return Task.FromResult(ReadTextFileResponseToReturn);
         }
