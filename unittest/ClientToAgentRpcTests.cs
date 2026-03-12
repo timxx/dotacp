@@ -1,5 +1,6 @@
 using dotacp.protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -274,7 +275,16 @@ namespace dotacp.unittest
 
                 Assert.IsNotNull(pair.Agent.LastExtMethodName);
                 Assert.AreEqual("custom_method", pair.Agent.LastExtMethodName);
+
+                Assert.IsNotNull(pair.Agent.LastExtMethodRequest);
+                Assert.IsTrue(pair.Agent.LastExtMethodRequest is Dictionary<string, object>);
+                Assert.AreEqual("value1", ((Dictionary<string, object>)pair.Agent.LastExtMethodRequest)["param1"].ToString());
+
                 Assert.IsNotNull(response);
+                Assert.IsTrue(response is JObject);
+                var dict = ((JObject)response).ToObject<Dictionary<string, string>>();
+                Assert.IsNotNull(dict);
+                Assert.AreEqual("customValue", dict["customField"]);
             }
         }
 
@@ -291,6 +301,9 @@ namespace dotacp.unittest
                 var received = await Task.WhenAny(pair.Agent.ExtNotificationReceivedSignal.Task, Task.Delay(5000));
                 Assert.AreEqual(pair.Agent.ExtNotificationReceivedSignal.Task, received);
                 Assert.AreEqual("custom_event", pair.Agent.LastExtNotificationName);
+                Assert.IsNotNull(pair.Agent.LastExtNotificationPayload);
+                Assert.IsTrue(pair.Agent.LastExtNotificationPayload is Dictionary<string, object>);
+                Assert.AreEqual("status_change", ((Dictionary<string, object>)pair.Agent.LastExtNotificationPayload)["event"].ToString());
             }
         }
 

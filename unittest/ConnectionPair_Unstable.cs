@@ -46,6 +46,7 @@ namespace dotacp.unittest
         {
             _stream1.Dispose();
             _stream2.Dispose();
+            ClientConn.Dispose();
         }
     }
 }
