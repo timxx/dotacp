@@ -26,10 +26,22 @@ namespace clientcli
     {
         private MessageType _lastMessage = MessageType.Unknown;
 
-        public Task<RequestPermissionResponse> RequestPermissionAsync(
+        public async Task<RequestPermissionResponse> RequestPermissionAsync(
             RequestPermissionRequest request, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            await Console.Out.WriteLineAsync("Permission requested:");
+            if (request.ToolCall != null)
+                await Console.Out.WriteLineAsync($"  Tool call: {request.ToolCall.ToolCallId} `{request.ToolCall.Title}` {request.ToolCall.Kind} {request.ToolCall.Status}");
+
+            foreach (var opt in request.Options)
+            {
+                await Console.Out.WriteLineAsync($"  Option: {opt.Name} ({opt.OptionId})");
+            }
+
+            return new RequestPermissionResponse
+            {
+                Outcome = new RequestPermissionOutcomeCancelled()
+            };
         }
 
         public async Task SessionUpdateAsync(SessionNotification notification, CancellationToken cancellationToken = default)

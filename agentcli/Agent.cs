@@ -42,6 +42,12 @@ namespace agentcli
                 AgentCapabilities = new AgentCapabilities()
                 {
                     LoadSession = false,
+                    PromptCapabilities = new PromptCapabilities
+                    {
+                        Audio = true,
+                        EmbeddedContext = true,
+                        Image = true,
+                    }
                 },
             });
         }
@@ -92,6 +98,21 @@ namespace agentcli
                 {
                     case "codeblock":
                         blocksToResponse = _codeBlocks;
+                        break;
+                    case "permission":
+                        var permissionResponse = await RequstPermissionAsync(request.SessionId);
+                        switch (permissionResponse.Outcome)
+                        {
+                            case RequestPermissionOutcomeCancelled cancelled:
+                                blocksToResponse = new string[] { "User cancelled the permission request." };
+                                break;
+                            case SelectedPermissionOutcome selected:
+                                blocksToResponse = new string[] { $"User selected permission option: {selected.OptionId}" };
+                                break;
+                            default:
+                                blocksToResponse = Array.Empty<string>();
+                                break;
+                        }
                         break;
                     default:
                         blocksToResponse = new string[] { textContent.Text };
@@ -234,6 +255,44 @@ namespace agentcli
         {
             await Console.Error.WriteLineAsync($"Close operation received for session {request.SessionId}");
             return new CloseSessionResponse();
+        }
+
+        private Task<RequestPermissionResponse> RequstPermissionAsync(string sessionId)
+        {
+            return _connection!.RequestPermissionAsync(new RequestPermissionRequest()
+            {
+                SessionId = sessionId,
+                Options = new PermissionOption[]
+                {
+                    new PermissionOption()
+                    {
+                        Name = "Allow",
+                        Kind = PermissionOptionKind.AllowOnce,
+                        OptionId = "allow_once",
+                    },
+                    new PermissionOption()
+                    {
+                        Name = "Allow Always",
+                        Kind = PermissionOptionKind.AllowAlways,
+                        OptionId = "allow_always",
+                    },
+                    new PermissionOption()
+                    {
+                        Name = "Reject",
+                        Kind = PermissionOptionKind.RejectOnce,
+                        OptionId = "reject_once",
+                    },
+                },
+                ToolCall = new ToolCallUpdate()
+                {
+                    Title = "Permission Request Example",
+                    Kind = ToolKind.Execute,
+                    Content = new ToolCallContent[]
+                    {
+                        new Content { ContentValue = new TextContent { Text = "Execute action" } }
+                    }
+                }
+            });
         }
 
         private class Session
