@@ -12,6 +12,16 @@ namespace agentcli
         private Dictionary<string, Session> _sessions = new Dictionary<string, Session>();
         private Connection? _connection;
 
+        private string[] _codeBlocks = new string[]
+        {
+            "Compile", " and", " run", ":\n\n",
+            "```", "bash", "\n",
+            "g", "++", " -", "std", "=c", "++", "17", " demo", ".cpp", " -", "o", " demo", "\n",
+            "./", "demo", "\n",
+            "``", "`\n\n",
+            "If", " you", " want",
+        };
+
         public void OnClientConnected(Connection connection)
         {
             _connection = connection;
@@ -71,23 +81,37 @@ namespace agentcli
 
             foreach (var block in request.Prompt)
             {
-                if (!(block is TextContent))
+                if (!(block is TextContent textContent))
                 {
                     await Console.Error.WriteLineAsync($"Received unsupported content block of type {block.Type}");
                     continue;
                 }
 
-                await _connection!.SessionUpdateAsync(new SessionNotification()
+                string[] blocksToResponse;
+                switch (textContent.Text.Trim())
                 {
-                    SessionId = request.SessionId,
-                    Update = new SessionUpdateAgentMessageChunk()
+                    case "codeblock":
+                        blocksToResponse = _codeBlocks;
+                        break;
+                    default:
+                        blocksToResponse = new string[] { textContent.Text };
+                        break;
+                }
+
+                foreach (var text in blocksToResponse)
+                {
+                    await _connection!.SessionUpdateAsync(new SessionNotification()
                     {
-                        Content = new TextContent()
+                        SessionId = request.SessionId,
+                        Update = new SessionUpdateAgentMessageChunk()
                         {
-                            Text = $"Received: {(block as TextContent)!.Text}"
+                            Content = new TextContent()
+                            {
+                                Text = text
+                            },
                         },
-                    },
-                }, cancellationToken);
+                    }, cancellationToken);
+                }
             }
 
             var response = new PromptResponse()
