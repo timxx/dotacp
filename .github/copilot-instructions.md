@@ -1,126 +1,39 @@
-# dotacp Codebase Guide for AI Agents
+# dotacp instructions for AI coding agents
 
-## Overview
+- `dotacp` is a .NET SDK for ACP, not a single app. Most work falls into three layers: generated protocol surface (`protocol/`, generated files in `agent/` and `client/`), handwritten transport/runtime behavior (`shared/`, converter helpers), and schema/code generation (`generator/`).
+- Do not hand-edit files marked with `Generated from schema/meta.json and schema/schema.json. Do not edit by hand.` (for example `protocol/Meta.cs`, `protocol/Schema.cs`, `agent/Connection.cs`, `client/Connection.cs`, `agent/IAcpAgent.cs`, `client/IAcpClient.cs`).
+- If protocol shape changes, update `protocol/schema/` and regenerate instead of patching generated APIs directly.
 
-**dotacp** is a comprehensive .NET SDK implementation of the [Agent Client Protocol (ACP)](https://agentclientprotocol.com/), enabling communication between code editors/IDEs and AI coding agents via JSON-RPC.
+## Big picture architecture
 
-## Architecture & Component Structure
+- `protocol/` contains ACP DTOs/method constants plus handwritten JSON conversion helpers (`UnionTypeConverter.cs`, `ObjectUnionConverter.cs`, `TypeAliasConverter.cs`, `DiscriminatorConverter.cs`).
+- `agent/Connection.cs` and `client/Connection.cs` are mirrored wrappers over `StreamJsonRpc` (`NewLineDelimitedMessageHandler` + `JsonMessageFormatter`), each adding its generated RPC target and starting listeners.
+- `shared/ExtensionMethodRoutingMessageHandler.cs` is compiled into both `agent` and `client` via `<Compile Include="..\shared\*.cs" />`; changes here affect both directions.
+- Extension transport rule is repo-specific: outbound `ExtMethodAsync("foo", ...)` sends `_foo`; routing rewrites inbound `_foo` to `__acp_ext_method__`/`__acp_ext_notification__` with payload `{ method: "foo", arguments: ... }`.
+- `agentcli/` and `clientcli/` are reference integrations for stdio wiring and session lifecycle; consult them before changing connection bootstrap behavior.
+- Integration tests use in-memory duplex streams (`Nerdbank.Streams.FullDuplexStream.CreatePair()`) in `unittest/ConnectionPair.cs` rather than process-based tests.
 
-The solution contains 7 core projects organized by responsibility:
+## Project conventions that matter
 
-### Core Protocol Layer
-- **`protocol/`** - Type-safe .NET models auto-generated from ACP schema v0.10.8
-  - Auto-generated files have comment: "Generated from schema/meta.json and schema/schema.json. Do not edit by hand."
-  - Contains: `Meta.cs` (constants), protocol enums, and request/response DTOs
-  - Never manually edit protocol layer files - regenerate via `generator` project if schema changes
+- Language level is pinned to C# 8.0 in `Directory.Build.props`; avoid newer syntax/features.
+- Libraries target `netstandard2.0;net472`; CI can append `net10.0;net9.0;net8.0` when `EnableCiTargetFrameworks=true` (`agent.csproj`, `client.csproj`). Keep shared code `netstandard2.0`-compatible.
+- Nullable is enabled in `agent/`, `client/`, CLI projects, and tests; preserve nullability annotations and contracts.
+- `Connection.RunAgent(...)` and `Connection.RunClient(...)` intentionally return `null` for invalid args (verified by `unittest/ConnectionFactoryTests.cs`).
+- Public APIs follow async protocol handlers (`Task`/`Task<T>`) with optional `CancellationToken` and namespaces `dotacp.<project>`.
 
-### Integration Libraries
-- **`agent/`** - Library for building ACP agents (AI service implementations)
-  - Core interface: `IAcpAgent` with lifecycle method `OnClientConnected(Connection connection)`
-  - Reference: [agent/README.md](agent/README.md) for implementation patterns
-  - Connection manages JSON-RPC communication and handles inbound protocol calls
+## Developer workflows
 
-- **`client/`** - Library for building ACP clients (editor/IDE implementations)
-  - Core interface: `IAcpClient` with request handlers (e.g., `ReadTextFileAsync`, `WriteTextFileAsync`)
-  - Reference: [client/README.md](client/README.md) for usage examples
-  - Connection routes inbound requests to appropriate interface methods
+- Build all: `dotnet build dotacp.sln`
+- Run tests: `dotnet test unittest/unittest.csproj`
+- CI-like local pass: `pwsh ./scripts/build-ci.ps1 -Configuration Release -EnableModernTargetFrameworks:$true`
+- Full regeneration (preferred): `pwsh ./scripts/gen-schema.ps1`
+- Manual regeneration (when isolating failures):
+	- `dotnet run --project generator -- schema --schema-dir protocol/schema --output-dir protocol`
+	- `dotnet run --project generator -- meta --schema-dir protocol/schema --output-dir protocol`
+	- `dotnet run --project generator -- interfaces --schema-dir protocol/schema --output-dir .`
 
-### Code Generation
-- **`generator/`** - CLI tool that generates protocol types, interfaces, and connections
-  - Subcommands: `schema`, `meta`, `interfaces` (invoked during build)
-  - Key generators: `InterfaceGenerator.cs`, `SchemaGenerator.cs`, `MetaGenerator.cs`
-  - Updates are triggered by schema changes in `protocol/schema/`
+## Editing guidance
 
-### Examples & Testing
-- **`clientcli/` & `agentcli/`** - Reference CLI implementations demonstrating connection setup
-- **`unittest/`** - MSTest suite testing protocol conformance and generator correctness
-- **`shared/`** - `ExtensionMethodRoutingMessageHandler.cs` handles custom "_" prefixed extension methods
-
-## Critical Concepts
-
-### Protocol Extension Methods
-- Methods starting with underscore (e.g., `_custom_method`) are extension methods
-- `ExtensionMethodRoutingMessageHandler` intercepts these and routes to `__acp_ext_method__` / `__acp_ext_notification__`
-- Allows protocol extensions beyond the core ACP specification
-
-### JSON-RPC Message Flow
-1. Client/Agent implements interface (e.g., `IAcpAgent`)
-2. `Connection.RunAgent()` / `Connection.RunClient()` wraps implementation in JSON-RPC router
-3. StreamJsonRpc handles bidirectional message serialization over streams (stdin/stdout)
-4. Messages use `NewLineDelimitedMessageHandler` + `JsonMessageFormatter` (Newtonsoft.Json)
-
-### Auto-Generated Code Pattern
-Generated files are marked with header comment. Do NOT manually edit:
-- `client/ClientRpcTarget.cs` - Routes inbound RPC calls to IAcpClient
-- `agent/AgentRpcTarget.cs` - Routes inbound RPC calls to IAcpAgent
-- `client/Connection.cs` & `agent/Connection.cs` - RPC method signatures for client→agent communication
-- Protocol DTOs in `protocol/` - All request/response/notification types
-
-## Development Workflows
-
-### Building & Testing
-```bash
-# One-time setup (restore NuGet packages)
-dotnet restore
-
-# Build solution
-dotnet build
-
-# Run all unit tests (MSTest)
-dotnet test
-
-# CI build with modern target frameworks (run from PowerShell)
-.\scripts\build-ci.ps1 -Configuration Release -EnableModernTargetFrameworks $true
-```
-
-### Regenerating Protocol Types
-When `protocol/schema/schema.json` or `protocol/schema/meta.json` changes:
-```bash
-cd generator
-dotnet run -- schema --schema-dir ../protocol/schema --output-dir ../protocol
-dotnet run -- meta --schema-dir ../protocol/schema --output-dir ../protocol
-dotnet run -- interfaces --schema-dir ../protocol/schema --output-dir ..
-```
-
-### Adding New Protocol Methods
-1. Update `protocol/schema/schema.json` per ACP spec
-2. Run generator commands above to regenerate types
-3. Update `IAcpClient` or `IAcpAgent` interface implementations with new method handlers
-4. Add test cases in `unittest/`
-
-## Code Style & Conventions
-
-- **Language version**: C# 8.0 (`LangVersion` in Directory.Build.props)
-- **Nullable context**: Enabled globally - use `?` for nullable reference types
-- **Implicit usings**: Disabled - all namespaces explicitly included
-- **JSON serialization**: Newtonsoft.Json with custom converters for union types
-- **Namespacing**: `dotacp.<ProjectName>` (e.g., `dotacp.protocol`, `dotacp.agent`)
-- **Custom attributes**: `[JsonEnumMemberAttribute]` for enum mapping, `[TypeAliasConverter]` for type aliases
-
-## Key Files Reference
-
-| Purpose | Files |
-|---------|-------|
-| Protocol constants & methods | `protocol/Meta.cs`, `protocol/Schema.cs` |
-| Client contract | `client/IAcpClient.cs`, `client/ClientRpcTarget.cs` |
-| Agent contract | `agent/IAcpAgent.cs`, `agent/AgentRpcTarget.cs` |
-| RPC communication primitives | `client/Connection.cs`, `agent/Connection.cs` |
-| Extension method routing | `shared/ExtensionMethodRoutingMessageHandler.cs` |
-| Generator orchestration | `generator/Program.cs`, `generator/InterfaceGenerator.cs` |
-| CLI examples | `clientcli/Client.cs`, `agentcli/Agent.cs` |
-
-## Important Patterns to Follow
-
-1. **Async/await throughout** - All protocol methods return `Task<T>` and accept `CancellationToken`
-2. **Null safety** - Null checks in Connection factory methods (return null on invalid args)
-3. **Extension method naming** - Use `_` prefix for custom protocol methods
-4. **Interface preservation** - Don't modify `IAcpClient`/`IAcpAgent` directly; use generators
-5. **StreamJsonRpc integration** - Use provided `Connection` classes; don't create JsonRpc manually
-6. **Test organization** - Unit tests follow `<Component><Tested>Tests.cs` naming pattern
-
-## When Implementing New Features
-
-- **Adding protocol handlers**: Implement method in `IAcpClient` or `IAcpAgent`, regenerate interfaces
-- **Modifying protocol**: Update schema → regenerate all → update implementations
-- **Custom serialization**: Create custom converter inheriting `JsonConverter` in `protocol/` (see `UnionTypeConverter.cs`)
-- **Breaking changes**: Document in protocol version (currently v0.10.8)
+- For any schema/protocol behavior change, inspect all three layers together: `protocol/schema/` + `generator/` + generated `agent`/`client` outputs.
+- When message routing, extension behavior, or stream wiring changes, update/add tests in `unittest/AgentToClientRpcTests.cs`, `unittest/ClientToAgentRpcTests.cs`, and `unittest/ConnectionFactoryTests.cs`.
+- Use `agent/README.md`, `client/README.md`, and `protocol/README.md` as canonical usage examples; keep public API behavior aligned with those docs.
