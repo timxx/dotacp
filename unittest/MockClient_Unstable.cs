@@ -112,7 +112,7 @@ namespace dotacp.unittest
 
         public void OnDisconnected(Connection connection)
         {
-            throw new System.NotImplementedException();
+            // Mock implementation - no-op
         }
     }
 }
