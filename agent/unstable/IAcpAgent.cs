@@ -19,6 +19,12 @@ namespace dotacp.agent.unstable
         void OnClientConnected(Connection connection);
 
         /// <summary>
+        /// Called when the RPC connection is disconnected.
+        /// </summary>
+        /// <param name="connection">The connection that was disconnected.</param>
+        void OnDisconnected(Connection connection);
+
+        /// <summary>
         /// Handles the protocol <c>authenticate</c> request.
         /// </summary>
         /// <param name="request">The request payload.</param>

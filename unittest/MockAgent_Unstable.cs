@@ -160,5 +160,9 @@ namespace dotacp.unittest
             ExtNotificationReceivedSignal.TrySetResult(true);
             return Task.CompletedTask;
         }
+
+        public void OnDisconnected(Connection connection)
+        {
+        }
     }
 }

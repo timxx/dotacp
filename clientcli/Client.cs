@@ -232,5 +232,9 @@ namespace clientcli
         {
             _lastMessage = MessageType.Unknown;
         }
+
+        public void OnDisconnected(Connection connection)
+        {
+        }
     }
 }

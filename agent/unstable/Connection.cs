@@ -38,6 +38,8 @@ namespace dotacp.agent.unstable
             _rpc.AddLocalRpcTarget(new AgentRpcTarget(agent));
             _rpc.StartListening();
 
+            _rpc.Disconnected += (sender, e) => agent.OnDisconnected(this);
+
             agent.OnClientConnected(this);
         }
 

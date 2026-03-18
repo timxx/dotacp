@@ -183,6 +183,12 @@ namespace dotacp.generator
             sb.AppendLineLf("        /// <param name=\"connection\">The active connection that can be used for outbound calls to the client.</param>");
             sb.AppendLineLf("        void OnClientConnected(Connection connection);");
             sb.AppendLineLf();
+            sb.AppendLineLf("        /// <summary>");
+            sb.AppendLineLf("        /// Called when the RPC connection is disconnected.");
+            sb.AppendLineLf("        /// </summary>");
+            sb.AppendLineLf("        /// <param name=\"connection\">The connection that was disconnected.</param>");
+            sb.AppendLineLf("        void OnDisconnected(Connection connection);");
+            sb.AppendLineLf();
 
             // Sort methods by name for consistent output
             foreach (var method in _agentMethods.Values.OrderBy(m => m.MethodPath))
@@ -342,6 +348,8 @@ namespace dotacp.generator
             sb.AppendLineLf("            _rpc.AddLocalRpcTarget(new AgentRpcTarget(agent));");
             sb.AppendLineLf("            _rpc.StartListening();");
             sb.AppendLineLf();
+            sb.AppendLineLf("            _rpc.Disconnected += (sender, e) => agent.OnDisconnected(this);");
+            sb.AppendLineLf();
             sb.AppendLineLf("            agent.OnClientConnected(this);");
             sb.AppendLineLf("        }");
             sb.AppendLineLf();
@@ -479,6 +487,12 @@ namespace dotacp.generator
             sb.AppendLineLf("    /// </summary>");
             sb.AppendLineLf("    public interface IAcpClient");
             sb.AppendLineLf("    {");
+            sb.AppendLineLf("        /// <summary>");
+            sb.AppendLineLf("        /// Called when the RPC connection is disconnected.");
+            sb.AppendLineLf("        /// </summary>");
+            sb.AppendLineLf("        /// <param name=\"connection\">The connection that was disconnected.</param>");
+            sb.AppendLineLf("        void OnDisconnected(Connection connection);");
+            sb.AppendLineLf();
 
             // Sort methods by name for consistent output
             bool first = true;
@@ -642,6 +656,8 @@ namespace dotacp.generator
             sb.AppendLineLf();
             sb.AppendLineLf("            _rpc.AddLocalRpcTarget(new ClientRpcTarget(client));");
             sb.AppendLineLf("            _rpc.StartListening();");
+            sb.AppendLineLf();
+            sb.AppendLineLf("            _rpc.Disconnected += (sender, e) => client.OnDisconnected(this);");
             sb.AppendLineLf("        }");
             sb.AppendLineLf();
             sb.AppendLineLf("        private Task<TResponse> SendRequestAsync<TRequest, TResponse>(");

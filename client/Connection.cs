@@ -37,6 +37,8 @@ namespace dotacp.client
 
             _rpc.AddLocalRpcTarget(new ClientRpcTarget(client));
             _rpc.StartListening();
+
+            _rpc.Disconnected += (sender, e) => client.OnDisconnected(this);
         }
 
         private Task<TResponse> SendRequestAsync<TRequest, TResponse>(

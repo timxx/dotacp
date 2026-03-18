@@ -13,6 +13,12 @@ namespace dotacp.client
     public interface IAcpClient
     {
         /// <summary>
+        /// Called when the RPC connection is disconnected.
+        /// </summary>
+        /// <param name="connection">The connection that was disconnected.</param>
+        void OnDisconnected(Connection connection);
+
+        /// <summary>
         /// Handles the protocol <c>fs/read_text_file</c> request.
         /// </summary>
         /// <param name="request">The request payload.</param>

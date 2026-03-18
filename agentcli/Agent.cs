@@ -295,6 +295,10 @@ namespace agentcli
             });
         }
 
+        public void OnDisconnected(Connection connection)
+        {
+        }
+
         private class Session
         {
             public string SessionId { get; set; } = null!;
