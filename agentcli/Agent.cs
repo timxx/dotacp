@@ -114,6 +114,15 @@ namespace agentcli
                                 break;
                         }
                         break;
+                    case "plan":
+                        await CreatePlanAsync(request.SessionId);
+                        // Simulate some delay for plan execution
+                        await Task.Delay(5000);
+                        blocksToResponse = new string[]
+                        {
+                            "Plan is created\n",
+                        };
+                        break;
                     default:
                         blocksToResponse = new string[] { textContent.Text };
                         break;
@@ -292,6 +301,35 @@ namespace agentcli
                         new Content { ContentValue = new TextContent { Text = "Execute action" } }
                     }
                 }
+            });
+        }
+
+        private Task CreatePlanAsync(string sessionId)
+        {
+            return _connection!.SessionUpdateAsync(new SessionNotification()
+            {
+                SessionId = sessionId,
+                Update = new Plan()
+                {
+                    Entries = new PlanEntry[]
+                    {
+                        new PlanEntry()
+                        {
+                            Status = PlanEntryStatus.Completed,
+                            Content = "Step 1: Do something"
+                        },
+                        new PlanEntry()
+                        {
+                            Status = PlanEntryStatus.InProgress,
+                            Content = "Step 2: Do something else"
+                        },
+                        new PlanEntry()
+                        {
+                            Status = PlanEntryStatus.Pending,
+                            Content = "Step 3: Do another thing"
+                        }
+                    },
+                },
             });
         }
 
