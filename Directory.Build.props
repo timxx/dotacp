@@ -18,5 +18,7 @@
 
     <AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
     <FileVersion>$(VersionPrefix)</FileVersion>
+
+    <NuGetAuditLevel>critical</NuGetAuditLevel>
   </PropertyGroup>
 </Project>
