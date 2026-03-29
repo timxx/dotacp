@@ -58,17 +58,43 @@ namespace agentcli
             return Task.FromResult(new AuthenticateResponse());
         }
 
-        public Task<NewSessionResponse> NewSessionAsync(NewSessionRequest request,
+        public async Task<NewSessionResponse> NewSessionAsync(NewSessionRequest request,
             CancellationToken cancellationToken = default)
         {
             var sessionId = Guid.NewGuid().ToString();
             var session = new Session { SessionId = sessionId, Cwd = request.Cwd };
             _sessions[sessionId] = session;
 
-            return Task.FromResult(new NewSessionResponse()
+            await _connection!.SessionUpdateAsync(new SessionNotification()
             {
                 SessionId = sessionId,
-            });
+                Update = new AvailableCommandsUpdate()
+                {
+                    AvailableCommands = new AvailableCommand[]
+                    {
+                        new AvailableCommand()
+                        {
+                            Name = "codeblock",
+                            Description = "Show a streaming code block example",
+                        },
+                        new AvailableCommand()
+                        {
+                            Name = "permission",
+                            Description = "Request user permission with options",
+                        },
+                        new AvailableCommand()
+                        {
+                            Name = "plan",
+                            Description = "Create and display a plan",
+                        },
+                    },
+                },
+            }, cancellationToken);
+
+            return new NewSessionResponse()
+            {
+                SessionId = sessionId,
+            };
         }
 
         public Task<LoadSessionResponse> LoadSessionAsync(LoadSessionRequest request,
@@ -96,10 +122,10 @@ namespace agentcli
                 string[] blocksToResponse;
                 switch (textContent.Text.Trim())
                 {
-                    case "codeblock":
+                    case "/codeblock":
                         blocksToResponse = _codeBlocks;
                         break;
-                    case "permission":
+                    case "/permission":
                         var permissionResponse = await RequstPermissionAsync(request.SessionId);
                         switch (permissionResponse.Outcome)
                         {
@@ -114,7 +140,7 @@ namespace agentcli
                                 break;
                         }
                         break;
-                    case "plan":
+                    case "/plan":
                         await CreatePlanAsync(request.SessionId);
                         // Simulate some delay for plan execution
                         await Task.Delay(5000);
