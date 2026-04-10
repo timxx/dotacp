@@ -65,6 +65,21 @@ namespace agentcli
             var session = new Session { SessionId = sessionId, Cwd = request.Cwd };
             _sessions[sessionId] = session;
 
+            var response = new NewSessionResponse()
+            {
+                SessionId = sessionId,
+            };
+
+            _ = Task.Run(async () =>
+            {
+                await SendAvailableCommandsAsync(sessionId, cancellationToken);
+            });
+
+            return response;
+        }
+
+        private async Task SendAvailableCommandsAsync(string sessionId, CancellationToken cancellationToken = default)
+        {
             await _connection!.SessionUpdateAsync(new SessionNotification()
             {
                 SessionId = sessionId,
@@ -95,11 +110,6 @@ namespace agentcli
                     },
                 },
             }, cancellationToken);
-
-            return new NewSessionResponse()
-            {
-                SessionId = sessionId,
-            };
         }
 
         public Task<LoadSessionResponse> LoadSessionAsync(LoadSessionRequest request,
