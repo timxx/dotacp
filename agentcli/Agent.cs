@@ -87,6 +87,11 @@ namespace agentcli
                             Name = "plan",
                             Description = "Create and display a plan",
                         },
+                        new AvailableCommand()
+                        {
+                            Name = "usage",
+                            Description = "Update usage based on input",
+                        },
                     },
                 },
             }, cancellationToken);
@@ -148,6 +153,9 @@ namespace agentcli
                         {
                             "Plan is created\n",
                         };
+                        break;
+                    case var cmd when cmd.StartsWith("/usage"):
+                        blocksToResponse = await HandleUsageAsync(request.SessionId, textContent.Text.Trim());
                         break;
                     default:
                         blocksToResponse = new string[] { textContent.Text };
@@ -357,6 +365,45 @@ namespace agentcli
                     },
                 },
             });
+        }
+
+        private async Task<string[]> HandleUsageAsync(string sessionId, string input)
+        {
+            // Parse percentage from input if provided
+            double percentage;
+            var parts = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length > 1 && double.TryParse(parts[1], out var parsedPercentage) && parsedPercentage >= 0 && parsedPercentage <= 100)
+            {
+                percentage = parsedPercentage;
+            }
+            else
+            {
+                // Random percentage between 0 and 100
+                var random = new Random();
+                percentage = random.NextDouble() * 100;
+            }
+
+            // Calculate used based on percentage (assuming size is 100000 tokens)
+            const ulong size = 100000;
+            var used = (ulong)(size * percentage / 100.0);
+
+            await _connection!.SessionUpdateAsync(new SessionNotification()
+            {
+                SessionId = sessionId,
+                Update = new UsageUpdate()
+                {
+                    Size = size,
+                    Used = used,
+                    Cost = new Cost()
+                    {
+                        Currency = "USD",
+                        Amount = percentage / 100.0 * 0.5, // Max cost $0.50
+                    },
+                },
+            });
+
+            return new string[] { $"Usage updated: {percentage:F1}% ({used} tokens)" };
         }
 
         public void OnDisconnected(Connection connection)
