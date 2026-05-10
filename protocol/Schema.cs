@@ -1,5 +1,5 @@
 // Generated from schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.2
+// Schema ref: refs/tags/v0.12.2
 
 #pragma warning disable CS1591
 
@@ -1030,6 +1030,50 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("terminal")]
         public bool Terminal { get; set; } = false;
+    }
+
+    /// <summary>
+    /// Request parameters for closing an active session.
+    ///
+    /// If supported, the agent **must** cancel any ongoing work related to the session
+    /// (treat it as if `session/cancel` was called) and then free up any resources
+    /// associated with the session.
+    ///
+    /// Only available if the Agent supports the `sessionCapabilities.close` capability.
+    /// </summary>
+    public class CloseSessionRequest
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The ID of the session to close.
+        /// </summary>
+        [JsonProperty("sessionId")]
+        public SessionId SessionId { get; set; }
+    }
+
+    /// <summary>
+    /// Response from closing a session.
+    /// </summary>
+    public class CloseSessionResponse
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -2511,6 +2555,75 @@ namespace dotacp.protocol
     }
 
     /// <summary>
+    /// Request parameters for resuming an existing session.
+    ///
+    /// Resumes an existing session without returning previous messages (unlike `session/load`).
+    /// This is useful for agents that can resume sessions but don't implement full session loading.
+    ///
+    /// Only available if the Agent supports the `sessionCapabilities.resume` capability.
+    /// </summary>
+    public class ResumeSessionRequest
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The working directory for this session.
+        /// </summary>
+        [JsonProperty("cwd")]
+        public string Cwd { get; set; } = null!;
+
+        /// <summary>
+        /// List of MCP servers to connect to for this session.
+        /// </summary>
+        [JsonProperty("mcpServers")]
+        public McpServer[] McpServers { get; set; }
+
+        /// <summary>
+        /// The ID of the session to resume.
+        /// </summary>
+        [JsonProperty("sessionId")]
+        public SessionId SessionId { get; set; }
+    }
+
+    /// <summary>
+    /// Response from resuming an existing session.
+    /// </summary>
+    public class ResumeSessionResponse
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Initial session configuration options if supported by the Agent.
+        /// </summary>
+        [JsonProperty("configOptions")]
+        public SessionConfigOption[] ConfigOptions { get; set; }
+
+        /// <summary>
+        /// Initial mode state if supported by the Agent
+        ///
+        /// See protocol docs: [Session Modes](https://agentclientprotocol.com/protocol/session-modes)
+        /// </summary>
+        [JsonProperty("modes")]
+        public SessionModeState Modes { get; set; }
+    }
+
+    /// <summary>
     /// The user selected one of the provided options.
     /// </summary>
     public class SelectedPermissionOutcome : RequestPermissionOutcome
@@ -2559,10 +2672,40 @@ namespace dotacp.protocol
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
+        /// Whether the agent supports `session/close`.
+        /// </summary>
+        [JsonProperty("close")]
+        public SessionCloseCapabilities Close { get; set; }
+
+        /// <summary>
         /// Whether the agent supports `session/list`.
         /// </summary>
         [JsonProperty("list")]
         public SessionListCapabilities List { get; set; }
+
+        /// <summary>
+        /// Whether the agent supports `session/resume`.
+        /// </summary>
+        [JsonProperty("resume")]
+        public SessionResumeCapabilities Resume { get; set; }
+    }
+
+    /// <summary>
+    /// Capabilities for the `session/close` method.
+    ///
+    /// By supplying `{}` it means that the agent supports closing of sessions.
+    /// </summary>
+    public class SessionCloseCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -2881,6 +3024,24 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("update")]
         public SessionUpdate Update { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// Capabilities for the `session/resume` method.
+    ///
+    /// By supplying `{}` it means that the agent supports resuming of sessions.
+    /// </summary>
+    public class SessionResumeCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.2
+// Schema ref: refs/tags/v0.12.2
 
 using dotacp.protocol.unstable;
 using System.Threading;
@@ -34,12 +34,138 @@ namespace dotacp.agent.unstable
             CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Handles the protocol <c>document/didChange</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task DidchangeAsync(DidChangeDocumentNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>document/didClose</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task DidcloseAsync(DidCloseDocumentNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>document/didFocus</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task DidfocusAsync(DidFocusDocumentNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>document/didOpen</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task DidopenAsync(DidOpenDocumentNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>document/didSave</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task DidsaveAsync(DidSaveDocumentNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Handles the protocol <c>initialize</c> request.
         /// </summary>
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
         Task<InitializeResponse> InitializeAsync(InitializeRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>logout</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<LogoutResponse> LogoutAsync(LogoutRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>nes/accept</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task AcceptAsync(AcceptNesNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>nes/close</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<CloseNesResponse> CloseAsync(CloseNesRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>nes/reject</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task RejectAsync(RejectNesNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>nes/start</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<StartNesResponse> StartAsync(StartNesRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>nes/suggest</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<SuggestNesResponse> SuggestAsync(SuggestNesRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>providers/disable</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<DisableProvidersResponse> DisableAsync(DisableProvidersRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>providers/list</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<ListProvidersResponse> ListAsync(ListProvidersRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>providers/set</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<SetProvidersResponse> SetAsync(SetProvidersRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>

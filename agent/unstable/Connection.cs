@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.2
+// Schema ref: refs/tags/v0.12.2
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -75,6 +75,33 @@ namespace dotacp.agent.unstable
                 return null;
 
             return new Connection(agent, inputStream, outputStream, traceSource);
+        }
+
+        /// <summary>
+        /// Sends the client <c>elicitation/complete</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task CompleteAsync(
+            CompleteElicitationNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(ClientMethods.ElicitationComplete, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the client <c>elicitation/create</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<CreateElicitationResponse> CreateAsync(
+            CreateElicitationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<CreateElicitationRequest, CreateElicitationResponse>(
+                ClientMethods.ElicitationCreate, request, cancellationToken);
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 // Generated from schema/meta.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.2
+// Schema ref: refs/tags/v0.12.2
 
 #pragma warning disable CS1591
 
@@ -22,7 +22,21 @@ namespace dotacp.protocol.unstable
     public static class AgentMethods
     {
         public const string Authenticate = "authenticate";
+        public const string DocumentDidChange = "document/didChange";
+        public const string DocumentDidClose = "document/didClose";
+        public const string DocumentDidFocus = "document/didFocus";
+        public const string DocumentDidOpen = "document/didOpen";
+        public const string DocumentDidSave = "document/didSave";
         public const string Initialize = "initialize";
+        public const string Logout = "logout";
+        public const string NesAccept = "nes/accept";
+        public const string NesClose = "nes/close";
+        public const string NesReject = "nes/reject";
+        public const string NesStart = "nes/start";
+        public const string NesSuggest = "nes/suggest";
+        public const string ProvidersDisable = "providers/disable";
+        public const string ProvidersList = "providers/list";
+        public const string ProvidersSet = "providers/set";
         public const string SessionCancel = "session/cancel";
         public const string SessionClose = "session/close";
         public const string SessionFork = "session/fork";
@@ -41,6 +55,8 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public static class ClientMethods
     {
+        public const string ElicitationComplete = "elicitation/complete";
+        public const string ElicitationCreate = "elicitation/create";
         public const string FsReadTextFile = "fs/read_text_file";
         public const string FsWriteTextFile = "fs/write_text_file";
         public const string SessionRequestPermission = "session/request_permission";

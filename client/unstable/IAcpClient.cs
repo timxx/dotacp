@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.2
+// Schema ref: refs/tags/v0.12.2
 
 using dotacp.protocol.unstable;
 using System.Threading;
@@ -17,6 +17,24 @@ namespace dotacp.client.unstable
         /// </summary>
         /// <param name="connection">The connection that was disconnected.</param>
         void OnDisconnected(Connection connection);
+
+        /// <summary>
+        /// Handles the protocol <c>elicitation/complete</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>A task that completes when handling is finished.</returns>
+        Task CompleteAsync(CompleteElicitationNotification notification,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>elicitation/create</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<CreateElicitationResponse> CreateAsync(CreateElicitationRequest request,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Handles the protocol <c>fs/read_text_file</c> request.

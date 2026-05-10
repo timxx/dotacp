@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.2
+// Schema ref: refs/tags/v0.12.2
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -90,6 +90,71 @@ namespace dotacp.client.unstable
         }
 
         /// <summary>
+        /// Sends the agent <c>document/didChange</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task DidchangeAsync(
+            DidChangeDocumentNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(AgentMethods.DocumentDidChange, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the agent <c>document/didClose</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task DidcloseAsync(
+            DidCloseDocumentNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(AgentMethods.DocumentDidClose, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the agent <c>document/didFocus</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task DidfocusAsync(
+            DidFocusDocumentNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(AgentMethods.DocumentDidFocus, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the agent <c>document/didOpen</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task DidopenAsync(
+            DidOpenDocumentNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(AgentMethods.DocumentDidOpen, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the agent <c>document/didSave</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task DidsaveAsync(
+            DidSaveDocumentNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(AgentMethods.DocumentDidSave, notification, cancellationToken);
+        }
+
+        /// <summary>
         /// Calls the agent <c>initialize</c> method.
         /// </summary>
         /// <param name="request">The request payload.</param>
@@ -101,6 +166,130 @@ namespace dotacp.client.unstable
         {
             return SendRequestAsync<InitializeRequest, InitializeResponse>(
                 AgentMethods.Initialize, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>logout</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<LogoutResponse> LogoutAsync(
+            LogoutRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<LogoutRequest, LogoutResponse>(
+                AgentMethods.Logout, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the agent <c>nes/accept</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task AcceptAsync(
+            AcceptNesNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(AgentMethods.NesAccept, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>nes/close</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<CloseNesResponse> CloseAsync(
+            CloseNesRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<CloseNesRequest, CloseNesResponse>(
+                AgentMethods.NesClose, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the agent <c>nes/reject</c> notification.
+        /// </summary>
+        /// <param name="notification">The notification payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>A task that completes when the notification is sent.</returns>
+        public Task RejectAsync(
+            RejectNesNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return SendNotificationAsync(AgentMethods.NesReject, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>nes/start</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<StartNesResponse> StartAsync(
+            StartNesRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<StartNesRequest, StartNesResponse>(
+                AgentMethods.NesStart, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>nes/suggest</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<SuggestNesResponse> SuggestAsync(
+            SuggestNesRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<SuggestNesRequest, SuggestNesResponse>(
+                AgentMethods.NesSuggest, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>providers/disable</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<DisableProvidersResponse> DisableAsync(
+            DisableProvidersRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<DisableProvidersRequest, DisableProvidersResponse>(
+                AgentMethods.ProvidersDisable, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>providers/list</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<ListProvidersResponse> ListAsync(
+            ListProvidersRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<ListProvidersRequest, ListProvidersResponse>(
+                AgentMethods.ProvidersList, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>providers/set</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<SetProvidersResponse> SetAsync(
+            SetProvidersRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<SetProvidersRequest, SetProvidersResponse>(
+                AgentMethods.ProvidersSet, request, cancellationToken);
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.2
+// Schema ref: refs/tags/v0.12.2
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -16,6 +16,22 @@ namespace dotacp.client.unstable
         public ClientRpcTarget(IAcpClient client)
         {
             _client = client;
+        }
+
+        [JsonRpcMethod(ClientMethods.ElicitationComplete, UseSingleObjectParameterDeserialization = true)]
+        public Task CompleteAsync(
+            CompleteElicitationNotification notification,
+            CancellationToken cancellationToken = default)
+        {
+            return _client.CompleteAsync(notification, cancellationToken);
+        }
+
+        [JsonRpcMethod(ClientMethods.ElicitationCreate, UseSingleObjectParameterDeserialization = true)]
+        public Task<CreateElicitationResponse> CreateAsync(
+            CreateElicitationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _client.CreateAsync(request, cancellationToken);
         }
 
         [JsonRpcMethod(ClientMethods.FsReadTextFile, UseSingleObjectParameterDeserialization = true)]

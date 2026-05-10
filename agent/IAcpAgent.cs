@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.11.2
+// Schema ref: refs/tags/v0.12.2
 
 using dotacp.protocol;
 using System.Threading;
@@ -52,6 +52,15 @@ namespace dotacp.agent
             CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Handles the protocol <c>session/close</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Handles the protocol <c>session/list</c> request.
         /// </summary>
         /// <param name="request">The request payload.</param>
@@ -85,6 +94,15 @@ namespace dotacp.agent
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
         Task<PromptResponse> PromptAsync(PromptRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/resume</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
