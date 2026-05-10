@@ -11,6 +11,8 @@ namespace dotacp.unittest
     internal sealed class MockClient_Unstable : IAcpClient
     {
         // Captured requests
+        public CompleteElicitationNotification? LastCompleteElicitationNotification { get; private set; }
+        public CreateElicitationRequest? LastCreateElicitationRequest { get; private set; }
         public ReadTextFileRequest? LastReadTextFileRequest { get; private set; }
         public WriteTextFileRequest? LastWriteTextFileRequest { get; private set; }
         public RequestPermissionRequest? LastRequestPermissionRequest { get; private set; }
@@ -26,6 +28,7 @@ namespace dotacp.unittest
         public object? LastExtNotificationPayload { get; private set; }
 
         // Responses to return
+        public CreateElicitationResponse CreateElicitationResponseToReturn { get; set; } = new CreateElicitationResponseCancel();
         public ReadTextFileResponse ReadTextFileResponseToReturn { get; set; } = new ReadTextFileResponse { Content = "" };
         public WriteTextFileResponse WriteTextFileResponseToReturn { get; set; } = new WriteTextFileResponse();
         public RequestPermissionResponse RequestPermissionResponseToReturn { get; set; } = new RequestPermissionResponse { Outcome = new RequestPermissionOutcomeCancelled() };
@@ -37,8 +40,22 @@ namespace dotacp.unittest
         public object ExtMethodResponseToReturn { get; set; } = new object();
 
         // Notification signals
+        public TaskCompletionSource<bool> CompleteElicitationReceivedSignal { get; } = new TaskCompletionSource<bool>();
         public TaskCompletionSource<bool> SessionUpdateReceivedSignal { get; } = new TaskCompletionSource<bool>();
         public TaskCompletionSource<bool> ExtNotificationReceivedSignal { get; } = new TaskCompletionSource<bool>();
+
+        public Task CompleteAsync(CompleteElicitationNotification notification, CancellationToken cancellationToken = default)
+        {
+            LastCompleteElicitationNotification = notification;
+            CompleteElicitationReceivedSignal.TrySetResult(true);
+            return Task.CompletedTask;
+        }
+
+        public Task<CreateElicitationResponse> CreateAsync(CreateElicitationRequest request, CancellationToken cancellationToken = default)
+        {
+            LastCreateElicitationRequest = request;
+            return Task.FromResult(CreateElicitationResponseToReturn);
+        }
 
         public Task<ReadTextFileResponse> ReadTextFileAsync(ReadTextFileRequest request, CancellationToken cancellationToken = default)
         {

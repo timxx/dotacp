@@ -7,7 +7,6 @@ namespace dotacp.unittest
 {
     /// <summary>
     /// Mock IAcpAgent (stable) that captures received requests and returns configured responses.
-    /// Implements only the stable protocol surface (no session fork/resume/close, etc.).
     /// </summary>
     internal sealed class MockAgent : IAcpAgent
     {
@@ -21,8 +20,10 @@ namespace dotacp.unittest
         public LoadSessionRequest? LastLoadSessionRequest { get; private set; }
         public NewSessionRequest? LastNewSessionRequest { get; private set; }
         public PromptRequest? LastPromptRequest { get; private set; }
+        public ResumeSessionRequest? LastResumeSessionRequest { get; private set; }
         public SetSessionConfigOptionRequest? LastSetSessionConfigOptionRequest { get; private set; }
         public SetSessionModeRequest? LastSetSessionModeRequest { get; private set; }
+        public CloseSessionRequest? LastCloseSessionRequest { get; private set; }
         public string? LastExtMethodName { get; private set; }
         public object? LastExtMethodRequest { get; private set; }
         public string? LastExtNotificationName { get; private set; }
@@ -35,8 +36,10 @@ namespace dotacp.unittest
         public LoadSessionResponse LoadSessionResponseToReturn { get; set; } = new LoadSessionResponse();
         public NewSessionResponse NewSessionResponseToReturn { get; set; } = new NewSessionResponse();
         public PromptResponse PromptResponseToReturn { get; set; } = new PromptResponse();
+        public ResumeSessionResponse ResumeSessionResponseToReturn { get; set; } = new ResumeSessionResponse();
         public SetSessionConfigOptionResponse SetSessionConfigOptionResponseToReturn { get; set; } = new SetSessionConfigOptionResponse { ConfigOptions = new SessionConfigOption[0] };
         public SetSessionModeResponse SetSessionModeResponseToReturn { get; set; } = new SetSessionModeResponse();
+        public CloseSessionResponse CloseSessionResponseToReturn { get; set; } = new CloseSessionResponse();
         public object ExtMethodResponseToReturn { get; set; } = new object();
 
         // Notification signal
@@ -101,6 +104,12 @@ namespace dotacp.unittest
             return PromptResponseToReturn;
         }
 
+        public Task<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request, CancellationToken cancellationToken = default)
+        {
+            LastResumeSessionRequest = request;
+            return Task.FromResult(ResumeSessionResponseToReturn);
+        }
+
         public Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(SetSessionConfigOptionRequest request, CancellationToken cancellationToken = default)
         {
             LastSetSessionConfigOptionRequest = request;
@@ -111,6 +120,12 @@ namespace dotacp.unittest
         {
             LastSetSessionModeRequest = request;
             return Task.FromResult(SetSessionModeResponseToReturn);
+        }
+
+        public Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request, CancellationToken cancellationToken = default)
+        {
+            LastCloseSessionRequest = request;
+            return Task.FromResult(CloseSessionResponseToReturn);
         }
 
         public Task<object> ExtMethodAsync(string method, object request, CancellationToken cancellationToken = default)

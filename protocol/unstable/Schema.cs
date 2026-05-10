@@ -4068,7 +4068,7 @@ namespace dotacp.protocol.unstable
         /// The severity of the diagnostic.
         /// </summary>
         [JsonProperty("severity")]
-        public NesDiagnosticSeverity Severity { get; set; } = null!;
+        public NesDiagnosticSeverity Severity { get; set; }
 
         /// <summary>
         /// The URI of the file containing the diagnostic.
@@ -4112,7 +4112,7 @@ namespace dotacp.protocol.unstable
         /// The sync kind the agent wants: `"full"` or `"incremental"`.
         /// </summary>
         [JsonProperty("syncKind")]
-        public TextDocumentSyncKind SyncKind { get; set; } = null!;
+        public TextDocumentSyncKind SyncKind { get; set; }
     }
 
     /// <summary>
@@ -5209,7 +5209,7 @@ namespace dotacp.protocol.unstable
         /// Protocol currently used by this provider.
         /// </summary>
         [JsonProperty("apiType")]
-        public LlmProtocol ApiType { get; set; } = null!;
+        public LlmProtocol ApiType { get; set; }
 
         /// <summary>
         /// Base URL currently used by this provider.
@@ -6457,7 +6457,7 @@ namespace dotacp.protocol.unstable
         /// Protocol type for this provider.
         /// </summary>
         [JsonProperty("apiType")]
-        public LlmProtocol ApiType { get; set; } = null!;
+        public LlmProtocol ApiType { get; set; }
 
         /// <summary>
         /// Base URL for requests sent through this provider.
@@ -6877,7 +6877,7 @@ namespace dotacp.protocol.unstable
         /// What triggered this suggestion request.
         /// </summary>
         [JsonProperty("triggerKind")]
-        public NesTriggerKind TriggerKind { get; set; } = null!;
+        public NesTriggerKind TriggerKind { get; set; }
 
         /// <summary>
         /// The URI of the document to suggest for.
@@ -7361,7 +7361,7 @@ namespace dotacp.protocol.unstable
         /// Item type discriminator. Must be `"string"`.
         /// </summary>
         [JsonProperty("type")]
-        public ElicitationStringType Type { get; set; } = null!;
+        public ElicitationStringType Type { get; set; }
     }
 
     /// <summary>

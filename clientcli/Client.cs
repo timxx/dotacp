@@ -236,5 +236,15 @@ namespace clientcli
         public void OnDisconnected(Connection connection)
         {
         }
+
+        public Task CompleteAsync(CompleteElicitationNotification notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CreateElicitationResponse> CreateAsync(CreateElicitationRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

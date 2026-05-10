@@ -154,7 +154,12 @@ namespace dotacp.generator
             "ToolCallStatus",
             "ToolKind",
             "SessionConfigOptionCategory",
-            "ErrorCode"
+            "ErrorCode",
+            "ElicitationStringType",
+            "NesDiagnosticSeverity",
+            "TextDocumentSyncKind",
+            "LlmProtocol",
+            "NesTriggerKind",
         };
 
         /// <summary>

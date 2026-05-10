@@ -15,7 +15,21 @@ namespace dotacp.unittest
 
         // Captured requests
         public AuthenticateRequest? LastAuthenticateRequest { get; private set; }
+        public DidChangeDocumentNotification? LastDidChangeDocumentNotification { get; private set; }
+        public DidCloseDocumentNotification? LastDidCloseDocumentNotification { get; private set; }
+        public DidFocusDocumentNotification? LastDidFocusDocumentNotification { get; private set; }
+        public DidOpenDocumentNotification? LastDidOpenDocumentNotification { get; private set; }
+        public DidSaveDocumentNotification? LastDidSaveDocumentNotification { get; private set; }
         public InitializeRequest? LastInitializeRequest { get; private set; }
+        public LogoutRequest? LastLogoutRequest { get; private set; }
+        public AcceptNesNotification? LastAcceptNesNotification { get; private set; }
+        public CloseNesRequest? LastCloseNesRequest { get; private set; }
+        public RejectNesNotification? LastRejectNesNotification { get; private set; }
+        public StartNesRequest? LastStartNesRequest { get; private set; }
+        public SuggestNesRequest? LastSuggestNesRequest { get; private set; }
+        public DisableProvidersRequest? LastDisableProvidersRequest { get; private set; }
+        public ListProvidersRequest? LastListProvidersRequest { get; private set; }
+        public SetProvidersRequest? LastSetProvidersRequest { get; private set; }
         public CancelNotification? LastCancelNotification { get; private set; }
         public ForkSessionRequest? LastForkSessionRequest { get; private set; }
         public ListSessionsRequest? LastListSessionsRequest { get; private set; }
@@ -35,6 +49,13 @@ namespace dotacp.unittest
         // Responses to return
         public AuthenticateResponse AuthenticateResponseToReturn { get; set; } = new AuthenticateResponse();
         public InitializeResponse InitializeResponseToReturn { get; set; } = new InitializeResponse();
+        public LogoutResponse LogoutResponseToReturn { get; set; } = new LogoutResponse();
+        public CloseNesResponse CloseNesResponseToReturn { get; set; } = new CloseNesResponse();
+        public StartNesResponse StartNesResponseToReturn { get; set; } = new StartNesResponse();
+        public SuggestNesResponse SuggestNesResponseToReturn { get; set; } = new SuggestNesResponse();
+        public DisableProvidersResponse DisableProvidersResponseToReturn { get; set; } = new DisableProvidersResponse();
+        public ListProvidersResponse ListProvidersResponseToReturn { get; set; } = new ListProvidersResponse();
+        public SetProvidersResponse SetProvidersResponseToReturn { get; set; } = new SetProvidersResponse();
         public ForkSessionResponse ForkSessionResponseToReturn { get; set; } = new ForkSessionResponse();
         public ListSessionsResponse ListSessionsResponseToReturn { get; set; } = new ListSessionsResponse { Sessions = new SessionInfo[0] };
         public LoadSessionResponse LoadSessionResponseToReturn { get; set; } = new LoadSessionResponse();
@@ -62,10 +83,94 @@ namespace dotacp.unittest
             return Task.FromResult(AuthenticateResponseToReturn);
         }
 
+        public Task DidchangeAsync(DidChangeDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            LastDidChangeDocumentNotification = notification;
+            return Task.CompletedTask;
+        }
+
+        public Task DidcloseAsync(DidCloseDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            LastDidCloseDocumentNotification = notification;
+            return Task.CompletedTask;
+        }
+
+        public Task DidfocusAsync(DidFocusDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            LastDidFocusDocumentNotification = notification;
+            return Task.CompletedTask;
+        }
+
+        public Task DidopenAsync(DidOpenDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            LastDidOpenDocumentNotification = notification;
+            return Task.CompletedTask;
+        }
+
+        public Task DidsaveAsync(DidSaveDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            LastDidSaveDocumentNotification = notification;
+            return Task.CompletedTask;
+        }
+
         public Task<InitializeResponse> InitializeAsync(InitializeRequest request, CancellationToken cancellationToken = default)
         {
             LastInitializeRequest = request;
             return Task.FromResult(InitializeResponseToReturn);
+        }
+
+        public Task<LogoutResponse> LogoutAsync(LogoutRequest request, CancellationToken cancellationToken = default)
+        {
+            LastLogoutRequest = request;
+            return Task.FromResult(LogoutResponseToReturn);
+        }
+
+        public Task AcceptAsync(AcceptNesNotification notification, CancellationToken cancellationToken = default)
+        {
+            LastAcceptNesNotification = notification;
+            return Task.CompletedTask;
+        }
+
+        public Task<CloseNesResponse> CloseAsync(CloseNesRequest request, CancellationToken cancellationToken = default)
+        {
+            LastCloseNesRequest = request;
+            return Task.FromResult(CloseNesResponseToReturn);
+        }
+
+        public Task RejectAsync(RejectNesNotification notification, CancellationToken cancellationToken = default)
+        {
+            LastRejectNesNotification = notification;
+            return Task.CompletedTask;
+        }
+
+        public Task<StartNesResponse> StartAsync(StartNesRequest request, CancellationToken cancellationToken = default)
+        {
+            LastStartNesRequest = request;
+            return Task.FromResult(StartNesResponseToReturn);
+        }
+
+        public Task<SuggestNesResponse> SuggestAsync(SuggestNesRequest request, CancellationToken cancellationToken = default)
+        {
+            LastSuggestNesRequest = request;
+            return Task.FromResult(SuggestNesResponseToReturn);
+        }
+
+        public Task<DisableProvidersResponse> DisableAsync(DisableProvidersRequest request, CancellationToken cancellationToken = default)
+        {
+            LastDisableProvidersRequest = request;
+            return Task.FromResult(DisableProvidersResponseToReturn);
+        }
+
+        public Task<ListProvidersResponse> ListAsync(ListProvidersRequest request, CancellationToken cancellationToken = default)
+        {
+            LastListProvidersRequest = request;
+            return Task.FromResult(ListProvidersResponseToReturn);
+        }
+
+        public Task<SetProvidersResponse> SetAsync(SetProvidersRequest request, CancellationToken cancellationToken = default)
+        {
+            LastSetProvidersRequest = request;
+            return Task.FromResult(SetProvidersResponseToReturn);
         }
 
         public Task CancelAsync(CancelNotification notification, CancellationToken cancellationToken = default)

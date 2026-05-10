@@ -224,11 +224,17 @@ namespace dotacp.unittest
         public Task<PromptResponse> PromptAsync(PromptRequest request, CancellationToken cancellationToken = default) =>
             Task.FromResult(new PromptResponse());
 
+        public Task<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new ResumeSessionResponse());
+
         public Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(SetSessionConfigOptionRequest request, CancellationToken cancellationToken = default) =>
             Task.FromResult(new SetSessionConfigOptionResponse { ConfigOptions = Array.Empty<SessionConfigOption>() });
 
         public Task<SetSessionModeResponse> SetSessionModeAsync(SetSessionModeRequest request, CancellationToken cancellationToken = default) =>
             Task.FromResult(new SetSessionModeResponse());
+
+        public Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new CloseSessionResponse());
 
         public Task<object> ExtMethodAsync(string method, object request, CancellationToken cancellationToken = default) =>
             Task.FromResult(new object());
@@ -340,11 +346,17 @@ namespace dotacp.unittest
         public Task<PromptResponse> PromptAsync(PromptRequest request, CancellationToken cancellationToken = default) =>
             Task.FromResult(new PromptResponse());
 
+        public Task<ResumeSessionResponse> ResumeSessionAsync(ResumeSessionRequest request, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new ResumeSessionResponse());
+
         public Task<SetSessionConfigOptionResponse> SetSessionConfigOptionAsync(SetSessionConfigOptionRequest request, CancellationToken cancellationToken = default) =>
             Task.FromResult(new SetSessionConfigOptionResponse { ConfigOptions = Array.Empty<SessionConfigOption>() });
 
         public Task<SetSessionModeResponse> SetSessionModeAsync(SetSessionModeRequest request, CancellationToken cancellationToken = default) =>
             Task.FromResult(new SetSessionModeResponse());
+
+        public Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new CloseSessionResponse());
 
         public Task<object> ExtMethodAsync(string method, object request, CancellationToken cancellationToken = default) =>
             Task.FromResult(new object());

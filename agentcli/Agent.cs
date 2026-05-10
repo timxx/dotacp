@@ -420,6 +420,76 @@ namespace agentcli
         {
         }
 
+        public Task DidchangeAsync(DidChangeDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DidcloseAsync(DidCloseDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DidfocusAsync(DidFocusDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DidopenAsync(DidOpenDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DidsaveAsync(DidSaveDocumentNotification notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<LogoutResponse> LogoutAsync(LogoutRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AcceptAsync(AcceptNesNotification notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CloseNesResponse> CloseAsync(CloseNesRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RejectAsync(RejectNesNotification notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<StartNesResponse> StartAsync(StartNesRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SuggestNesResponse> SuggestAsync(SuggestNesRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DisableProvidersResponse> DisableAsync(DisableProvidersRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ListProvidersResponse> ListAsync(ListProvidersRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SetProvidersResponse> SetAsync(SetProvidersRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
         private class Session
         {
             public string SessionId { get; set; } = null!;
