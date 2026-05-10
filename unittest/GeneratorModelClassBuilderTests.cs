@@ -252,7 +252,7 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
-        public void AnyOfEnumDetection_GeneratesEnumWithTitleFallback()
+        public void AnyOfEnumDetection_GeneratesOpenStringStructWithTitleFallback()
         {
             var defs = JObject.Parse(@"{
   'TestCategory': {
@@ -266,10 +266,61 @@ namespace dotacp.unittest
 
             var result = BuildModel("TestCategory", defs);
 
-            StringAssert.Contains(result, "public enum TestCategory");
-            StringAssert.Contains(result, "JsonEnumValue(\"mode\")");
-            StringAssert.Contains(result, "Mode");
-            StringAssert.Contains(result, "Other");
+            StringAssert.Contains(result, "public readonly struct TestCategory");
+            StringAssert.Contains(result, "TypeAliasConverter<TestCategory, string>");
+            StringAssert.Contains(result, "public static TestCategory Mode => new TestCategory(\"mode\");");
+            Assert.DoesNotContain("public enum TestCategory", result);
+            Assert.DoesNotContain("JsonEnumValue(\"other\")", result);
+            Assert.DoesNotContain("public static TestCategory Other", result);
+        }
+
+        [TestMethod]
+        public void AnyOfEnumDetection_GeneratesOpenStringStructForKnownValuesPlusFallback()
+        {
+            var defs = JObject.Parse(@"{
+  'SessionConfigOptionCategory': {
+    'description': 'Semantic category for a session configuration option.',
+    'anyOf': [
+      { 'type': 'string', 'const': 'mode', 'description': 'Session mode selector.' },
+      { 'type': 'string', 'const': 'model', 'description': 'Model selector.' },
+      { 'type': 'string', 'const': 'thought_level', 'description': 'Thought/reasoning level selector.' },
+      { 'type': 'string', 'title': 'other', 'description': 'Unknown / uncategorized selector.' }
+    ]
+  }
+}");
+
+            var result = BuildModel("SessionConfigOptionCategory", defs);
+
+            StringAssert.Contains(result, "public readonly struct SessionConfigOptionCategory");
+            StringAssert.Contains(result, "TypeAliasConverter<SessionConfigOptionCategory, string>");
+            StringAssert.Contains(result, "SessionConfigOptionCategory(string value)");
+            StringAssert.Contains(result, "implicit operator SessionConfigOptionCategory(string value)");
+            StringAssert.Contains(result, "public static SessionConfigOptionCategory Mode => new SessionConfigOptionCategory(\"mode\");");
+            StringAssert.Contains(result, "public static SessionConfigOptionCategory Model => new SessionConfigOptionCategory(\"model\");");
+            StringAssert.Contains(result, "public static SessionConfigOptionCategory ThoughtLevel => new SessionConfigOptionCategory(\"thought_level\");");
+            Assert.DoesNotContain("public enum SessionConfigOptionCategory", result);
+            Assert.DoesNotContain("JsonEnumValue(\"other\")", result);
+            Assert.DoesNotContain("public static SessionConfigOptionCategory Other", result);
+        }
+
+        [TestMethod]
+        public void AnyOfEnumDetection_DoesNotTreatConstrainedStringArmAsOpenFallback()
+        {
+            var defs = JObject.Parse(@"{
+  'ConstrainedCategory': {
+    'description': 'Should stay closed when fallback is constrained.',
+    'anyOf': [
+      { 'type': 'string', 'const': 'mode' },
+      { 'type': 'string', 'title': 'Other', 'pattern': '^[a-z]+$' }
+    ]
+  }
+}");
+
+            var result = BuildModel("ConstrainedCategory", defs);
+
+            StringAssert.Contains(result, "public readonly struct ConstrainedCategory");
+            StringAssert.Contains(result, "UnionTypeConverter<ConstrainedCategory>");
+            Assert.DoesNotContain("TypeAliasConverter<ConstrainedCategory, string>", result);
         }
 
         [TestMethod]

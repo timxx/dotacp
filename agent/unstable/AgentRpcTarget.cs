@@ -91,7 +91,7 @@ namespace dotacp.agent.unstable
         }
 
         [JsonRpcMethod(AgentMethods.NesClose, UseSingleObjectParameterDeserialization = true)]
-        public Task<CloseNesResponse> CloseNesAsync(
+        public Task<CloseNesResponse> CloseAsync(
             CloseNesRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -155,7 +155,7 @@ namespace dotacp.agent.unstable
         }
 
         [JsonRpcMethod(AgentMethods.SessionClose, UseSingleObjectParameterDeserialization = true)]
-        public Task<CloseSessionResponse> CloseSessionAsync(
+        public Task<CloseSessionResponse> CloseAsync(
             CloseSessionRequest request,
             CancellationToken cancellationToken = default)
         {

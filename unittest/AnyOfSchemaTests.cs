@@ -96,38 +96,57 @@ namespace dotacp.unittest
         #region SessionConfigOptionCategory String Enum Tests
 
         [TestMethod]
-        public void SessionConfigOptionCategory_SerializesToCorrectJsonValues()
+        public void SessionConfigOptionCategory_SerializesKnownValuesToCorrectJsonValues()
         {
-            // Arrange
             var categories = new[]
             {
                 SessionConfigOptionCategory.Mode,
                 SessionConfigOptionCategory.Model,
                 SessionConfigOptionCategory.ThoughtLevel,
-                SessionConfigOptionCategory.Other
             };
 
-            var expectedValues = new[] { "mode", "model", "thought_level", "other" };
+            var expectedValues = new[] { "mode", "model", "thought_level" };
 
-            // Act & Assert
             for (int i = 0; i < categories.Length; i++)
             {
                 string json = JsonConvert.SerializeObject(categories[i]);
-                Assert.Contains(expectedValues[i], json, $"Expected {expectedValues[i]} but got {json}");
+                Assert.AreEqual($"\"{expectedValues[i]}\"", json);
             }
         }
 
         [TestMethod]
-        public void SessionConfigOptionCategory_CanDeserializeFromJson()
+        public void SessionConfigOptionCategory_CanDeserializeKnownValueFromJson()
         {
-            // Arrange
             string json = "\"thought_level\"";
 
-            // Act
             var category = JsonConvert.DeserializeObject<SessionConfigOptionCategory>(json);
 
-            // Assert
             Assert.AreEqual(SessionConfigOptionCategory.ThoughtLevel, category);
+            Assert.AreEqual("thought_level", (string)category);
+        }
+
+        [TestMethod]
+        public void SessionConfigOptionCategory_CanDeserializeUnknownValueFromJson()
+        {
+            string json = "\"permissions\"";
+
+            var category = JsonConvert.DeserializeObject<SessionConfigOptionCategory>(json);
+
+            Assert.AreEqual("permissions", (string)category);
+            Assert.AreNotEqual(SessionConfigOptionCategory.Mode, category);
+        }
+
+        [TestMethod]
+        public void SessionConfigOptionCategory_UnknownValue_RoundTripsUnchanged()
+        {
+            SessionConfigOptionCategory category = "permissions";
+
+            string json = JsonConvert.SerializeObject(category);
+            var roundTripped = JsonConvert.DeserializeObject<SessionConfigOptionCategory>(json);
+
+            Assert.AreEqual("\"permissions\"", json);
+            Assert.AreEqual(category, roundTripped);
+            Assert.AreEqual("permissions", (string)roundTripped);
         }
 
         #endregion

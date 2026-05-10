@@ -154,6 +154,62 @@ namespace dotacp.protocol.unstable
     ///
     /// This capability is not part of the spec yet, and may be removed or changed at any point.
     ///
+    /// Well-known API protocol identifiers for LLM providers.
+    ///
+    /// Agents and clients MUST handle unknown protocol identifiers gracefully.
+    ///
+    /// Protocol names beginning with `_` are free for custom use, like other ACP extension methods.
+    /// Protocol names that do not begin with `_` are reserved for the ACP spec.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<LlmProtocol, string>))]
+    public readonly struct LlmProtocol : IEquatable<LlmProtocol>
+    {
+        private readonly string _value;
+
+        public LlmProtocol(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator LlmProtocol(string value) => new LlmProtocol(value);
+        public static implicit operator string(LlmProtocol alias) => alias._value;
+
+        /// <summary>
+        /// Anthropic API protocol.
+        /// </summary>
+        public static LlmProtocol Anthropic => new LlmProtocol("anthropic");
+
+        /// <summary>
+        /// OpenAI API protocol.
+        /// </summary>
+        public static LlmProtocol Openai => new LlmProtocol("openai");
+
+        /// <summary>
+        /// Azure OpenAI API protocol.
+        /// </summary>
+        public static LlmProtocol Azure => new LlmProtocol("azure");
+
+        /// <summary>
+        /// Google Vertex AI API protocol.
+        /// </summary>
+        public static LlmProtocol Vertex => new LlmProtocol("vertex");
+
+        /// <summary>
+        /// AWS Bedrock API protocol.
+        /// </summary>
+        public static LlmProtocol Bedrock => new LlmProtocol("bedrock");
+
+        public bool Equals(LlmProtocol other) => _value == other._value;
+        public override bool Equals(object obj) => obj is LlmProtocol other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
     /// A unique identifier for a model.
     /// </summary>
     [JsonConverter(typeof(TypeAliasConverter<ModelId, string>))]
@@ -356,6 +412,51 @@ namespace dotacp.protocol.unstable
 
         public bool Equals(SessionConfigId other) => _value == other._value;
         public override bool Equals(object obj) => obj is SessionConfigId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Semantic category for a session configuration option.
+    ///
+    /// This is intended to help Clients distinguish broadly common selectors (e.g. model selector vs
+    /// session mode selector vs thought/reasoning level) for UX purposes (keyboard shortcuts, icons,
+    /// placement). It MUST NOT be required for correctness. Clients MUST handle missing or unknown
+    /// categories gracefully.
+    ///
+    /// Category names beginning with `_` are free for custom use, like other ACP extension methods.
+    /// Category names that do not begin with `_` are reserved for the ACP spec.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<SessionConfigOptionCategory, string>))]
+    public readonly struct SessionConfigOptionCategory : IEquatable<SessionConfigOptionCategory>
+    {
+        private readonly string _value;
+
+        public SessionConfigOptionCategory(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator SessionConfigOptionCategory(string value) => new SessionConfigOptionCategory(value);
+        public static implicit operator string(SessionConfigOptionCategory alias) => alias._value;
+
+        /// <summary>
+        /// Session mode selector.
+        /// </summary>
+        public static SessionConfigOptionCategory Mode => new SessionConfigOptionCategory("mode");
+
+        /// <summary>
+        /// Model selector.
+        /// </summary>
+        public static SessionConfigOptionCategory Model => new SessionConfigOptionCategory("model");
+
+        /// <summary>
+        /// Thought/reasoning level selector.
+        /// </summary>
+        public static SessionConfigOptionCategory ThoughtLevel => new SessionConfigOptionCategory("thought_level");
+
+        public bool Equals(SessionConfigOptionCategory other) => _value == other._value;
+        public override bool Equals(object obj) => obj is SessionConfigOptionCategory other && Equals(other);
         public override int GetHashCode() => _value?.GetHashCode() ?? 0;
         public override string ToString() => _value?.ToString() ?? string.Empty;
     }
@@ -608,58 +709,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// Well-known API protocol identifiers for LLM providers.
-    ///
-    /// Agents and clients MUST handle unknown protocol identifiers gracefully.
-    ///
-    /// Protocol names beginning with `_` are free for custom use, like other ACP extension methods.
-    /// Protocol names that do not begin with `_` are reserved for the ACP spec.
-    /// </summary>
-    [JsonConverter(typeof(JsonEnumMemberConverter<LlmProtocol>))]
-    public enum LlmProtocol
-    {
-        /// <summary>
-        /// Anthropic API protocol.
-        /// </summary>
-        [JsonEnumValue("anthropic")]
-        Anthropic,
-
-        /// <summary>
-        /// OpenAI API protocol.
-        /// </summary>
-        [JsonEnumValue("openai")]
-        Openai,
-
-        /// <summary>
-        /// Azure OpenAI API protocol.
-        /// </summary>
-        [JsonEnumValue("azure")]
-        Azure,
-
-        /// <summary>
-        /// Google Vertex AI API protocol.
-        /// </summary>
-        [JsonEnumValue("vertex")]
-        Vertex,
-
-        /// <summary>
-        /// AWS Bedrock API protocol.
-        /// </summary>
-        [JsonEnumValue("bedrock")]
-        Bedrock,
-
-        /// <summary>
-        /// Unknown or custom protocol.
-        /// </summary>
-        [JsonEnumValue("other")]
-        Other
-    }
-
-    /// <summary>
     /// Severity of a diagnostic.
     /// </summary>
     [JsonConverter(typeof(JsonEnumMemberConverter<NesDiagnosticSeverity>))]
@@ -874,45 +923,6 @@ namespace dotacp.protocol.unstable
 
         [JsonEnumValue("user")]
         User
-    }
-
-    /// <summary>
-    /// Semantic category for a session configuration option.
-    ///
-    /// This is intended to help Clients distinguish broadly common selectors (e.g. model selector vs
-    /// session mode selector vs thought/reasoning level) for UX purposes (keyboard shortcuts, icons,
-    /// placement). It MUST NOT be required for correctness. Clients MUST handle missing or unknown
-    /// categories gracefully.
-    ///
-    /// Category names beginning with `_` are free for custom use, like other ACP extension methods.
-    /// Category names that do not begin with `_` are reserved for the ACP spec.
-    /// </summary>
-    [JsonConverter(typeof(JsonEnumMemberConverter<SessionConfigOptionCategory>))]
-    public enum SessionConfigOptionCategory
-    {
-        /// <summary>
-        /// Session mode selector.
-        /// </summary>
-        [JsonEnumValue("mode")]
-        Mode,
-
-        /// <summary>
-        /// Model selector.
-        /// </summary>
-        [JsonEnumValue("model")]
-        Model,
-
-        /// <summary>
-        /// Thought/reasoning level selector.
-        /// </summary>
-        [JsonEnumValue("thought_level")]
-        ThoughtLevel,
-
-        /// <summary>
-        /// Unknown / uncategorized selector.
-        /// </summary>
-        [JsonEnumValue("other")]
-        Other
     }
 
     /// <summary>

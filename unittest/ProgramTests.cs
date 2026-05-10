@@ -88,6 +88,51 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public async Task Main_SchemaCommand_WithTargetNamespace_GeneratesRequestedNamespace()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            var schemaDir = Path.Combine(tempDir, "schema");
+            var outputDir = Path.Combine(tempDir, "output");
+            Directory.CreateDirectory(schemaDir);
+            Directory.CreateDirectory(outputDir);
+
+            try
+            {
+                File.WriteAllText(Path.Combine(schemaDir, "schema.json"), @"{
+                    ""$defs"": {
+                        ""TestType"": {
+                            ""type"": ""object"",
+                            ""properties"": {
+                                ""value"": { ""type"": ""string"" }
+                            }
+                        }
+                    }
+                }");
+
+                File.WriteAllText(Path.Combine(schemaDir, "VERSION"), "v1.0.0");
+
+                var args = new[]
+                {
+                    "schema",
+                    "--schema-dir", schemaDir,
+                    "--output-dir", outputDir,
+                    "--target-namespace", "dotacp.protocol.unstable"
+                };
+
+                var result = await InvokeMainAsync(args);
+
+                Assert.AreEqual(0, result);
+                var generated = File.ReadAllText(Path.Combine(outputDir, "Schema.cs"));
+                StringAssert.Contains(generated, "namespace dotacp.protocol.unstable");
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
         public async Task Main_SchemaCommand_WithMissingSchemaFile_ReturnsError()
         {
             // Arrange

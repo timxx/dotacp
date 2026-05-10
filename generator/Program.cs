@@ -25,25 +25,34 @@ namespace dotacp.generator
                 Description = "Path to output directory",
                 DefaultValueFactory = _ => GetDefaultOutputDir()
             };
+            var targetNamespaceOption = new Option<string>("--target-namespace")
+            {
+                Description = "Namespace used by generated protocol files",
+                DefaultValueFactory = _ => "dotacp.protocol"
+            };
 
             var schemaCommand = new Command("schema", "Generate C# models from schema.json");
             schemaCommand.Options.Add(schemaDirOption);
             schemaCommand.Options.Add(outputDirOption);
+            schemaCommand.Options.Add(targetNamespaceOption);
             schemaCommand.SetAction(parseResult =>
             {
                 var schemaDir = parseResult.GetValue(schemaDirOption);
                 var outputDir = parseResult.GetValue(outputDirOption);
-                return GenerateSchema(schemaDir, outputDir);
+                var targetNamespace = parseResult.GetValue(targetNamespaceOption);
+                return GenerateSchema(schemaDir, outputDir, targetNamespace);
             });
 
             var metaCommand = new Command("meta", "Generate Meta.cs from meta.json");
             metaCommand.Options.Add(schemaDirOption);
             metaCommand.Options.Add(outputDirOption);
+            metaCommand.Options.Add(targetNamespaceOption);
             metaCommand.SetAction(parseResult =>
             {
                 var schemaDir = parseResult.GetValue(schemaDirOption);
                 var outputDir = parseResult.GetValue(outputDirOption);
-                return GenerateMeta(schemaDir, outputDir);
+                var targetNamespace = parseResult.GetValue(targetNamespaceOption);
+                return GenerateMeta(schemaDir, outputDir, targetNamespace);
             });
 
             var interfacesCommand = new Command("interfaces", "Generate agent/client interfaces and connections");

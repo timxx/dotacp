@@ -86,6 +86,12 @@ namespace dotacp.generator
             {
                 var items = (oneOf ?? anyOf)!;
 
+                // Open-ended string anyOf with known const values maps better to a string-backed alias.
+                if (IsOpenStringEnumLikePattern(items))
+                {
+                    return GenerateOpenStringEnumLikeStruct(items);
+                }
+
                 // Check if this is an enum-like pattern
                 if (IsEnumLikePattern(items, out var enumType))
                 {
@@ -392,6 +398,7 @@ namespace dotacp.generator
 
             var allHaveConstOrTitle = true;
             var allSameType = true;
+            var allHaveConst = true;
             string firstType = null;
 
             foreach (var item in items)
@@ -430,15 +437,135 @@ namespace dotacp.generator
                     allHaveConstOrTitle = false;
                     break;
                 }
+
+                if (itemObj["const"] == null)
+                {
+                    allHaveConst = false;
+                }
             }
 
-            if (allHaveConstOrTitle && allSameType && (firstType == "string" || firstType == "integer"))
+            if (!allHaveConstOrTitle || !allSameType)
+            {
+                return false;
+            }
+
+            if (firstType == "string" && allHaveConst)
+            {
+                enumType = firstType;
+                return true;
+            }
+
+            if (firstType == "integer")
             {
                 enumType = firstType;
                 return true;
             }
 
             return false;
+        }
+
+        private bool IsOpenStringEnumLikePattern(JArray items)
+        {
+            var hasConst = false;
+            var hasPlainStringFallback = false;
+            var allowedFallbackKeys = new HashSet<string>(StringComparer.Ordinal)
+            {
+                "type",
+                "title",
+                "description"
+            };
+
+            foreach (var item in items)
+            {
+                var itemObj = item as JObject;
+                if (itemObj == null)
+                {
+                    return false;
+                }
+
+                var itemTypeToken = itemObj["type"];
+                string itemType = null;
+
+                if (itemTypeToken != null)
+                {
+                    if (itemTypeToken.Type == JTokenType.Array)
+                    {
+                        var typeArray = itemTypeToken as JArray;
+                        itemType = typeArray!.FirstOrDefault(t => t.ToString() != "null")?.ToString();
+                    }
+                    else
+                    {
+                        itemType = itemTypeToken.ToString();
+                    }
+                }
+
+                if (itemType != "string")
+                {
+                    return false;
+                }
+
+                if (itemObj["const"] != null)
+                {
+                    hasConst = true;
+                    continue;
+                }
+
+                if (itemObj.Properties().Any(property => !allowedFallbackKeys.Contains(property.Name)))
+                {
+                    return false;
+                }
+
+                hasPlainStringFallback = true;
+            }
+
+            return hasConst && hasPlainStringFallback;
+        }
+
+        private string GenerateOpenStringEnumLikeStruct(JArray items)
+        {
+            var className = NamingHelper.ConvertNameToClass(name);
+            var sb = new StringBuilder();
+
+            AppendXmlDocs(sb, definition["description"]?.ToString());
+
+            sb.AppendLineLf($"[JsonConverter(typeof(TypeAliasConverter<{className}, string>))]");
+            sb.AppendLineLf($"public readonly struct {className} : IEquatable<{className}>");
+            sb.AppendLineLf("{");
+            sb.AppendLineLf("    private readonly string _value;");
+            sb.AppendLineLf();
+            sb.AppendLineLf($"    public {className}(string value)");
+            sb.AppendLineLf("    {");
+            sb.AppendLineLf("        _value = value;");
+            sb.AppendLineLf("    }");
+            sb.AppendLineLf();
+            sb.AppendLineLf($"    public static implicit operator {className}(string value) => new {className}(value);");
+            sb.AppendLineLf($"    public static implicit operator string({className} alias) => alias._value;");
+
+            foreach (var item in items.OfType<JObject>().Where(item => item["const"] != null))
+            {
+                var constValue = item["const"]!.ToString();
+                var memberName = !string.IsNullOrEmpty(item["title"]?.ToString())
+                    ? NamingHelper.ConvertPropertyName(item["title"]!.ToString())
+                    : NamingHelper.ConvertPropertyName(constValue);
+                var description = item["description"]?.ToString();
+
+                sb.AppendLineLf();
+                if (!string.IsNullOrEmpty(description))
+                {
+                    AppendXmlDocs(sb, description, "    ");
+                }
+
+                sb.AppendLineLf($"    public static {className} {memberName} => new {className}(\"{constValue}\");");
+            }
+
+            sb.AppendLineLf();
+            sb.AppendLineLf($"    public bool Equals({className} other) => _value == other._value;");
+            sb.AppendLineLf($"    public override bool Equals(object obj) => obj is {className} other && Equals(other);");
+            sb.AppendLineLf("    public override int GetHashCode() => _value?.GetHashCode() ?? 0;");
+            sb.AppendLineLf("    public override string ToString() => _value?.ToString() ?? string.Empty;");
+            sb.Append("}");
+
+            return sb.ToString();
         }
 
         private string GenerateEnumFromOneOf(JArray items, string enumType)

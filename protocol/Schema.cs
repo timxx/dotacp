@@ -197,6 +197,51 @@ namespace dotacp.protocol
     }
 
     /// <summary>
+    /// Semantic category for a session configuration option.
+    ///
+    /// This is intended to help Clients distinguish broadly common selectors (e.g. model selector vs
+    /// session mode selector vs thought/reasoning level) for UX purposes (keyboard shortcuts, icons,
+    /// placement). It MUST NOT be required for correctness. Clients MUST handle missing or unknown
+    /// categories gracefully.
+    ///
+    /// Category names beginning with `_` are free for custom use, like other ACP extension methods.
+    /// Category names that do not begin with `_` are reserved for the ACP spec.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<SessionConfigOptionCategory, string>))]
+    public readonly struct SessionConfigOptionCategory : IEquatable<SessionConfigOptionCategory>
+    {
+        private readonly string _value;
+
+        public SessionConfigOptionCategory(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator SessionConfigOptionCategory(string value) => new SessionConfigOptionCategory(value);
+        public static implicit operator string(SessionConfigOptionCategory alias) => alias._value;
+
+        /// <summary>
+        /// Session mode selector.
+        /// </summary>
+        public static SessionConfigOptionCategory Mode => new SessionConfigOptionCategory("mode");
+
+        /// <summary>
+        /// Model selector.
+        /// </summary>
+        public static SessionConfigOptionCategory Model => new SessionConfigOptionCategory("model");
+
+        /// <summary>
+        /// Thought/reasoning level selector.
+        /// </summary>
+        public static SessionConfigOptionCategory ThoughtLevel => new SessionConfigOptionCategory("thought_level");
+
+        public bool Equals(SessionConfigOptionCategory other) => _value == other._value;
+        public override bool Equals(object obj) => obj is SessionConfigOptionCategory other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
     /// Possible values for a session configuration option.
     /// </summary>
     [JsonConverter(typeof(UnionTypeConverter<SessionConfigSelectOptions>))]
@@ -499,45 +544,6 @@ namespace dotacp.protocol
 
         [JsonEnumValue("user")]
         User
-    }
-
-    /// <summary>
-    /// Semantic category for a session configuration option.
-    ///
-    /// This is intended to help Clients distinguish broadly common selectors (e.g. model selector vs
-    /// session mode selector vs thought/reasoning level) for UX purposes (keyboard shortcuts, icons,
-    /// placement). It MUST NOT be required for correctness. Clients MUST handle missing or unknown
-    /// categories gracefully.
-    ///
-    /// Category names beginning with `_` are free for custom use, like other ACP extension methods.
-    /// Category names that do not begin with `_` are reserved for the ACP spec.
-    /// </summary>
-    [JsonConverter(typeof(JsonEnumMemberConverter<SessionConfigOptionCategory>))]
-    public enum SessionConfigOptionCategory
-    {
-        /// <summary>
-        /// Session mode selector.
-        /// </summary>
-        [JsonEnumValue("mode")]
-        Mode,
-
-        /// <summary>
-        /// Model selector.
-        /// </summary>
-        [JsonEnumValue("model")]
-        Model,
-
-        /// <summary>
-        /// Thought/reasoning level selector.
-        /// </summary>
-        [JsonEnumValue("thought_level")]
-        ThoughtLevel,
-
-        /// <summary>
-        /// Unknown / uncategorized selector.
-        /// </summary>
-        [JsonEnumValue("other")]
-        Other
     }
 
     /// <summary>
