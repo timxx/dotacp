@@ -300,6 +300,80 @@ namespace dotacp.unittest
         }
 
         [TestMethod]
+        public void Generate_AgentRpcTarget_UsesDistinctNamesForConflictingMethods()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            var schemaDir = Path.Combine(tempDir, "schema");
+            var agentDir = Path.Combine(tempDir, "agent", "unstable");
+            var clientDir = Path.Combine(tempDir, "client", "unstable");
+
+            Directory.CreateDirectory(schemaDir);
+            Directory.CreateDirectory(agentDir);
+            Directory.CreateDirectory(clientDir);
+
+            try
+            {
+                var metaJsonPath = Path.Combine(schemaDir, "meta.json");
+                var schemaJsonPath = Path.Combine(schemaDir, "schema.json");
+                var versionFilePath = Path.Combine(schemaDir, "VERSION");
+
+                File.WriteAllText(metaJsonPath, @"{
+                    ""agentMethods"": {
+                        ""close_nes"": ""nes/close"",
+                        ""close_session"": ""session/close""
+                    },
+                    ""clientMethods"": {}
+                }");
+
+                File.WriteAllText(schemaJsonPath, @"{
+                    ""$defs"": {
+                        ""CloseNesRequest"": {
+                            ""x-method"": ""nes/close"",
+                            ""x-side"": ""agent""
+                        },
+                        ""CloseNesResponse"": {
+                            ""x-method"": ""nes/close"",
+                            ""x-side"": ""agent""
+                        },
+                        ""CloseSessionRequest"": {
+                            ""x-method"": ""session/close"",
+                            ""x-side"": ""agent""
+                        },
+                        ""CloseSessionResponse"": {
+                            ""x-method"": ""session/close"",
+                            ""x-side"": ""agent""
+                        }
+                    }
+                }");
+
+                File.WriteAllText(versionFilePath, "v0.12.2");
+
+                var generator = new InterfaceGenerator();
+
+                generator.Generate(
+                    metaJsonPath,
+                    schemaJsonPath,
+                    versionFilePath,
+                    agentDir,
+                    clientDir,
+                    "dotacp.protocol.unstable",
+                    "dotacp.agent.unstable",
+                    "dotacp.client.unstable");
+
+                var agentRpcTarget = File.ReadAllText(Path.Combine(agentDir, "AgentRpcTarget.cs"));
+                Assert.Contains("public Task<CloseNesResponse> CloseNesAsync(", agentRpcTarget);
+                Assert.Contains("return _agent.CloseAsync(request, cancellationToken);", agentRpcTarget);
+                Assert.Contains("public Task<CloseSessionResponse> CloseSessionAsync(", agentRpcTarget);
+                Assert.DoesNotContain("public Task<CloseNesResponse> CloseAsync(", agentRpcTarget);
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
+        }
+
+        [TestMethod]
         public void Generate_AgentConnection_ContainsExpectedMethods()
         {
             // Arrange

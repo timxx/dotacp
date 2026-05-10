@@ -262,12 +262,14 @@ namespace dotacp.generator
             sb.AppendLineLf("        }");
 
             // Sort methods by name for consistent output
+            var agentTargetMethodNames = ResolveRpcTargetMethodNames(_agentMethods.Values);
             foreach (var method in _agentMethods.Values.OrderBy(m => m.MethodPath))
             {
                 if (string.IsNullOrEmpty(method.RequestType) || string.IsNullOrEmpty(method.ResponseType))
                     continue;
 
-                var methodName = GetMethodName(method);
+                var interfaceMethodName = GetMethodName(method);
+                var methodName = agentTargetMethodNames[method.MethodPath];
                 var returnType = method.IsNotification ? "Task" : $"Task<{method.ResponseType}>";
 
                 sb.AppendLineLf();
@@ -276,7 +278,7 @@ namespace dotacp.generator
                 sb.AppendLineLf($"            {method.RequestType} {(method.IsNotification ? "notification" : "request")},");
                 sb.AppendLineLf("            CancellationToken cancellationToken = default)");
                 sb.AppendLineLf("        {");
-                sb.AppendLineLf($"            return _agent.{methodName}Async({(method.IsNotification ? "notification" : "request")}, cancellationToken);");
+                sb.AppendLineLf($"            return _agent.{interfaceMethodName}Async({(method.IsNotification ? "notification" : "request")}, cancellationToken);");
                 sb.AppendLineLf("        }");
             }
 
@@ -571,12 +573,14 @@ namespace dotacp.generator
             sb.AppendLineLf("        }");
 
             // Sort methods by name for consistent output
+            var clientTargetMethodNames = ResolveRpcTargetMethodNames(_clientMethods.Values);
             foreach (var method in _clientMethods.Values.OrderBy(m => m.MethodPath))
             {
                 if (string.IsNullOrEmpty(method.RequestType) || string.IsNullOrEmpty(method.ResponseType))
                     continue;
 
-                var methodName = GetMethodName(method);
+                var interfaceMethodName = GetMethodName(method);
+                var methodName = clientTargetMethodNames[method.MethodPath];
                 var returnType = method.IsNotification ? "Task" : $"Task<{method.ResponseType}>";
 
                 sb.AppendLineLf();
@@ -585,7 +589,7 @@ namespace dotacp.generator
                 sb.AppendLineLf($"            {method.RequestType} {(method.IsNotification ? "notification" : "request")},");
                 sb.AppendLineLf("            CancellationToken cancellationToken = default)");
                 sb.AppendLineLf("        {");
-                sb.AppendLineLf($"            return _client.{methodName}Async({(method.IsNotification ? "notification" : "request")}, cancellationToken);");
+                sb.AppendLineLf($"            return _client.{interfaceMethodName}Async({(method.IsNotification ? "notification" : "request")}, cancellationToken);");
                 sb.AppendLineLf("        }");
             }
 
@@ -795,6 +799,25 @@ namespace dotacp.generator
             }
 
             return lastPart;
+        }
+
+        private Dictionary<string, string> ResolveRpcTargetMethodNames(IEnumerable<MethodInfo> methods)
+        {
+            var orderedMethods = methods.OrderBy(m => m.MethodPath).ToList();
+            var groupedNames = orderedMethods
+                .GroupBy(GetMethodName)
+                .ToDictionary(group => group.Key, group => group.Count());
+
+            var resolvedNames = new Dictionary<string, string>();
+            foreach (var method in orderedMethods)
+            {
+                var baseName = GetMethodName(method);
+                resolvedNames[method.MethodPath] = groupedNames[baseName] > 1
+                    ? method.MethodName
+                    : baseName;
+            }
+
+            return resolvedNames;
         }
     }
 }
