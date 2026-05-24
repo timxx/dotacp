@@ -147,5 +147,10 @@ namespace dotacp.unittest
         {
             // Mock implementation - no-op
         }
+
+        public Task<LogoutResponse> LogoutAsync(LogoutRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

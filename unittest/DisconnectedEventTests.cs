@@ -241,6 +241,11 @@ namespace dotacp.unittest
 
         public Task ExtNotificationAsync(string method, object notification, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
+
+        public Task<LogoutResponse> LogoutAsync(LogoutRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     /// <summary>
@@ -363,5 +368,10 @@ namespace dotacp.unittest
 
         public Task ExtNotificationAsync(string method, object notification, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
+
+        public Task<LogoutResponse> LogoutAsync(LogoutRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

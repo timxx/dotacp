@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 using dotacp.protocol.unstable;
 using System.Threading;
@@ -147,7 +147,7 @@ namespace dotacp.agent.unstable
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
-        Task<DisableProvidersResponse> DisableAsync(DisableProvidersRequest request,
+        Task<DisableProviderResponse> DisableAsync(DisableProviderRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace dotacp.agent.unstable
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
-        Task<SetProvidersResponse> SetAsync(SetProvidersRequest request,
+        Task<SetProviderResponse> SetAsync(SetProviderRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -184,6 +184,15 @@ namespace dotacp.agent.unstable
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
         Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>session/delete</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<DeleteSessionResponse> DeleteAsync(DeleteSessionRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>

@@ -1,5 +1,5 @@
 // Generated from schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 #pragma warning disable CS1591
 
@@ -61,13 +61,13 @@ namespace dotacp.protocol
     /// <summary>
     /// JSON RPC Request Id
     ///
-    /// An identifier established by the Client that MUST contain a String, Number, or NULL value if included. If it is not included it is assumed to be a notification. The value SHOULD normally not be Null [1] and Numbers SHOULD NOT contain fractional parts [2]
+    /// An identifier established by the Client that MUST contain a String, Number, or NULL value if included. If it is not included it is assumed to be a notification. The value SHOULD normally not be Null \[1\] and Numbers SHOULD NOT contain fractional parts \[2\]
     ///
     /// The Server MUST reply with the same value in the Response object if included. This member is used to correlate the context between the two objects.
     ///
-    /// [1] The use of Null as a value for the id member in a Request object is discouraged, because this specification uses a value of Null for Responses with an unknown id. Also, because JSON-RPC 1.0 uses an id value of Null for Notifications this could cause confusion in handling.
+    /// \[1\] The use of Null as a value for the id member in a Request object is discouraged, because this specification uses a value of Null for Responses with an unknown id. Also, because JSON-RPC 1.0 uses an id value of Null for Notifications this could cause confusion in handling.
     ///
-    /// [2] Fractional parts may be problematic, since many decimal fractions cannot be represented exactly as binary fractions.
+    /// \[2\] Fractional parts may be problematic, since many decimal fractions cannot be represented exactly as binary fractions.
     /// </summary>
     [JsonConverter(typeof(UnionTypeConverter<RequestId>))]
     public readonly struct RequestId : IEquatable<RequestId>
@@ -704,6 +704,30 @@ namespace dotacp.protocol
     // Generated model classes from ACP schema
 
     /// <summary>
+    /// Authentication-related capabilities supported by the agent.
+    /// </summary>
+    public class AgentAuthCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Whether the agent supports the logout method.
+        ///
+        /// By supplying `{}` it means that the agent supports the logout method.
+        /// </summary>
+        [JsonProperty("logout")]
+        public LogoutCapabilities Logout { get; set; }
+    }
+
+    /// <summary>
     /// Capabilities supported by the agent.
     ///
     /// Advertised during initialization to inform the client about
@@ -722,6 +746,12 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Authentication-related capabilities supported by the agent.
+        /// </summary>
+        [JsonProperty("auth")]
+        public AgentAuthCapabilities Auth { get; set; }
 
         /// <summary>
         /// Whether the agent supports `session/load`.
@@ -1857,6 +1887,58 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("modes")]
         public SessionModeState Modes { get; set; }
+    }
+
+    /// <summary>
+    /// Logout capabilities supported by the agent.
+    ///
+    /// By supplying `{}` it means that the agent supports the logout method.
+    /// </summary>
+    public class LogoutCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+    }
+
+    /// <summary>
+    /// Request parameters for the logout method.
+    ///
+    /// Terminates the current authenticated session.
+    /// </summary>
+    public class LogoutRequest
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+    }
+
+    /// <summary>
+    /// Response to the `logout` method.
+    /// </summary>
+    public class LogoutResponse
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>

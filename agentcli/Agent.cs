@@ -475,7 +475,7 @@ namespace agentcli
             throw new NotImplementedException();
         }
 
-        public Task<DisableProvidersResponse> DisableAsync(DisableProvidersRequest request, CancellationToken cancellationToken = default)
+        public Task<DisableProviderResponse> DisableAsync(DisableProviderRequest request, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -485,7 +485,12 @@ namespace agentcli
             throw new NotImplementedException();
         }
 
-        public Task<SetProvidersResponse> SetAsync(SetProvidersRequest request, CancellationToken cancellationToken = default)
+        public Task<SetProviderResponse> SetAsync(SetProviderRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DeleteSessionResponse> DeleteAsync(DeleteSessionRequest request, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

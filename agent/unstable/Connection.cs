@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -130,6 +130,34 @@ namespace dotacp.agent.unstable
         {
             return SendRequestAsync<WriteTextFileRequest, WriteTextFileResponse>(
                 ClientMethods.FsWriteTextFile, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the client <c>mcp/connect</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<ConnectMcpResponse> ConnectAsync(
+            ConnectMcpRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<ConnectMcpRequest, ConnectMcpResponse>(
+                ClientMethods.McpConnect, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the client <c>mcp/disconnect</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<DisconnectMcpResponse> DisconnectAsync(
+            DisconnectMcpRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<DisconnectMcpRequest, DisconnectMcpResponse>(
+                ClientMethods.McpDisconnect, request, cancellationToken);
         }
 
         /// <summary>

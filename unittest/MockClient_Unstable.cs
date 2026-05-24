@@ -131,5 +131,15 @@ namespace dotacp.unittest
         {
             // Mock implementation - no-op
         }
+
+        public Task<ConnectMcpResponse> ConnectAsync(ConnectMcpRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<DisconnectMcpResponse> DisconnectAsync(DisconnectMcpRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

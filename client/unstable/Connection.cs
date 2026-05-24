@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -256,11 +256,11 @@ namespace dotacp.client.unstable
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<DisableProvidersResponse> DisableAsync(
-            DisableProvidersRequest request,
+        public Task<DisableProviderResponse> DisableAsync(
+            DisableProviderRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<DisableProvidersRequest, DisableProvidersResponse>(
+            return SendRequestAsync<DisableProviderRequest, DisableProviderResponse>(
                 AgentMethods.ProvidersDisable, request, cancellationToken);
         }
 
@@ -284,11 +284,11 @@ namespace dotacp.client.unstable
         /// <param name="request">The request payload.</param>
         /// <param name="cancellationToken">A token that cancels the operation.</param>
         /// <returns>The response.</returns>
-        public Task<SetProvidersResponse> SetAsync(
-            SetProvidersRequest request,
+        public Task<SetProviderResponse> SetAsync(
+            SetProviderRequest request,
             CancellationToken cancellationToken = default)
         {
-            return SendRequestAsync<SetProvidersRequest, SetProvidersResponse>(
+            return SendRequestAsync<SetProviderRequest, SetProviderResponse>(
                 AgentMethods.ProvidersSet, request, cancellationToken);
         }
 
@@ -317,6 +317,20 @@ namespace dotacp.client.unstable
         {
             return SendRequestAsync<CloseSessionRequest, CloseSessionResponse>(
                 AgentMethods.SessionClose, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/delete</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<DeleteSessionResponse> DeleteAsync(
+            DeleteSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<DeleteSessionRequest, DeleteSessionResponse>(
+                AgentMethods.SessionDelete, request, cancellationToken);
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -123,8 +123,8 @@ namespace dotacp.agent.unstable
         }
 
         [JsonRpcMethod(AgentMethods.ProvidersDisable, UseSingleObjectParameterDeserialization = true)]
-        public Task<DisableProvidersResponse> DisableAsync(
-            DisableProvidersRequest request,
+        public Task<DisableProviderResponse> DisableAsync(
+            DisableProviderRequest request,
             CancellationToken cancellationToken = default)
         {
             return _agent.DisableAsync(request, cancellationToken);
@@ -139,8 +139,8 @@ namespace dotacp.agent.unstable
         }
 
         [JsonRpcMethod(AgentMethods.ProvidersSet, UseSingleObjectParameterDeserialization = true)]
-        public Task<SetProvidersResponse> SetAsync(
-            SetProvidersRequest request,
+        public Task<SetProviderResponse> SetAsync(
+            SetProviderRequest request,
             CancellationToken cancellationToken = default)
         {
             return _agent.SetAsync(request, cancellationToken);
@@ -160,6 +160,14 @@ namespace dotacp.agent.unstable
             CancellationToken cancellationToken = default)
         {
             return _agent.CloseAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.SessionDelete, UseSingleObjectParameterDeserialization = true)]
+        public Task<DeleteSessionResponse> DeleteAsync(
+            DeleteSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.DeleteAsync(request, cancellationToken);
         }
 
         [JsonRpcMethod(AgentMethods.SessionFork, UseSingleObjectParameterDeserialization = true)]

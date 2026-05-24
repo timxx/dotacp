@@ -246,5 +246,15 @@ namespace clientcli
         {
             throw new NotImplementedException();
         }
+
+        public Task<ConnectMcpResponse> ConnectAsync(ConnectMcpRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DisconnectMcpResponse> DisconnectAsync(DisconnectMcpRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 using dotacp.protocol;
 using dotacp.shared;
@@ -101,6 +101,20 @@ namespace dotacp.client
         {
             return SendRequestAsync<InitializeRequest, InitializeResponse>(
                 AgentMethods.Initialize, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>logout</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<LogoutResponse> LogoutAsync(
+            LogoutRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<LogoutRequest, LogoutResponse>(
+                AgentMethods.Logout, request, cancellationToken);
         }
 
         /// <summary>

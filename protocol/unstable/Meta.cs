@@ -1,5 +1,5 @@
 // Generated from schema/meta.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 #pragma warning disable CS1591
 
@@ -29,6 +29,7 @@ namespace dotacp.protocol.unstable
         public const string DocumentDidSave = "document/didSave";
         public const string Initialize = "initialize";
         public const string Logout = "logout";
+        public const string McpMessage = "mcp/message";
         public const string NesAccept = "nes/accept";
         public const string NesClose = "nes/close";
         public const string NesReject = "nes/reject";
@@ -39,6 +40,7 @@ namespace dotacp.protocol.unstable
         public const string ProvidersSet = "providers/set";
         public const string SessionCancel = "session/cancel";
         public const string SessionClose = "session/close";
+        public const string SessionDelete = "session/delete";
         public const string SessionFork = "session/fork";
         public const string SessionList = "session/list";
         public const string SessionLoad = "session/load";
@@ -59,6 +61,9 @@ namespace dotacp.protocol.unstable
         public const string ElicitationCreate = "elicitation/create";
         public const string FsReadTextFile = "fs/read_text_file";
         public const string FsWriteTextFile = "fs/write_text_file";
+        public const string McpConnect = "mcp/connect";
+        public const string McpDisconnect = "mcp/disconnect";
+        public const string McpMessage = "mcp/message";
         public const string SessionRequestPermission = "session/request_permission";
         public const string SessionUpdate = "session/update";
         public const string TerminalCreate = "terminal/create";

@@ -27,9 +27,9 @@ namespace dotacp.unittest
         public RejectNesNotification? LastRejectNesNotification { get; private set; }
         public StartNesRequest? LastStartNesRequest { get; private set; }
         public SuggestNesRequest? LastSuggestNesRequest { get; private set; }
-        public DisableProvidersRequest? LastDisableProvidersRequest { get; private set; }
+        public DisableProviderRequest? LastDisableProviderRequest { get; private set; }
         public ListProvidersRequest? LastListProvidersRequest { get; private set; }
-        public SetProvidersRequest? LastSetProvidersRequest { get; private set; }
+        public SetProviderRequest? LastSetProviderRequest { get; private set; }
         public CancelNotification? LastCancelNotification { get; private set; }
         public ForkSessionRequest? LastForkSessionRequest { get; private set; }
         public ListSessionsRequest? LastListSessionsRequest { get; private set; }
@@ -53,9 +53,9 @@ namespace dotacp.unittest
         public CloseNesResponse CloseNesResponseToReturn { get; set; } = new CloseNesResponse();
         public StartNesResponse StartNesResponseToReturn { get; set; } = new StartNesResponse();
         public SuggestNesResponse SuggestNesResponseToReturn { get; set; } = new SuggestNesResponse();
-        public DisableProvidersResponse DisableProvidersResponseToReturn { get; set; } = new DisableProvidersResponse();
+        public DisableProviderResponse DisableProviderResponseToReturn { get; set; } = new DisableProviderResponse();
         public ListProvidersResponse ListProvidersResponseToReturn { get; set; } = new ListProvidersResponse();
-        public SetProvidersResponse SetProvidersResponseToReturn { get; set; } = new SetProvidersResponse();
+        public SetProviderResponse SetProviderResponseToReturn { get; set; } = new SetProviderResponse();
         public ForkSessionResponse ForkSessionResponseToReturn { get; set; } = new ForkSessionResponse();
         public ListSessionsResponse ListSessionsResponseToReturn { get; set; } = new ListSessionsResponse { Sessions = new SessionInfo[0] };
         public LoadSessionResponse LoadSessionResponseToReturn { get; set; } = new LoadSessionResponse();
@@ -155,10 +155,10 @@ namespace dotacp.unittest
             return Task.FromResult(SuggestNesResponseToReturn);
         }
 
-        public Task<DisableProvidersResponse> DisableAsync(DisableProvidersRequest request, CancellationToken cancellationToken = default)
+        public Task<DisableProviderResponse> DisableAsync(DisableProviderRequest request, CancellationToken cancellationToken = default)
         {
-            LastDisableProvidersRequest = request;
-            return Task.FromResult(DisableProvidersResponseToReturn);
+            LastDisableProviderRequest = request;
+            return Task.FromResult(DisableProviderResponseToReturn);
         }
 
         public Task<ListProvidersResponse> ListAsync(ListProvidersRequest request, CancellationToken cancellationToken = default)
@@ -167,10 +167,10 @@ namespace dotacp.unittest
             return Task.FromResult(ListProvidersResponseToReturn);
         }
 
-        public Task<SetProvidersResponse> SetAsync(SetProvidersRequest request, CancellationToken cancellationToken = default)
+        public Task<SetProviderResponse> SetAsync(SetProviderRequest request, CancellationToken cancellationToken = default)
         {
-            LastSetProvidersRequest = request;
-            return Task.FromResult(SetProvidersResponseToReturn);
+            LastSetProviderRequest = request;
+            return Task.FromResult(SetProviderResponseToReturn);
         }
 
         public Task CancelAsync(CancelNotification notification, CancellationToken cancellationToken = default)
@@ -268,6 +268,11 @@ namespace dotacp.unittest
 
         public void OnDisconnected(Connection connection)
         {
+        }
+
+        public Task<DeleteSessionResponse> DeleteAsync(DeleteSessionRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

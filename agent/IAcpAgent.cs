@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 using dotacp.protocol;
 using System.Threading;
@@ -40,6 +40,15 @@ namespace dotacp.agent
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
         Task<InitializeResponse> InitializeAsync(InitializeRequest request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Handles the protocol <c>logout</c> request.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels request processing.</param>
+        /// <returns>The response.</returns>
+        Task<LogoutResponse> LogoutAsync(LogoutRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>

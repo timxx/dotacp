@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.12.2
+// Schema ref: refs/tags/v0.13.3
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -48,6 +48,22 @@ namespace dotacp.client.unstable
             CancellationToken cancellationToken = default)
         {
             return _client.WriteTextFileAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(ClientMethods.McpConnect, UseSingleObjectParameterDeserialization = true)]
+        public Task<ConnectMcpResponse> ConnectAsync(
+            ConnectMcpRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _client.ConnectAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(ClientMethods.McpDisconnect, UseSingleObjectParameterDeserialization = true)]
+        public Task<DisconnectMcpResponse> DisconnectAsync(
+            DisconnectMcpRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _client.DisconnectAsync(request, cancellationToken);
         }
 
         [JsonRpcMethod(ClientMethods.SessionRequestPermission, UseSingleObjectParameterDeserialization = true)]
