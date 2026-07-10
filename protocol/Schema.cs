@@ -1,5 +1,5 @@
 // Generated from schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.13.3
+// Schema ref: refs/tags/schema-v1.19.0
 
 #pragma warning disable CS1591
 
@@ -10,6 +10,50 @@ using System.Collections.Generic;
 namespace dotacp.protocol
 {
     // Type aliases
+
+    /// <summary>
+    /// Typed identifier used for auth method values on the wire.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<AuthMethodId, string>))]
+    public readonly struct AuthMethodId : IEquatable<AuthMethodId>
+    {
+        private readonly string _value;
+
+        public AuthMethodId(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator AuthMethodId(string value) => new AuthMethodId(value);
+        public static implicit operator string(AuthMethodId alias) => alias._value;
+
+        public bool Equals(AuthMethodId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is AuthMethodId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Unique identifier for a message within a session.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<MessageId, string>))]
+    public readonly struct MessageId : IEquatable<MessageId>
+    {
+        private readonly string _value;
+
+        public MessageId(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator MessageId(string value) => new MessageId(value);
+        public static implicit operator string(MessageId alias) => alias._value;
+
+        public bool Equals(MessageId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is MessageId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
 
     /// <summary>
     /// Unique identifier for a permission option.
@@ -231,6 +275,11 @@ namespace dotacp.protocol
         public static SessionConfigOptionCategory Model => new SessionConfigOptionCategory("model");
 
         /// <summary>
+        /// Model-related configuration parameter.
+        /// </summary>
+        public static SessionConfigOptionCategory ModelConfig => new SessionConfigOptionCategory("model_config");
+
+        /// <summary>
         /// Thought/reasoning level selector.
         /// </summary>
         public static SessionConfigOptionCategory ThoughtLevel => new SessionConfigOptionCategory("thought_level");
@@ -374,6 +423,28 @@ namespace dotacp.protocol
     }
 
     /// <summary>
+    /// Typed identifier used for terminal values on the wire.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<TerminalId, string>))]
+    public readonly struct TerminalId : IEquatable<TerminalId>
+    {
+        private readonly string _value;
+
+        public TerminalId(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator TerminalId(string value) => new TerminalId(value);
+        public static implicit operator string(TerminalId alias) => alias._value;
+
+        public bool Equals(TerminalId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is TerminalId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
     /// Unique identifier for a tool call within a session.
     /// </summary>
     [JsonConverter(typeof(TypeAliasConverter<ToolCallId, string>))]
@@ -431,6 +502,12 @@ namespace dotacp.protocol
         /// Reserved for implementation-defined server errors.
         /// </summary>
         InternalError = -32603,
+
+        /// <summary>
+        /// **Request cancelled**: Execution of the method was aborted either due to a cancellation request from the caller or
+        /// because of resource constraints or shutdown.
+        /// </summary>
+        RequestCancelled = -32800,
 
         /// <summary>
         /// **Authentication required**: Authentication is required before this operation can be performed.
@@ -539,9 +616,15 @@ namespace dotacp.protocol
     [JsonConverter(typeof(JsonEnumMemberConverter<Role>))]
     public enum Role
     {
+        /// <summary>
+        /// The assistant side of a conversation.
+        /// </summary>
         [JsonEnumValue("assistant")]
         Assistant,
 
+        /// <summary>
+        /// The user side of a conversation.
+        /// </summary>
         [JsonEnumValue("user")]
         User
     }
@@ -721,7 +804,8 @@ namespace dotacp.protocol
         /// <summary>
         /// Whether the agent supports the logout method.
         ///
-        /// By supplying `{}` it means that the agent supports the logout method.
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports the logout method.
         /// </summary>
         [JsonProperty("logout")]
         public LogoutCapabilities Logout { get; set; }
@@ -771,6 +855,9 @@ namespace dotacp.protocol
         [JsonProperty("promptCapabilities")]
         public PromptCapabilities PromptCapabilities { get; set; }
 
+        /// <summary>
+        /// Session lifecycle and prompt capabilities advertised by the agent.
+        /// </summary>
         [JsonProperty("sessionCapabilities")]
         public SessionCapabilities SessionCapabilities { get; set; }
     }
@@ -790,12 +877,21 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Intended recipients for this content, such as the user or assistant.
+        /// </summary>
         [JsonProperty("audience")]
         public Role[] Audience { get; set; }
 
+        /// <summary>
+        /// Timestamp indicating when the underlying resource was last modified.
+        /// </summary>
         [JsonProperty("lastModified")]
         public string LastModified { get; set; }
 
+        /// <summary>
+        /// Relative importance of this content when clients choose what to surface.
+        /// </summary>
         [JsonProperty("priority")]
         public double? Priority { get; set; }
     }
@@ -818,12 +914,21 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Base64-encoded media payload.
+        /// </summary>
         [JsonProperty("data")]
         public string Data { get; set; } = null!;
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; } = null!;
     }
@@ -850,7 +955,7 @@ namespace dotacp.protocol
         /// Must be one of the methods advertised in the initialize response.
         /// </summary>
         [JsonProperty("methodId")]
-        public string MethodId { get; set; } = null!;
+        public AuthMethodId MethodId { get; set; } = null!;
     }
 
     /// <summary>
@@ -906,7 +1011,7 @@ namespace dotacp.protocol
         /// Unique identifier for this authentication method.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public AuthMethodId Id { get; set; } = null!;
 
         /// <summary>
         /// Human-readable name of the authentication method.
@@ -1000,14 +1105,41 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Base64-encoded bytes for a binary resource payload.
+        /// </summary>
         [JsonProperty("blob")]
         public string Blob { get; set; } = null!;
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; }
 
+        /// <summary>
+        /// URI associated with this resource or media payload.
+        /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// Capabilities for boolean session configuration options.
+    ///
+    /// Supplying `{}` means the client supports boolean session configuration options.
+    /// </summary>
+    public class BooleanConfigOptionCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -1032,6 +1164,30 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("sessionId")]
         public SessionId SessionId { get; set; }
+    }
+
+    /// <summary>
+    /// Notification to cancel an ongoing request.
+    ///
+    /// See protocol docs: [Cancellation](https://agentclientprotocol.com/protocol/cancellation)
+    /// </summary>
+    public class CancelRequestNotification
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The ID of the request to cancel.
+        /// </summary>
+        [JsonProperty("requestId")]
+        public RequestId RequestId { get; set; }
     }
 
     /// <summary>
@@ -1062,10 +1218,44 @@ namespace dotacp.protocol
         public FileSystemCapabilities Fs { get; set; }
 
         /// <summary>
+        /// Session-related capabilities supported by the client.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise any
+        /// session-related extensions.
+        /// </summary>
+        [JsonProperty("session")]
+        public ClientSessionCapabilities Session { get; set; }
+
+        /// <summary>
         /// Whether the Client support all `terminal/*` methods.
         /// </summary>
         [JsonProperty("terminal")]
         public bool Terminal { get; set; } = false;
+    }
+
+    /// <summary>
+    /// Session-related capabilities supported by the client.
+    /// </summary>
+    public class ClientSessionCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Config option capabilities supported by the client.
+        ///
+        /// Omitted or `null` both mean the client does not advertise support for any
+        /// config option extensions.
+        /// </summary>
+        [JsonProperty("configOptions")]
+        public SessionConfigOptionsCapabilities ConfigOptions { get; set; }
     }
 
     /// <summary>
@@ -1215,6 +1405,43 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("content")]
         public ContentBlock Content { get; set; } = null!;
+
+        /// <summary>
+        /// A unique identifier for the message this chunk belongs to.
+        ///
+        /// All chunks belonging to the same message share the same `messageId`.
+        /// A change in `messageId` indicates a new message has started.
+        /// </summary>
+        [JsonProperty("messageId")]
+        public MessageId MessageId { get; set; }
+    }
+
+    /// <summary>
+    /// Cost information for a session.
+    /// </summary>
+    public class Cost
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Total cumulative cost for session.
+        /// </summary>
+        [JsonProperty("amount")]
+        public double Amount { get; set; }
+
+        /// <summary>
+        /// ISO 4217 currency code (e.g., "USD", "EUR").
+        /// </summary>
+        [JsonProperty("currency")]
+        public string Currency { get; set; } = null!;
     }
 
     /// <summary>
@@ -1245,7 +1472,7 @@ namespace dotacp.protocol
         public string Command { get; set; } = null!;
 
         /// <summary>
-        /// Working directory for the command (absolute path).
+        /// Working directory for the command. Must be an absolute path.
         /// </summary>
         [JsonProperty("cwd")]
         public string Cwd { get; set; }
@@ -1295,7 +1522,7 @@ namespace dotacp.protocol
         /// The unique identifier for the created terminal.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -1323,6 +1550,46 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("currentModeId")]
         public SessionModeId CurrentModeId { get; set; }
+    }
+
+    /// <summary>
+    /// Request parameters for deleting an existing session from `session/list`.
+    ///
+    /// Only available if the Agent supports the `sessionCapabilities.delete` capability.
+    /// </summary>
+    public class DeleteSessionRequest
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The ID of the session to delete.
+        /// </summary>
+        [JsonProperty("sessionId")]
+        public SessionId SessionId { get; set; }
+    }
+
+    /// <summary>
+    /// Response from deleting a session.
+    /// </summary>
+    public class DeleteSessionResponse
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
     }
 
     /// <summary>
@@ -1360,7 +1627,7 @@ namespace dotacp.protocol
         public string OldText { get; set; }
 
         /// <summary>
-        /// The file path being modified.
+        /// The absolute file path being modified.
         /// </summary>
         [JsonProperty("path")]
         public string Path { get; set; } = null!;
@@ -1384,9 +1651,15 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Embedded resource payload, either text or binary data.
+        /// </summary>
         [JsonProperty("resource")]
         public EmbeddedResourceResource Resource { get; set; } = null!;
     }
@@ -1575,22 +1848,34 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Base64-encoded media payload.
+        /// </summary>
         [JsonProperty("data")]
         public string Data { get; set; } = null!;
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; } = null!;
 
+        /// <summary>
+        /// URI associated with this resource or media payload.
+        /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; }
     }
 
     /// <summary>
     /// Metadata about the implementation of the client or agent.
-    /// Describes the name and version of an MCP implementation, with an optional
+    /// Describes the name and version of an ACP implementation, with an optional
     /// title for UI representation.
     /// </summary>
     public class Implementation
@@ -1743,7 +2028,7 @@ namespace dotacp.protocol
         /// The ID of the terminal to kill.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -1841,7 +2126,18 @@ namespace dotacp.protocol
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// The working directory for this session.
+        /// Additional workspace roots to activate for this session. Each path must be absolute.
+        ///
+        /// When omitted or empty, no additional roots are activated. When non-empty,
+        /// this is the complete resulting additional-root list for the loaded
+        /// session. It may differ from any previously used or reported list as long as
+        /// the request `cwd` matches the session's `cwd`.
+        /// </summary>
+        [JsonProperty("additionalDirectories")]
+        public string[] AdditionalDirectories { get; set; }
+
+        /// <summary>
+        /// The working directory for this session. Must be an absolute path.
         /// </summary>
         [JsonProperty("cwd")]
         public string Cwd { get; set; } = null!;
@@ -1892,7 +2188,7 @@ namespace dotacp.protocol
     /// <summary>
     /// Logout capabilities supported by the agent.
     ///
-    /// By supplying `{}` it means that the agent supports the logout method.
+    /// Supplying `{}` means the agent supports the logout method.
     /// </summary>
     public class LogoutCapabilities
     {
@@ -2094,7 +2390,7 @@ namespace dotacp.protocol
         public string[] Args { get; set; } = null!;
 
         /// <summary>
-        /// Path to the MCP server executable.
+        /// Absolute path to the MCP server executable.
         /// </summary>
         [JsonProperty("command")]
         public string Command { get; set; } = null!;
@@ -2128,6 +2424,16 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Additional workspace roots for this session. Each path must be absolute.
+        ///
+        /// These expand the session's filesystem scope without changing `cwd`, which
+        /// remains the base for relative paths. When omitted or empty, no
+        /// additional roots are activated for the new session.
+        /// </summary>
+        [JsonProperty("additionalDirectories")]
+        public string[] AdditionalDirectories { get; set; }
 
         /// <summary>
         /// The working directory for this session. Must be an absolute path.
@@ -2462,6 +2768,9 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Content payload returned by this response.
+        /// </summary>
         [JsonProperty("content")]
         public string Content { get; set; } = null!;
     }
@@ -2491,7 +2800,7 @@ namespace dotacp.protocol
         /// The ID of the terminal to release.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -2620,24 +2929,45 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Optional human-readable details shown with this protocol object.
+        /// </summary>
         [JsonProperty("description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; }
 
+        /// <summary>
+        /// Human-readable name shown for this protocol object.
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; } = null!;
 
+        /// <summary>
+        /// Optional size of the linked resource in bytes, if known.
+        /// </summary>
         [JsonProperty("size")]
         public long? Size { get; set; }
 
+        /// <summary>
+        /// Optional display title for end-user UI.
+        /// </summary>
         [JsonProperty("title")]
         public string Title { get; set; }
 
+        /// <summary>
+        /// URI associated with this resource or media payload.
+        /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; } = null!;
     }
@@ -2663,7 +2993,18 @@ namespace dotacp.protocol
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// The working directory for this session.
+        /// Additional workspace roots to activate for this session. Each path must be absolute.
+        ///
+        /// When omitted or empty, no additional roots are activated. When non-empty,
+        /// this is the complete resulting additional-root list for the resumed
+        /// session. It may differ from any previously used or reported list as long as
+        /// the request `cwd` matches the session's `cwd`.
+        /// </summary>
+        [JsonProperty("additionalDirectories")]
+        public string[] AdditionalDirectories { get; set; }
+
+        /// <summary>
+        /// The working directory for this session. Must be an absolute path.
         /// </summary>
         [JsonProperty("cwd")]
         public string Cwd { get; set; } = null!;
@@ -2737,6 +3078,27 @@ namespace dotacp.protocol
     }
 
     /// <summary>
+    /// Capabilities for additional session directories support.
+    ///
+    /// Supplying `{}` means the agent supports the `additionalDirectories` field on
+    /// supported session lifecycle requests. Agents that also support
+    /// `session/list` may return `SessionInfo.additionalDirectories` to report the
+    /// complete ordered additional-root list associated with a listed session.
+    /// </summary>
+    public class SessionAdditionalDirectoriesCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+    }
+
+    /// <summary>
     /// Session capabilities supported by the agent.
     ///
     /// As a baseline, all Agents **MUST** support `session/new`, `session/prompt`, `session/cancel`, and `session/update`.
@@ -2760,19 +3122,51 @@ namespace dotacp.protocol
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
+        /// Whether the agent supports `additionalDirectories` on supported session lifecycle requests.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports `additionalDirectories` on
+        /// supported session lifecycle requests.
+        ///
+        /// Agents that also support `session/list` may return
+        /// `SessionInfo.additionalDirectories` to report the complete ordered
+        /// additional-root list associated with a listed session.
+        /// </summary>
+        [JsonProperty("additionalDirectories")]
+        public SessionAdditionalDirectoriesCapabilities AdditionalDirectories { get; set; }
+
+        /// <summary>
         /// Whether the agent supports `session/close`.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports closing sessions.
         /// </summary>
         [JsonProperty("close")]
         public SessionCloseCapabilities Close { get; set; }
 
         /// <summary>
+        /// Whether the agent supports `session/delete`.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports deleting sessions from `session/list`.
+        /// </summary>
+        [JsonProperty("delete")]
+        public SessionDeleteCapabilities Delete { get; set; }
+
+        /// <summary>
         /// Whether the agent supports `session/list`.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports listing sessions.
         /// </summary>
         [JsonProperty("list")]
         public SessionListCapabilities List { get; set; }
 
         /// <summary>
         /// Whether the agent supports `session/resume`.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports resuming sessions.
         /// </summary>
         [JsonProperty("resume")]
         public SessionResumeCapabilities Resume { get; set; }
@@ -2781,7 +3175,7 @@ namespace dotacp.protocol
     /// <summary>
     /// Capabilities for the `session/close` method.
     ///
-    /// By supplying `{}` it means that the agent supports closing of sessions.
+    /// Supplying `{}` means the agent supports closing sessions.
     /// </summary>
     public class SessionCloseCapabilities
     {
@@ -2797,6 +3191,21 @@ namespace dotacp.protocol
     }
 
     /// <summary>
+    /// A boolean on/off toggle session configuration option payload.
+    /// </summary>
+    public class SessionConfigBoolean : SessionConfigOption
+    {
+        [JsonProperty("type")]
+        public override string Type => "boolean";
+
+        /// <summary>
+        /// The current value of the boolean option.
+        /// </summary>
+        [JsonProperty("currentValue")]
+        public bool CurrentValue { get; set; }
+    }
+
+    /// <summary>
     /// A session configuration option selector and its current state.
     /// </summary>
     [JsonConverter(typeof(DiscriminatorConverter<SessionConfigOption>))]
@@ -2805,6 +3214,7 @@ namespace dotacp.protocol
         internal const string DiscriminatorPropertyName = "type";
         internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
         {
+            { "boolean", typeof(SessionConfigBoolean) },
             { "select", typeof(SessionConfigSelect) }
         };
 
@@ -2844,6 +3254,33 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// Session configuration option capabilities supported by the client.
+    /// </summary>
+    public class SessionConfigOptionsCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Whether the client supports boolean session configuration options.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise support.
+        /// Supplying `{}` means agents may include `type: "boolean"` entries in
+        /// `configOptions`, and the client may send `session/set_config_option`
+        /// requests with `type: "boolean"` and a boolean `value`.
+        /// </summary>
+        [JsonProperty("boolean")]
+        public BooleanConfigOptionCapabilities Boolean { get; set; }
     }
 
     /// <summary>
@@ -2936,6 +3373,24 @@ namespace dotacp.protocol
     }
 
     /// <summary>
+    /// Capabilities for the `session/delete` method.
+    ///
+    /// Supplying `{}` means the agent supports deleting sessions from `session/list`.
+    /// </summary>
+    public class SessionDeleteCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+    }
+
+    /// <summary>
     /// Information about a session returned by session/list
     /// </summary>
     public class SessionInfo
@@ -2949,6 +3404,16 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Additional workspace roots reported for this session. Each path must be absolute.
+        ///
+        /// When present, this is the complete ordered additional-root list reported
+        /// by the Agent. Omitted and empty values are equivalent: the response
+        /// reports no additional roots.
+        /// </summary>
+        [JsonProperty("additionalDirectories")]
+        public string[] AdditionalDirectories { get; set; }
 
         /// <summary>
         /// The working directory for this session. Must be an absolute path.
@@ -3012,7 +3477,7 @@ namespace dotacp.protocol
     /// <summary>
     /// Capabilities for the `session/list` method.
     ///
-    /// By supplying `{}` it means that the agent supports listing of sessions.
+    /// Supplying `{}` means the agent supports listing sessions.
     /// </summary>
     public class SessionListCapabilities
     {
@@ -3044,12 +3509,21 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional human-readable details shown with this protocol object.
+        /// </summary>
         [JsonProperty("description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// Stable identifier used to refer to this protocol object in later messages.
+        /// </summary>
         [JsonProperty("id")]
         public SessionModeId Id { get; set; }
 
+        /// <summary>
+        /// Human-readable name shown for this protocol object.
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; } = null!;
     }
@@ -3117,7 +3591,7 @@ namespace dotacp.protocol
     /// <summary>
     /// Capabilities for the `session/resume` method.
     ///
-    /// By supplying `{}` it means that the agent supports resuming of sessions.
+    /// Supplying `{}` means the agent supports resuming sessions.
     /// </summary>
     public class SessionResumeCapabilities
     {
@@ -3154,6 +3628,7 @@ namespace dotacp.protocol
             { "session_info_update", typeof(SessionInfoUpdate) },
             { "tool_call", typeof(ToolCall) },
             { "tool_call_update", typeof(SessionUpdateToolCallUpdate) },
+            { "usage_update", typeof(UsageUpdate) },
             { "user_message_chunk", typeof(SessionUpdateUserMessageChunk) }
         };
 
@@ -3184,6 +3659,15 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("content")]
         public ContentBlock Content { get; set; } = null!;
+
+        /// <summary>
+        /// A unique identifier for the message this chunk belongs to.
+        ///
+        /// All chunks belonging to the same message share the same `messageId`.
+        /// A change in `messageId` indicates a new message has started.
+        /// </summary>
+        [JsonProperty("messageId")]
+        public MessageId MessageId { get; set; }
     }
 
     /// <summary>
@@ -3209,6 +3693,15 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("content")]
         public ContentBlock Content { get; set; } = null!;
+
+        /// <summary>
+        /// A unique identifier for the message this chunk belongs to.
+        ///
+        /// All chunks belonging to the same message share the same `messageId`.
+        /// A change in `messageId` indicates a new message has started.
+        /// </summary>
+        [JsonProperty("messageId")]
+        public MessageId MessageId { get; set; }
     }
 
     /// <summary>
@@ -3234,6 +3727,15 @@ namespace dotacp.protocol
         /// </summary>
         [JsonProperty("content")]
         public ContentBlock Content { get; set; } = null!;
+
+        /// <summary>
+        /// A unique identifier for the message this chunk belongs to.
+        ///
+        /// All chunks belonging to the same message share the same `messageId`.
+        /// A change in `messageId` indicates a new message has started.
+        /// </summary>
+        [JsonProperty("messageId")]
+        public MessageId MessageId { get; set; }
     }
 
     /// <summary>
@@ -3306,6 +3808,64 @@ namespace dotacp.protocol
     /// <summary>
     /// Request parameters for setting a session configuration option.
     /// </summary>
+    [JsonConverter(typeof(UnionTypeConverter<SetSessionConfigOptionRequestValue>))]
+    public readonly struct SetSessionConfigOptionRequestValue : IEquatable<SetSessionConfigOptionRequestValue>
+    {
+        private readonly object _value;
+        private readonly int _typeIndex;
+
+        public SetSessionConfigOptionRequestValue(bool value)
+        {
+            _value = value;
+            _typeIndex = 0;
+        }
+
+        public SetSessionConfigOptionRequestValue(SessionConfigValueId value)
+        {
+            _value = value;
+            _typeIndex = 1;
+        }
+
+        public static implicit operator SetSessionConfigOptionRequestValue(bool value) => new SetSessionConfigOptionRequestValue(value);
+        public static implicit operator SetSessionConfigOptionRequestValue(SessionConfigValueId value) => new SetSessionConfigOptionRequestValue(value);
+
+        public bool TryGetBool(out bool value)
+        {
+            if (_value is bool v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetSessionConfigValueId(out SessionConfigValueId value)
+        {
+            if (_value is SessionConfigValueId v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool Equals(SetSessionConfigOptionRequestValue other) => Equals(_value, other._value) && _typeIndex == other._typeIndex;
+        public override bool Equals(object obj) => obj is SetSessionConfigOptionRequestValue other && Equals(other);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (_value != null ? _value.GetHashCode() : 0);
+                hash = hash * 31 + _typeIndex;
+                return hash;
+            }
+        }
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
     public class SetSessionConfigOptionRequest
     {
         /// <summary>
@@ -3330,11 +3890,14 @@ namespace dotacp.protocol
         [JsonProperty("sessionId")]
         public SessionId SessionId { get; set; }
 
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
         /// <summary>
-        /// The ID of the configuration option value to set.
+        /// The boolean value.
         /// </summary>
         [JsonProperty("value")]
-        public SessionConfigValueId Value { get; set; }
+        public SetSessionConfigOptionRequestValue Value { get; set; }
     }
 
     /// <summary>
@@ -3425,8 +3988,11 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Identifier of the terminal instance to embed in the content stream.
+        /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -3482,7 +4048,7 @@ namespace dotacp.protocol
         /// The ID of the terminal to get output from.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -3537,9 +4103,15 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Text payload carried by this content block.
+        /// </summary>
         [JsonProperty("text")]
         public string Text { get; set; } = null!;
     }
@@ -3563,12 +4135,21 @@ namespace dotacp.protocol
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; }
 
+        /// <summary>
+        /// Text payload carried by this content block.
+        /// </summary>
         [JsonProperty("text")]
         public string Text { get; set; } = null!;
 
+        /// <summary>
+        /// URI associated with this resource or media payload.
+        /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; } = null!;
     }
@@ -3697,7 +4278,7 @@ namespace dotacp.protocol
         public uint? Line { get; set; }
 
         /// <summary>
-        /// The file path being accessed or modified.
+        /// The absolute file path being accessed or modified.
         /// </summary>
         [JsonProperty("path")]
         public string Path { get; set; } = null!;
@@ -3795,6 +4376,43 @@ namespace dotacp.protocol
     }
 
     /// <summary>
+    /// Context window and cost update for a session.
+    /// </summary>
+    public class UsageUpdate : SessionUpdate
+    {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "usage_update";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Cumulative session cost (optional).
+        /// </summary>
+        [JsonProperty("cost")]
+        public Cost Cost { get; set; }
+
+        /// <summary>
+        /// Total context window size in tokens.
+        /// </summary>
+        [JsonProperty("size")]
+        public ulong Size { get; set; }
+
+        /// <summary>
+        /// Tokens currently in context.
+        /// </summary>
+        [JsonProperty("used")]
+        public ulong Used { get; set; }
+    }
+
+    /// <summary>
     /// Request to wait for a terminal command to exit.
     /// </summary>
     public class WaitForTerminalExitRequest
@@ -3819,7 +4437,7 @@ namespace dotacp.protocol
         /// The ID of the terminal to wait for.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>

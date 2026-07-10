@@ -1,5 +1,5 @@
 // Generated from schema/meta.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.13.3
+// Schema ref: refs/tags/schema-v1.19.0
 
 #pragma warning disable CS1591
 
@@ -26,6 +26,7 @@ namespace dotacp.protocol
         public const string Logout = "logout";
         public const string SessionCancel = "session/cancel";
         public const string SessionClose = "session/close";
+        public const string SessionDelete = "session/delete";
         public const string SessionList = "session/list";
         public const string SessionLoad = "session/load";
         public const string SessionNew = "session/new";

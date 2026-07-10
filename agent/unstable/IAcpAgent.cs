@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.13.3
+// Schema ref: refs/tags/schema-v1.19.0
 
 using dotacp.protocol.unstable;
 using System.Threading;
@@ -265,15 +265,6 @@ namespace dotacp.agent.unstable
         /// <param name="cancellationToken">A token that cancels request processing.</param>
         /// <returns>The response.</returns>
         Task<SetSessionModeResponse> SetSessionModeAsync(SetSessionModeRequest request,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Handles the protocol <c>session/set_model</c> request.
-        /// </summary>
-        /// <param name="request">The request payload.</param>
-        /// <param name="cancellationToken">A token that cancels request processing.</param>
-        /// <returns>The response.</returns>
-        Task<SetSessionModelResponse> SetSessionModelAsync(SetSessionModelRequest request,
             CancellationToken cancellationToken = default);
 
         /// <summary>

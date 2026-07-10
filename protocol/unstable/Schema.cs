@@ -1,5 +1,5 @@
 // Generated from schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.13.3
+// Schema ref: refs/tags/schema-v1.19.0
 
 #pragma warning disable CS1591
 
@@ -11,6 +11,31 @@ namespace dotacp.protocol.unstable
 {
     // Type aliases
 
+    /// <summary>
+    /// Typed identifier used for auth method values on the wire.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<AuthMethodId, string>))]
+    public readonly struct AuthMethodId : IEquatable<AuthMethodId>
+    {
+        private readonly string _value;
+
+        public AuthMethodId(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator AuthMethodId(string value) => new AuthMethodId(value);
+        public static implicit operator string(AuthMethodId alias) => alias._value;
+
+        public bool Equals(AuthMethodId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is AuthMethodId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Allowed wire representations for [`ElicitationContentValue`].
+    /// </summary>
     [JsonConverter(typeof(UnionTypeConverter<ElicitationContentValue>))]
     public readonly struct ElicitationContentValue : IEquatable<ElicitationContentValue>
     {
@@ -262,27 +287,45 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// A unique identifier for a model.
+    /// Unique identifier for a message within a session.
     /// </summary>
-    [JsonConverter(typeof(TypeAliasConverter<ModelId, string>))]
-    public readonly struct ModelId : IEquatable<ModelId>
+    [JsonConverter(typeof(TypeAliasConverter<MessageId, string>))]
+    public readonly struct MessageId : IEquatable<MessageId>
     {
         private readonly string _value;
 
-        public ModelId(string value)
+        public MessageId(string value)
         {
             _value = value;
         }
 
-        public static implicit operator ModelId(string value) => new ModelId(value);
-        public static implicit operator string(ModelId alias) => alias._value;
+        public static implicit operator MessageId(string value) => new MessageId(value);
+        public static implicit operator string(MessageId alias) => alias._value;
 
-        public bool Equals(ModelId other) => _value == other._value;
-        public override bool Equals(object obj) => obj is ModelId other && Equals(other);
+        public bool Equals(MessageId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is MessageId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Unique identifier for a next edit suggestion.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<NesSuggestionId, string>))]
+    public readonly struct NesSuggestionId : IEquatable<NesSuggestionId>
+    {
+        private readonly string _value;
+
+        public NesSuggestionId(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator NesSuggestionId(string value) => new NesSuggestionId(value);
+        public static implicit operator string(NesSuggestionId alias) => alias._value;
+
+        public bool Equals(NesSuggestionId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is NesSuggestionId other && Equals(other);
         public override int GetHashCode() => _value?.GetHashCode() ?? 0;
         public override string ToString() => _value?.ToString() ?? string.Empty;
     }
@@ -310,6 +353,32 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// Unique identifier for a plan within a session.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<PlanId, string>))]
+    public readonly struct PlanId : IEquatable<PlanId>
+    {
+        private readonly string _value;
+
+        public PlanId(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator PlanId(string value) => new PlanId(value);
+        public static implicit operator string(PlanId alias) => alias._value;
+
+        public bool Equals(PlanId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is PlanId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
     /// Protocol version identifier.
     ///
     /// This version is only bumped for breaking changes.
@@ -332,6 +401,32 @@ namespace dotacp.protocol.unstable
         public override bool Equals(object obj) => obj is ProtocolVersion other && Equals(other);
         public override int GetHashCode() => _value.GetHashCode();
         public override string ToString() => _value.ToString();
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// Unique identifier for a configurable LLM provider.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<ProviderId, string>))]
+    public readonly struct ProviderId : IEquatable<ProviderId>
+    {
+        private readonly string _value;
+
+        public ProviderId(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator ProviderId(string value) => new ProviderId(value);
+        public static implicit operator string(ProviderId alias) => alias._value;
+
+        public bool Equals(ProviderId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is ProviderId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
     }
 
     /// <summary>
@@ -507,6 +602,11 @@ namespace dotacp.protocol.unstable
         public static SessionConfigOptionCategory Model => new SessionConfigOptionCategory("model");
 
         /// <summary>
+        /// Model-related configuration parameter.
+        /// </summary>
+        public static SessionConfigOptionCategory ModelConfig => new SessionConfigOptionCategory("model_config");
+
+        /// <summary>
         /// Thought/reasoning level selector.
         /// </summary>
         public static SessionConfigOptionCategory ThoughtLevel => new SessionConfigOptionCategory("thought_level");
@@ -650,6 +750,28 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
+    /// Typed identifier used for terminal values on the wire.
+    /// </summary>
+    [JsonConverter(typeof(TypeAliasConverter<TerminalId, string>))]
+    public readonly struct TerminalId : IEquatable<TerminalId>
+    {
+        private readonly string _value;
+
+        public TerminalId(string value)
+        {
+            _value = value;
+        }
+
+        public static implicit operator TerminalId(string value) => new TerminalId(value);
+        public static implicit operator string(TerminalId alias) => alias._value;
+
+        public bool Equals(TerminalId other) => _value == other._value;
+        public override bool Equals(object obj) => obj is TerminalId other && Equals(other);
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
     /// Unique identifier for a tool call within a session.
     /// </summary>
     [JsonConverter(typeof(TypeAliasConverter<ToolCallId, string>))]
@@ -684,19 +806,6 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonEnumValue("object")]
         Object
-    }
-
-    /// <summary>
-    /// Items definition for untitled multi-select enum properties.
-    /// </summary>
-    [JsonConverter(typeof(JsonEnumMemberConverter<ElicitationStringType>))]
-    public enum ElicitationStringType
-    {
-        /// <summary>
-        /// String schema type.
-        /// </summary>
-        [JsonEnumValue("string")]
-        String
     }
 
     /// <summary>
@@ -735,11 +844,7 @@ namespace dotacp.protocol.unstable
         InternalError = -32603,
 
         /// <summary>
-        /// **Request cancelled**: **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// Execution of the method was aborted either due to a cancellation request from the caller or
+        /// **Request cancelled**: Execution of the method was aborted either due to a cancellation request from the caller or
         /// because of resource constraints or shutdown.
         /// </summary>
         RequestCancelled = -32800,
@@ -752,16 +857,7 @@ namespace dotacp.protocol.unstable
         /// <summary>
         /// **Resource not found**: A given resource, such as a file, was not found.
         /// </summary>
-        ResourceNotFound = -32002,
-
-        /// <summary>
-        /// **URL elicitation required**: **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// The agent requires user input via a URL-based elicitation before it can proceed.
-        /// </summary>
-        UrlElicitationRequired = -32042
+        ResourceNotFound = -32002
     }
 
     /// <summary>
@@ -974,9 +1070,15 @@ namespace dotacp.protocol.unstable
     [JsonConverter(typeof(JsonEnumMemberConverter<Role>))]
     public enum Role
     {
+        /// <summary>
+        /// The assistant side of a conversation.
+        /// </summary>
         [JsonEnumValue("assistant")]
         Assistant,
 
+        /// <summary>
+        /// The user side of a conversation.
+        /// </summary>
         [JsonEnumValue("user")]
         User
     }
@@ -1207,7 +1309,7 @@ namespace dotacp.protocol.unstable
         /// The ID of the accepted suggestion.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public NesSuggestionId Id { get; set; } = null!;
 
         /// <summary>
         /// The session ID for this notification.
@@ -1234,7 +1336,8 @@ namespace dotacp.protocol.unstable
         /// <summary>
         /// Whether the agent supports the logout method.
         ///
-        /// By supplying `{}` it means that the agent supports the logout method.
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports the logout method.
         /// </summary>
         [JsonProperty("logout")]
         public LogoutCapabilities Logout { get; set; }
@@ -1284,6 +1387,9 @@ namespace dotacp.protocol.unstable
         /// This capability is not part of the spec yet, and may be removed or changed at any point.
         ///
         /// NES (Next Edit Suggestions) capabilities supported by the agent.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support
+        /// for NES methods.
         /// </summary>
         [JsonProperty("nes")]
         public NesCapabilities Nes { get; set; }
@@ -1311,11 +1417,15 @@ namespace dotacp.protocol.unstable
         ///
         /// Provider configuration capabilities supported by the agent.
         ///
-        /// By supplying `{}` it means that the agent supports provider configuration methods.
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports provider configuration methods.
         /// </summary>
         [JsonProperty("providers")]
         public ProvidersCapabilities Providers { get; set; }
 
+        /// <summary>
+        /// Session lifecycle and prompt capabilities advertised by the agent.
+        /// </summary>
         [JsonProperty("sessionCapabilities")]
         public SessionCapabilities SessionCapabilities { get; set; }
     }
@@ -1335,12 +1445,21 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Intended recipients for this content, such as the user or assistant.
+        /// </summary>
         [JsonProperty("audience")]
         public Role[] Audience { get; set; }
 
+        /// <summary>
+        /// Timestamp indicating when the underlying resource was last modified.
+        /// </summary>
         [JsonProperty("lastModified")]
         public string LastModified { get; set; }
 
+        /// <summary>
+        /// Relative importance of this content when clients choose what to surface.
+        /// </summary>
         [JsonProperty("priority")]
         public double? Priority { get; set; }
     }
@@ -1363,12 +1482,21 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Base64-encoded media payload.
+        /// </summary>
         [JsonProperty("data")]
         public string Data { get; set; } = null!;
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; } = null!;
     }
@@ -1427,7 +1555,7 @@ namespace dotacp.protocol.unstable
         /// Must be one of the methods advertised in the initialize response.
         /// </summary>
         [JsonProperty("methodId")]
-        public string MethodId { get; set; } = null!;
+        public AuthMethodId MethodId { get; set; } = null!;
     }
 
     /// <summary>
@@ -1549,7 +1677,7 @@ namespace dotacp.protocol.unstable
         /// Unique identifier for this authentication method.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public AuthMethodId Id { get; set; } = null!;
 
         /// <summary>
         /// Human-readable name of the authentication method.
@@ -1592,7 +1720,7 @@ namespace dotacp.protocol.unstable
         /// Unique identifier for this authentication method.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public AuthMethodId Id { get; set; } = null!;
 
         /// <summary>
         /// Optional link to a page where the user can obtain their credentials.
@@ -1659,7 +1787,7 @@ namespace dotacp.protocol.unstable
         /// Unique identifier for this authentication method.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public AuthMethodId Id { get; set; } = null!;
 
         /// <summary>
         /// Human-readable name of the authentication method.
@@ -1753,23 +1881,57 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Base64-encoded bytes for a binary resource payload.
+        /// </summary>
         [JsonProperty("blob")]
         public string Blob { get; set; } = null!;
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; }
 
+        /// <summary>
+        /// URI associated with this resource or media payload.
+        /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; } = null!;
     }
 
     /// <summary>
+    /// Capabilities for boolean session configuration options.
+    ///
+    /// Supplying `{}` means the client supports boolean session configuration options.
+    /// </summary>
+    public class BooleanConfigOptionCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+    }
+
+    /// <summary>
     /// Schema for boolean properties in an elicitation form.
     /// </summary>
-    public class BooleanPropertySchema : ElicitationPropertySchema
+    public class BooleanPropertySchema
     {
-        [JsonProperty("type")]
-        public override string Type => "boolean";
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Default value.
@@ -1815,10 +1977,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Notification to cancel an ongoing request.
     ///
     /// See protocol docs: [Cancellation](https://agentclientprotocol.com/protocol/cancellation)
@@ -1881,6 +2039,9 @@ namespace dotacp.protocol.unstable
         ///
         /// Elicitation capabilities supported by the client.
         /// Determines which elicitation modes the agent may use.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise
+        /// elicitation support.
         /// </summary>
         [JsonProperty("elicitation")]
         public ElicitationCapabilities Elicitation { get; set; }
@@ -1898,9 +2059,25 @@ namespace dotacp.protocol.unstable
         /// This capability is not part of the spec yet, and may be removed or changed at any point.
         ///
         /// NES (Next Edit Suggestions) capabilities supported by the client.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise any
+        /// NES suggestion-kind extensions.
         /// </summary>
         [JsonProperty("nes")]
         public ClientNesCapabilities Nes { get; set; }
+
+        /// <summary>
+        /// **UNSTABLE**
+        ///
+        /// This capability is not part of the spec yet, and may be removed or changed at any point.
+        ///
+        /// Whether the client supports `plan_update` and `plan_removed` session updates.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise support.
+        /// Supplying `{}` means the client can receive both update types.
+        /// </summary>
+        [JsonProperty("plan")]
+        public PlanCapabilities Plan { get; set; }
 
         /// <summary>
         /// **UNSTABLE**
@@ -1911,6 +2088,15 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonProperty("positionEncodings")]
         public PositionEncodingKind[] PositionEncodings { get; set; }
+
+        /// <summary>
+        /// Session-related capabilities supported by the client.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise any
+        /// session-related extensions.
+        /// </summary>
+        [JsonProperty("session")]
+        public ClientSessionCapabilities Session { get; set; }
 
         /// <summary>
         /// Whether the Client support all `terminal/*` methods.
@@ -1951,6 +2137,31 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonProperty("searchAndReplace")]
         public NesSearchAndReplaceCapabilities SearchAndReplace { get; set; }
+    }
+
+    /// <summary>
+    /// Session-related capabilities supported by the client.
+    /// </summary>
+    public class ClientSessionCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Config option capabilities supported by the client.
+        ///
+        /// Omitted or `null` both mean the client does not advertise support for any
+        /// config option extensions.
+        /// </summary>
+        [JsonProperty("configOptions")]
+        public SessionConfigOptionsCapabilities ConfigOptions { get; set; }
     }
 
     /// <summary>
@@ -2111,8 +2322,8 @@ namespace dotacp.protocol.unstable
         /// <summary>
         /// The ACP MCP server ID that was provided by the component declaring the MCP server.
         /// </summary>
-        [JsonProperty("acpId")]
-        public McpServerAcpId AcpId { get; set; } = null!;
+        [JsonProperty("serverId")]
+        public McpServerAcpId ServerId { get; set; } = null!;
     }
 
     /// <summary>
@@ -2221,29 +2432,30 @@ namespace dotacp.protocol.unstable
         public ContentBlock Content { get; set; } = null!;
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// A unique identifier for the message this chunk belongs to.
         ///
         /// All chunks belonging to the same message share the same `messageId`.
         /// A change in `messageId` indicates a new message has started.
-        /// Both clients and agents MUST use UUID format for message IDs.
         /// </summary>
         [JsonProperty("messageId")]
-        public string MessageId { get; set; }
+        public MessageId MessageId { get; set; }
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Cost information for a session.
     /// </summary>
     public class Cost
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// Total cumulative cost for session.
         /// </summary>
@@ -2268,19 +2480,8 @@ namespace dotacp.protocol.unstable
     /// either via a form or by directing them to a URL.
     /// Elicitations are tied to a session (optionally a tool call) or a request.
     /// </summary>
-    [JsonConverter(typeof(DiscriminatorConverter<CreateElicitationRequest>))]
-    public abstract class CreateElicitationRequest
+    public class CreateElicitationRequest
     {
-        internal const string DiscriminatorPropertyName = "mode";
-        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
-        {
-            { "form", typeof(ElicitationFormMode) },
-            { "url", typeof(ElicitationUrlMode) }
-        };
-
-        [JsonProperty("mode")]
-        public abstract string Mode { get; }
-
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2296,6 +2497,9 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonProperty("message")]
         public string Message { get; set; } = null!;
+
+        [JsonProperty("mode")]
+        public string Mode { get; set; } = null!;
     }
 
     /// <summary>
@@ -2305,20 +2509,8 @@ namespace dotacp.protocol.unstable
     ///
     /// Response from the client to an elicitation request.
     /// </summary>
-    [JsonConverter(typeof(DiscriminatorConverter<CreateElicitationResponse>))]
-    public abstract class CreateElicitationResponse
+    public class CreateElicitationResponse
     {
-        internal const string DiscriminatorPropertyName = "action";
-        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
-        {
-            { "accept", typeof(ElicitationAcceptAction) },
-            { "cancel", typeof(CreateElicitationResponseCancel) },
-            { "decline", typeof(CreateElicitationResponseDecline) }
-        };
-
-        [JsonProperty("action")]
-        public abstract string Action { get; }
-
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
         /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
@@ -2328,24 +2520,9 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
-    }
 
-    /// <summary>
-    /// The user declined the elicitation.
-    /// </summary>
-    public class CreateElicitationResponseDecline : CreateElicitationResponse
-    {
         [JsonProperty("action")]
-        public override string Action => "decline";
-    }
-
-    /// <summary>
-    /// The elicitation was cancelled.
-    /// </summary>
-    public class CreateElicitationResponseCancel : CreateElicitationResponse
-    {
-        [JsonProperty("action")]
-        public override string Action => "cancel";
+        public string Action { get; set; } = null!;
     }
 
     /// <summary>
@@ -2376,7 +2553,7 @@ namespace dotacp.protocol.unstable
         public string Command { get; set; } = null!;
 
         /// <summary>
-        /// Working directory for the command (absolute path).
+        /// Working directory for the command. Must be an absolute path.
         /// </summary>
         [JsonProperty("cwd")]
         public string Cwd { get; set; }
@@ -2426,7 +2603,7 @@ namespace dotacp.protocol.unstable
         /// The unique identifier for the created terminal.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -2457,10 +2634,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Request parameters for deleting an existing session from `session/list`.
     ///
     /// Only available if the Agent supports the `sessionCapabilities.delete` capability.
@@ -2485,10 +2658,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Response from deleting a session.
     /// </summary>
     public class DeleteSessionResponse
@@ -2727,7 +2896,7 @@ namespace dotacp.protocol.unstable
         public string OldText { get; set; }
 
         /// <summary>
-        /// The file path being modified.
+        /// The absolute file path being modified.
         /// </summary>
         [JsonProperty("path")]
         public string Path { get; set; } = null!;
@@ -2753,10 +2922,10 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// Provider id to disable.
+        /// Provider ID to disable.
         /// </summary>
-        [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        [JsonProperty("providerId")]
+        public ProviderId ProviderId { get; set; } = null!;
     }
 
     /// <summary>
@@ -2832,11 +3001,8 @@ namespace dotacp.protocol.unstable
     ///
     /// The user accepted the elicitation and provided content.
     /// </summary>
-    public class ElicitationAcceptAction : CreateElicitationResponse
+    public class ElicitationAcceptAction
     {
-        [JsonProperty("action")]
-        public override string Action => "accept";
-
         /// <summary>
         /// The user-provided content, if any, as an object matching the requested schema.
         /// </summary>
@@ -2865,12 +3031,18 @@ namespace dotacp.protocol.unstable
 
         /// <summary>
         /// Whether the client supports form-based elicitation.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise support.
+        /// Supplying `{}` means the client supports form-based elicitation.
         /// </summary>
         [JsonProperty("form")]
         public ElicitationFormCapabilities Form { get; set; }
 
         /// <summary>
         /// Whether the client supports URL-based elicitation.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise support.
+        /// Supplying `{}` means the client supports URL-based elicitation.
         /// </summary>
         [JsonProperty("url")]
         public ElicitationUrlCapabilities Url { get; set; }
@@ -2882,6 +3054,8 @@ namespace dotacp.protocol.unstable
     /// This capability is not part of the spec yet, and may be removed or changed at any point.
     ///
     /// Form-based elicitation capabilities.
+    ///
+    /// Supplying `{}` means the client supports form-based elicitation.
     /// </summary>
     public class ElicitationFormCapabilities
     {
@@ -2922,21 +3096,10 @@ namespace dotacp.protocol.unstable
     /// Single-select enums use the `String` variant with `enum` or `oneOf` set.
     /// Multi-select enums use the `Array` variant.
     /// </summary>
-    [JsonConverter(typeof(DiscriminatorConverter<ElicitationPropertySchema>))]
-    public abstract class ElicitationPropertySchema
+    public class ElicitationPropertySchema
     {
-        internal const string DiscriminatorPropertyName = "type";
-        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
-        {
-            { "array", typeof(MultiSelectPropertySchema) },
-            { "boolean", typeof(BooleanPropertySchema) },
-            { "integer", typeof(IntegerPropertySchema) },
-            { "number", typeof(NumberPropertySchema) },
-            { "string", typeof(StringPropertySchema) }
-        };
-
         [JsonProperty("type")]
-        public abstract string Type { get; }
+        public string Type { get; set; } = null!;
     }
 
     /// <summary>
@@ -2968,6 +3131,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class ElicitationSchema
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// Optional description of what this schema represents.
         /// </summary>
@@ -3035,6 +3208,8 @@ namespace dotacp.protocol.unstable
     /// This capability is not part of the spec yet, and may be removed or changed at any point.
     ///
     /// URL-based elicitation capabilities.
+    ///
+    /// Supplying `{}` means the client supports URL-based elicitation.
     /// </summary>
     public class ElicitationUrlCapabilities
     {
@@ -3086,9 +3261,15 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Embedded resource payload, either text or binary data.
+        /// </summary>
         [JsonProperty("resource")]
         public EmbeddedResourceResource Resource { get; set; } = null!;
     }
@@ -3109,15 +3290,31 @@ namespace dotacp.protocol.unstable
 
 
     /// <summary>
-    /// A titled enum option with a const value and human-readable title.
+    /// A titled enum option with a const value, human-readable title, and optional description.
     /// </summary>
     public class EnumOption
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The constant value for this option.
         /// </summary>
         [JsonProperty("const")]
         public string Const { get; set; } = null!;
+
+        /// <summary>
+        /// Human-readable description.
+        /// </summary>
+        [JsonProperty("description")]
+        public string Description { get; set; }
 
         /// <summary>
         /// Human-readable title for this option.
@@ -3274,10 +3471,6 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// Additional workspace roots to activate for this session. Each path must be absolute.
         ///
         /// When omitted or empty, no additional roots are activated. When non-empty,
@@ -3288,7 +3481,7 @@ namespace dotacp.protocol.unstable
         public string[] AdditionalDirectories { get; set; }
 
         /// <summary>
-        /// The working directory for this session.
+        /// The working directory for this session. Must be an absolute path.
         /// </summary>
         [JsonProperty("cwd")]
         public string Cwd { get; set; } = null!;
@@ -3330,16 +3523,6 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonProperty("configOptions")]
         public SessionConfigOption[] ConfigOptions { get; set; }
-
-        /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// Initial model state if supported by the Agent
-        /// </summary>
-        [JsonProperty("models")]
-        public SessionModelState Models { get; set; }
 
         /// <summary>
         /// Initial mode state if supported by the Agent
@@ -3402,22 +3585,34 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Base64-encoded media payload.
+        /// </summary>
         [JsonProperty("data")]
         public string Data { get; set; } = null!;
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; } = null!;
 
+        /// <summary>
+        /// URI associated with this resource or media payload.
+        /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; }
     }
 
     /// <summary>
     /// Metadata about the implementation of the client or agent.
-    /// Describes the name and version of an MCP implementation, with an optional
+    /// Describes the name and version of an ACP implementation, with an optional
     /// title for UI representation.
     /// </summary>
     public class Implementation
@@ -3548,10 +3743,17 @@ namespace dotacp.protocol.unstable
     /// <summary>
     /// Schema for integer properties in an elicitation form.
     /// </summary>
-    public class IntegerPropertySchema : ElicitationPropertySchema
+    public class IntegerPropertySchema
     {
-        [JsonProperty("type")]
-        public override string Type => "integer";
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Default value.
@@ -3609,7 +3811,7 @@ namespace dotacp.protocol.unstable
         /// The ID of the terminal to kill.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -3753,10 +3955,6 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// Additional workspace roots to activate for this session. Each path must be absolute.
         ///
         /// When omitted or empty, no additional roots are activated. When non-empty,
@@ -3768,7 +3966,7 @@ namespace dotacp.protocol.unstable
         public string[] AdditionalDirectories { get; set; }
 
         /// <summary>
-        /// The working directory for this session.
+        /// The working directory for this session. Must be an absolute path.
         /// </summary>
         [JsonProperty("cwd")]
         public string Cwd { get; set; } = null!;
@@ -3808,16 +4006,6 @@ namespace dotacp.protocol.unstable
         public SessionConfigOption[] ConfigOptions { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// Initial model state if supported by the Agent
-        /// </summary>
-        [JsonProperty("models")]
-        public SessionModelState Models { get; set; }
-
-        /// <summary>
         /// Initial mode state if supported by the Agent
         ///
         /// See protocol docs: [Session Modes](https://agentclientprotocol.com/protocol/session-modes)
@@ -3829,7 +4017,7 @@ namespace dotacp.protocol.unstable
     /// <summary>
     /// Logout capabilities supported by the agent.
     ///
-    /// By supplying `{}` it means that the agent supports the logout method.
+    /// Supplying `{}` means the agent supports the logout method.
     /// </summary>
     public class LogoutCapabilities
     {
@@ -3969,19 +4157,19 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
+        /// Human-readable name identifying this MCP server.
+        /// </summary>
+        [JsonProperty("name")]
+        public string Name { get; set; } = null!;
+
+        /// <summary>
         /// Unique identifier for this MCP server, generated by the component providing it.
         ///
         /// Providers MUST NOT reuse an ID for multiple ACP-transport MCP servers that are visible
         /// on the same ACP connection.
         /// </summary>
-        [JsonProperty("id")]
-        public McpServerAcpId Id { get; set; } = null!;
-
-        /// <summary>
-        /// Human-readable name identifying this MCP server.
-        /// </summary>
-        [JsonProperty("name")]
-        public string Name { get; set; } = null!;
+        [JsonProperty("serverId")]
+        public McpServerAcpId ServerId { get; set; } = null!;
     }
 
     /// <summary>
@@ -4083,7 +4271,7 @@ namespace dotacp.protocol.unstable
         public string[] Args { get; set; } = null!;
 
         /// <summary>
-        /// Path to the MCP server executable.
+        /// Absolute path to the MCP server executable.
         /// </summary>
         [JsonProperty("command")]
         public string Command { get; set; } = null!;
@@ -4198,13 +4386,18 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// Information about a selectable model.
+    /// Items for a multi-select (array) property schema.
     /// </summary>
-    public class ModelInfo
+    public class MultiSelectItems
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; }
+    }
+
+    /// <summary>
+    /// Schema for multi-select (array) properties in an elicitation form.
+    /// </summary>
+    public class MultiSelectPropertySchema
     {
         /// <summary>
         /// The _meta property is reserved by ACP to allow clients and agents to attach additional
@@ -4215,48 +4408,6 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
-
-        /// <summary>
-        /// Optional description of the model.
-        /// </summary>
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Unique identifier for the model.
-        /// </summary>
-        [JsonProperty("modelId")]
-        public ModelId ModelId { get; set; } = null!;
-
-        /// <summary>
-        /// Human-readable name of the model.
-        /// </summary>
-        [JsonProperty("name")]
-        public string Name { get; set; } = null!;
-    }
-
-    /// <summary>
-    /// Items for a multi-select (array) property schema.
-    /// </summary>
-    [JsonConverter(typeof(ObjectUnionConverter<MultiSelectItems>))]
-    public abstract class MultiSelectItems
-    {
-        /// <summary>Variant types for union deserialization (no discriminator in JSON).</summary>
-        internal static readonly Type[] UnionVariantTypes = new Type[]
-        {
-            typeof(UntitledMultiSelectItems),
-            typeof(TitledMultiSelectItems),
-        };
-    }
-
-
-    /// <summary>
-    /// Schema for multi-select (array) properties in an elicitation form.
-    /// </summary>
-    public class MultiSelectPropertySchema : ElicitationPropertySchema
-    {
-        [JsonProperty("type")]
-        public override string Type => "array";
 
         /// <summary>
         /// Default selected values.
@@ -4380,6 +4531,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class NesDiagnostic
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The diagnostic message.
         /// </summary>
@@ -4581,6 +4742,16 @@ namespace dotacp.protocol.unstable
     public class NesEditHistoryEntry
     {
         /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
         /// A diff representing the edit.
         /// </summary>
         [JsonProperty("diff")]
@@ -4602,6 +4773,16 @@ namespace dotacp.protocol.unstable
         public override string Kind => "edit";
 
         /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
         /// Optional suggested cursor position after applying edits.
         /// </summary>
         [JsonProperty("cursorPosition")]
@@ -4617,7 +4798,7 @@ namespace dotacp.protocol.unstable
         /// Unique identifier for accept/reject tracking.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public NesSuggestionId Id { get; set; } = null!;
 
         /// <summary>
         /// The URI of the file to edit.
@@ -4653,6 +4834,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class NesExcerpt
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The end line of the excerpt (zero-based).
         /// </summary>
@@ -4697,10 +4888,20 @@ namespace dotacp.protocol.unstable
         public override string Kind => "jump";
 
         /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
         /// Unique identifier for accept/reject tracking.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public NesSuggestionId Id { get; set; } = null!;
 
         /// <summary>
         /// The target position within the file.
@@ -4720,6 +4921,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class NesOpenFile
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The language identifier.
         /// </summary>
@@ -4767,6 +4978,16 @@ namespace dotacp.protocol.unstable
     public class NesRecentFile
     {
         /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
         /// The language identifier.
         /// </summary>
         [JsonProperty("languageId")]
@@ -4812,6 +5033,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class NesRelatedSnippet
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The code excerpts.
         /// </summary>
@@ -4866,10 +5097,20 @@ namespace dotacp.protocol.unstable
         public override string Kind => "rename";
 
         /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
         /// Unique identifier for accept/reject tracking.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public NesSuggestionId Id { get; set; } = null!;
 
         /// <summary>
         /// The new name for the symbol.
@@ -4895,6 +5136,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class NesRepository
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The repository name.
         /// </summary>
@@ -4939,10 +5190,20 @@ namespace dotacp.protocol.unstable
         public override string Kind => "searchAndReplace";
 
         /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
         /// Unique identifier for accept/reject tracking.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public NesSuggestionId Id { get; set; } = null!;
 
         /// <summary>
         /// Whether `search` is a regular expression. Defaults to `false`.
@@ -5046,6 +5307,16 @@ namespace dotacp.protocol.unstable
     public class NesTextEdit
     {
         /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
         /// The replacement text.
         /// </summary>
         [JsonProperty("newText")]
@@ -5063,6 +5334,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class NesUserAction
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The kind of action (e.g., "insertChar", "cursorMovement").
         /// </summary>
@@ -5128,10 +5409,6 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// Additional workspace roots for this session. Each path must be absolute.
         ///
         /// These expand the session's filesystem scope without changing `cwd`, which
@@ -5178,16 +5455,6 @@ namespace dotacp.protocol.unstable
         public SessionConfigOption[] ConfigOptions { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// Initial model state if supported by the Agent
-        /// </summary>
-        [JsonProperty("models")]
-        public SessionModelState Models { get; set; }
-
-        /// <summary>
         /// Initial mode state if supported by the Agent
         ///
         /// See protocol docs: [Session Modes](https://agentclientprotocol.com/protocol/session-modes)
@@ -5207,10 +5474,17 @@ namespace dotacp.protocol.unstable
     /// <summary>
     /// Schema for number (floating-point) properties in an elicitation form.
     /// </summary>
-    public class NumberPropertySchema : ElicitationPropertySchema
+    public class NumberPropertySchema
     {
-        [JsonProperty("type")]
-        public override string Type => "number";
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Default value.
@@ -5312,6 +5586,26 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// Capabilities for receiving `plan_update` and `plan_removed` session updates.
+    /// </summary>
+    public class PlanCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+    }
+
+    /// <summary>
     /// A single entry in the execution plan.
     ///
     /// Represents a task or goal that the assistant intends to accomplish
@@ -5351,12 +5645,210 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// A plan represented by a file URI.
+    /// </summary>
+    public class PlanFile : PlanUpdateContent
+    {
+        [JsonProperty("type")]
+        public override string Type => "file";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The plan ID to update.
+        /// </summary>
+        [JsonProperty("planId")]
+        public PlanId PlanId { get; set; } = null!;
+
+        /// <summary>
+        /// The URI of the file containing the plan.
+        /// </summary>
+        [JsonProperty("uri")]
+        public string Uri { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// A plan represented as structured entries.
+    /// </summary>
+    public class PlanItems : PlanUpdateContent
+    {
+        [JsonProperty("type")]
+        public override string Type => "items";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The list of tasks to be accomplished.
+        ///
+        /// When updating an item-based plan, the agent must send a complete list of all entries
+        /// with their current status. The client replaces that plan with each update.
+        /// </summary>
+        [JsonProperty("entries")]
+        public PlanEntry[] Entries { get; set; } = null!;
+
+        /// <summary>
+        /// The plan ID to update.
+        /// </summary>
+        [JsonProperty("planId")]
+        public PlanId PlanId { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// A plan represented as raw markdown content.
+    /// </summary>
+    public class PlanMarkdown : PlanUpdateContent
+    {
+        [JsonProperty("type")]
+        public override string Type => "markdown";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Markdown content for the plan.
+        /// </summary>
+        [JsonProperty("content")]
+        public string Content { get; set; } = null!;
+
+        /// <summary>
+        /// The plan ID to update.
+        /// </summary>
+        [JsonProperty("planId")]
+        public PlanId PlanId { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// Removal notice for a plan identified by ID.
+    /// </summary>
+    public class PlanRemoved : SessionUpdate
+    {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "plan_removed";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The plan ID to remove.
+        /// </summary>
+        [JsonProperty("planId")]
+        public PlanId PlanId { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// A content update for a plan identified by ID.
+    /// </summary>
+    public class PlanUpdate : SessionUpdate
+    {
+        [JsonProperty("sessionUpdate")]
+        public override string SessionUpdateValue => "plan_update";
+
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// The updated plan content.
+        /// </summary>
+        [JsonProperty("plan")]
+        public PlanUpdateContent Plan { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// **UNSTABLE**
+    ///
+    /// This capability is not part of the spec yet, and may be removed or changed at any point.
+    ///
+    /// Updated content for a plan.
+    /// </summary>
+    [JsonConverter(typeof(DiscriminatorConverter<PlanUpdateContent>))]
+    public abstract class PlanUpdateContent
+    {
+        internal const string DiscriminatorPropertyName = "type";
+        internal static readonly Dictionary<string, Type> DiscriminatorMapping = new Dictionary<string, Type>(StringComparer.Ordinal)
+        {
+            { "file", typeof(PlanFile) },
+            { "items", typeof(PlanItems) },
+            { "markdown", typeof(PlanMarkdown) }
+        };
+
+        [JsonProperty("type")]
+        public abstract string Type { get; }
+    }
+
+    /// <summary>
     /// A zero-based position in a text document.
     ///
     /// The meaning of `character` depends on the negotiated position encoding.
     /// </summary>
     public class Position
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// Zero-based character offset (encoding-dependent).
         /// </summary>
@@ -5438,20 +5930,6 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// A client-generated unique identifier for this user message.
-        ///
-        /// If provided, the Agent SHOULD echo this value as `userMessageId` in the
-        /// [`PromptResponse`] to confirm it was recorded.
-        /// Both clients and agents MUST use UUID format for message IDs.
-        /// </summary>
-        [JsonProperty("messageId")]
-        public string MessageId { get; set; }
-
-        /// <summary>
         /// The blocks of content that compose the user's message.
         ///
         /// As a baseline, the Agent MUST support [`ContentBlock::Text`] and [`ContentBlock::ResourceLink`],
@@ -5508,20 +5986,6 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonProperty("usage")]
         public Usage Usage { get; set; }
-
-        /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// The acknowledged user message ID.
-        ///
-        /// If the client provided a `messageId` in the [`PromptRequest`], the agent echoes it here
-        /// to confirm it was recorded. If the client did not provide one, the agent MAY assign one
-        /// and return it here. Absence of this field indicates the agent did not record a message ID.
-        /// </summary>
-        [JsonProperty("userMessageId")]
-        public string UserMessageId { get; set; }
     }
 
     /// <summary>
@@ -5533,6 +5997,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class ProviderCurrentConfig
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// Protocol currently used by this provider.
         /// </summary>
@@ -5575,12 +6049,12 @@ namespace dotacp.protocol.unstable
         /// <summary>
         /// Provider identifier, for example "main" or "openai".
         /// </summary>
-        [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        [JsonProperty("providerId")]
+        public ProviderId ProviderId { get; set; } = null!;
 
         /// <summary>
         /// Whether this provider is mandatory and cannot be disabled via `providers/disable`.
-        /// If true, clients must not call `providers/disable` for this id.
+        /// If true, clients must not call `providers/disable` for this provider ID.
         /// </summary>
         [JsonProperty("required")]
         public bool Required { get; set; }
@@ -5599,7 +6073,7 @@ namespace dotacp.protocol.unstable
     ///
     /// Provider configuration capabilities supported by the agent.
     ///
-    /// By supplying `{}` it means that the agent supports provider configuration methods.
+    /// Supplying `{}` means the agent supports provider configuration methods.
     /// </summary>
     public class ProvidersCapabilities
     {
@@ -5619,6 +6093,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class Range
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The end position (exclusive).
         /// </summary>
@@ -5689,6 +6173,9 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Content payload returned by this response.
+        /// </summary>
         [JsonProperty("content")]
         public string Content { get; set; } = null!;
     }
@@ -5712,7 +6199,7 @@ namespace dotacp.protocol.unstable
         /// The ID of the rejected suggestion.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        public NesSuggestionId Id { get; set; } = null!;
 
         /// <summary>
         /// The reason for rejection.
@@ -5752,7 +6239,7 @@ namespace dotacp.protocol.unstable
         /// The ID of the terminal to release.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -5881,24 +6368,45 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Optional human-readable details shown with this protocol object.
+        /// </summary>
         [JsonProperty("description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; }
 
+        /// <summary>
+        /// Human-readable name shown for this protocol object.
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; } = null!;
 
+        /// <summary>
+        /// Optional size of the linked resource in bytes, if known.
+        /// </summary>
         [JsonProperty("size")]
         public long? Size { get; set; }
 
+        /// <summary>
+        /// Optional display title for end-user UI.
+        /// </summary>
         [JsonProperty("title")]
         public string Title { get; set; }
 
+        /// <summary>
+        /// URI associated with this resource or media payload.
+        /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; } = null!;
     }
@@ -5924,10 +6432,6 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// Additional workspace roots to activate for this session. Each path must be absolute.
         ///
         /// When omitted or empty, no additional roots are activated. When non-empty,
@@ -5939,7 +6443,7 @@ namespace dotacp.protocol.unstable
         public string[] AdditionalDirectories { get; set; }
 
         /// <summary>
-        /// The working directory for this session.
+        /// The working directory for this session. Must be an absolute path.
         /// </summary>
         [JsonProperty("cwd")]
         public string Cwd { get; set; } = null!;
@@ -5979,16 +6483,6 @@ namespace dotacp.protocol.unstable
         public SessionConfigOption[] ConfigOptions { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
-        /// Initial model state if supported by the Agent
-        /// </summary>
-        [JsonProperty("models")]
-        public SessionModelState Models { get; set; }
-
-        /// <summary>
         /// Initial mode state if supported by the Agent
         ///
         /// See protocol docs: [Session Modes](https://agentclientprotocol.com/protocol/session-modes)
@@ -6023,14 +6517,10 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Capabilities for additional session directories support.
     ///
-    /// By supplying `{}` it means that the agent supports the `additionalDirectories`
-    /// field on supported session lifecycle requests. Agents that also support
+    /// Supplying `{}` means the agent supports the `additionalDirectories` field on
+    /// supported session lifecycle requests. Agents that also support
     /// `session/list` may return `SessionInfo.additionalDirectories` to report the
     /// complete ordered additional-root list associated with a listed session.
     /// </summary>
@@ -6071,11 +6561,11 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// Whether the agent supports `additionalDirectories` on supported session lifecycle requests.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports `additionalDirectories` on
+        /// supported session lifecycle requests.
         ///
         /// Agents that also support `session/list` may return
         /// `SessionInfo.additionalDirectories` to report the complete ordered
@@ -6086,15 +6576,14 @@ namespace dotacp.protocol.unstable
 
         /// <summary>
         /// Whether the agent supports `session/close`.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports closing sessions.
         /// </summary>
         [JsonProperty("close")]
         public SessionCloseCapabilities Close { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// Whether the agent supports `session/delete`.
         ///
         /// Optional. Omitted or `null` both mean the agent does not advertise support.
@@ -6109,18 +6598,27 @@ namespace dotacp.protocol.unstable
         /// This capability is not part of the spec yet, and may be removed or changed at any point.
         ///
         /// Whether the agent supports `session/fork`.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports forking sessions.
         /// </summary>
         [JsonProperty("fork")]
         public SessionForkCapabilities Fork { get; set; }
 
         /// <summary>
         /// Whether the agent supports `session/list`.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports listing sessions.
         /// </summary>
         [JsonProperty("list")]
         public SessionListCapabilities List { get; set; }
 
         /// <summary>
         /// Whether the agent supports `session/resume`.
+        ///
+        /// Optional. Omitted or `null` both mean the agent does not advertise support.
+        /// Supplying `{}` means the agent supports resuming sessions.
         /// </summary>
         [JsonProperty("resume")]
         public SessionResumeCapabilities Resume { get; set; }
@@ -6129,7 +6627,7 @@ namespace dotacp.protocol.unstable
     /// <summary>
     /// Capabilities for the `session/close` method.
     ///
-    /// By supplying `{}` it means that the agent supports closing of sessions.
+    /// Supplying `{}` means the agent supports closing sessions.
     /// </summary>
     public class SessionCloseCapabilities
     {
@@ -6145,10 +6643,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// A boolean on/off toggle session configuration option payload.
     /// </summary>
     public class SessionConfigBoolean : SessionConfigOption
@@ -6212,6 +6706,33 @@ namespace dotacp.protocol.unstable
         /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// Session configuration option capabilities supported by the client.
+    /// </summary>
+    public class SessionConfigOptionsCapabilities
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Whether the client supports boolean session configuration options.
+        ///
+        /// Optional. Omitted or `null` both mean the client does not advertise support.
+        /// Supplying `{}` means agents may include `type: "boolean"` entries in
+        /// `configOptions`, and the client may send `session/set_config_option`
+        /// requests with `type: "boolean"` and a boolean `value`.
+        /// </summary>
+        [JsonProperty("boolean")]
+        public BooleanConfigOptionCapabilities Boolean { get; set; }
     }
 
     /// <summary>
@@ -6304,10 +6825,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Capabilities for the `session/delete` method.
     ///
     /// Supplying `{}` means the agent supports deleting sessions from `session/list`.
@@ -6332,7 +6849,7 @@ namespace dotacp.protocol.unstable
     ///
     /// Capabilities for the `session/fork` method.
     ///
-    /// By supplying `{}` it means that the agent supports forking of sessions.
+    /// Supplying `{}` means the agent supports forking sessions.
     /// </summary>
     public class SessionForkCapabilities
     {
@@ -6363,10 +6880,6 @@ namespace dotacp.protocol.unstable
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// Additional workspace roots reported for this session. Each path must be absolute.
         ///
         /// When present, this is the complete ordered additional-root list reported
@@ -6438,7 +6951,7 @@ namespace dotacp.protocol.unstable
     /// <summary>
     /// Capabilities for the `session/list` method.
     ///
-    /// By supplying `{}` it means that the agent supports listing of sessions.
+    /// Supplying `{}` means the agent supports listing sessions.
     /// </summary>
     public class SessionListCapabilities
     {
@@ -6470,46 +6983,23 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional human-readable details shown with this protocol object.
+        /// </summary>
         [JsonProperty("description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// Stable identifier used to refer to this protocol object in later messages.
+        /// </summary>
         [JsonProperty("id")]
         public SessionModeId Id { get; set; }
 
+        /// <summary>
+        /// Human-readable name shown for this protocol object.
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; } = null!;
-    }
-
-    /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// The set of models and the one currently active.
-    /// </summary>
-    public class SessionModelState
-    {
-        /// <summary>
-        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
-        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
-        /// these keys.
-        ///
-        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
-        /// </summary>
-        [JsonProperty("_meta")]
-        public Dictionary<string, object> Meta { get; set; }
-
-        /// <summary>
-        /// The set of models that the Agent can use
-        /// </summary>
-        [JsonProperty("availableModels")]
-        public ModelInfo[] AvailableModels { get; set; } = null!;
-
-        /// <summary>
-        /// The current model the Agent is in.
-        /// </summary>
-        [JsonProperty("currentModelId")]
-        public ModelId CurrentModelId { get; set; } = null!;
     }
 
     /// <summary>
@@ -6575,7 +7065,7 @@ namespace dotacp.protocol.unstable
     /// <summary>
     /// Capabilities for the `session/resume` method.
     ///
-    /// By supplying `{}` it means that the agent supports resuming of sessions.
+    /// Supplying `{}` means the agent supports resuming sessions.
     /// </summary>
     public class SessionResumeCapabilities
     {
@@ -6609,6 +7099,8 @@ namespace dotacp.protocol.unstable
             { "config_option_update", typeof(ConfigOptionUpdate) },
             { "current_mode_update", typeof(CurrentModeUpdate) },
             { "plan", typeof(Plan) },
+            { "plan_removed", typeof(PlanRemoved) },
+            { "plan_update", typeof(PlanUpdate) },
             { "session_info_update", typeof(SessionInfoUpdate) },
             { "tool_call", typeof(ToolCall) },
             { "tool_call_update", typeof(SessionUpdateToolCallUpdate) },
@@ -6645,18 +7137,13 @@ namespace dotacp.protocol.unstable
         public ContentBlock Content { get; set; } = null!;
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// A unique identifier for the message this chunk belongs to.
         ///
         /// All chunks belonging to the same message share the same `messageId`.
         /// A change in `messageId` indicates a new message has started.
-        /// Both clients and agents MUST use UUID format for message IDs.
         /// </summary>
         [JsonProperty("messageId")]
-        public string MessageId { get; set; }
+        public MessageId MessageId { get; set; }
     }
 
     /// <summary>
@@ -6684,18 +7171,13 @@ namespace dotacp.protocol.unstable
         public ContentBlock Content { get; set; } = null!;
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// A unique identifier for the message this chunk belongs to.
         ///
         /// All chunks belonging to the same message share the same `messageId`.
         /// A change in `messageId` indicates a new message has started.
-        /// Both clients and agents MUST use UUID format for message IDs.
         /// </summary>
         [JsonProperty("messageId")]
-        public string MessageId { get; set; }
+        public MessageId MessageId { get; set; }
     }
 
     /// <summary>
@@ -6723,18 +7205,13 @@ namespace dotacp.protocol.unstable
         public ContentBlock Content { get; set; } = null!;
 
         /// <summary>
-        /// **UNSTABLE**
-        ///
-        /// This capability is not part of the spec yet, and may be removed or changed at any point.
-        ///
         /// A unique identifier for the message this chunk belongs to.
         ///
         /// All chunks belonging to the same message share the same `messageId`.
         /// A change in `messageId` indicates a new message has started.
-        /// Both clients and agents MUST use UUID format for message IDs.
         /// </summary>
         [JsonProperty("messageId")]
-        public string MessageId { get; set; }
+        public MessageId MessageId { get; set; }
     }
 
     /// <summary>
@@ -6811,7 +7288,7 @@ namespace dotacp.protocol.unstable
     ///
     /// Request parameters for `providers/set`.
     ///
-    /// Replaces the full configuration for one provider id.
+    /// Replaces the full configuration for one provider ID.
     /// </summary>
     public class SetProviderRequest
     {
@@ -6845,10 +7322,10 @@ namespace dotacp.protocol.unstable
         public object Headers { get; set; }
 
         /// <summary>
-        /// Provider id to configure.
+        /// Provider ID to configure.
         /// </summary>
-        [JsonProperty("id")]
-        public string Id { get; set; } = null!;
+        [JsonProperty("providerId")]
+        public ProviderId ProviderId { get; set; } = null!;
     }
 
     /// <summary>
@@ -6989,58 +7466,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// Request parameters for setting a session model.
-    /// </summary>
-    public class SetSessionModelRequest
-    {
-        /// <summary>
-        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
-        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
-        /// these keys.
-        ///
-        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
-        /// </summary>
-        [JsonProperty("_meta")]
-        public Dictionary<string, object> Meta { get; set; }
-
-        /// <summary>
-        /// The ID of the model to set.
-        /// </summary>
-        [JsonProperty("modelId")]
-        public ModelId ModelId { get; set; } = null!;
-
-        /// <summary>
-        /// The ID of the session to set the model for.
-        /// </summary>
-        [JsonProperty("sessionId")]
-        public SessionId SessionId { get; set; }
-    }
-
-    /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
-    /// Response to `session/set_model` method.
-    /// </summary>
-    public class SetSessionModelResponse
-    {
-        /// <summary>
-        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
-        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
-        /// these keys.
-        ///
-        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
-        /// </summary>
-        [JsonProperty("_meta")]
-        public Dictionary<string, object> Meta { get; set; }
-    }
-
-    /// <summary>
     /// Request parameters for setting a session mode.
     /// </summary>
     public class SetSessionModeRequest
@@ -7141,15 +7566,44 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
+    /// String item schema for multi-select enum properties.
+    /// </summary>
+    public class StringMultiSelectItems
+    {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
+        /// <summary>
+        /// Allowed enum values.
+        /// </summary>
+        [JsonProperty("enum")]
+        public string[] Enum { get; set; } = null!;
+    }
+
+    /// <summary>
     /// Schema for string properties in an elicitation form.
     ///
     /// When `enum` or `oneOf` is set, this represents a single-select enum
     /// with `"type": "string"`.
     /// </summary>
-    public class StringPropertySchema : ElicitationPropertySchema
+    public class StringPropertySchema
     {
-        [JsonProperty("type")]
-        public override string Type => "string";
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Default value.
@@ -7308,8 +7762,11 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Identifier of the terminal instance to embed in the content stream.
+        /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -7365,7 +7822,7 @@ namespace dotacp.protocol.unstable
         /// The ID of the terminal to get output from.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -7420,9 +7877,15 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Optional annotations that help clients decide how to display or route this content.
+        /// </summary>
         [JsonProperty("annotations")]
         public Annotations Annotations { get; set; }
 
+        /// <summary>
+        /// Text payload carried by this content block.
+        /// </summary>
         [JsonProperty("text")]
         public string Text { get; set; } = null!;
     }
@@ -7435,6 +7898,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class TextDocumentContentChangeEvent
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The range of the document that changed. If `None`, the entire content is replaced.
         /// </summary>
@@ -7467,12 +7940,21 @@ namespace dotacp.protocol.unstable
         [JsonProperty("_meta")]
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// MIME type describing the encoded media payload.
+        /// </summary>
         [JsonProperty("mimeType")]
         public string MimeType { get; set; }
 
+        /// <summary>
+        /// Text payload carried by this content block.
+        /// </summary>
         [JsonProperty("text")]
         public string Text { get; set; } = null!;
 
+        /// <summary>
+        /// URI associated with this resource or media payload.
+        /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; } = null!;
     }
@@ -7480,11 +7962,17 @@ namespace dotacp.protocol.unstable
     /// <summary>
     /// Items definition for titled multi-select enum properties.
     /// </summary>
-    public class TitledMultiSelectItems : MultiSelectItems
+    public class TitledMultiSelectItems
     {
-        /// <summary>Required JSON keys for union variant matching (no discriminator).</summary>
-
-        internal static readonly string[] UnionVariantRequiredJsonKeys = new string[] { "anyOf" };
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>
         /// Titled enum options.
@@ -7617,7 +8105,7 @@ namespace dotacp.protocol.unstable
         public uint? Line { get; set; }
 
         /// <summary>
-        /// The file path being accessed or modified.
+        /// The absolute file path being accessed or modified.
         /// </summary>
         [JsonProperty("path")]
         public string Path { get; set; } = null!;
@@ -7715,28 +8203,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// Items definition for untitled multi-select enum properties.
-    /// </summary>
-    public class UntitledMultiSelectItems : MultiSelectItems
-    {
-        /// <summary>Required JSON keys for union variant matching (no discriminator).</summary>
-
-        internal static readonly string[] UnionVariantRequiredJsonKeys = new string[] { "type", "enum" };
-
-        /// <summary>
-        /// Allowed enum values.
-        /// </summary>
-        [JsonProperty("enum")]
-        public string[] Enum { get; set; } = null!;
-
-        /// <summary>
-        /// Item type discriminator. Must be `"string"`.
-        /// </summary>
-        [JsonProperty("type")]
-        public ElicitationStringType Type { get; set; }
-    }
-
-    /// <summary>
     /// **UNSTABLE**
     ///
     /// This capability is not part of the spec yet, and may be removed or changed at any point.
@@ -7745,6 +8211,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class Usage
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// Total cache read tokens.
         /// </summary>
@@ -7783,10 +8259,6 @@ namespace dotacp.protocol.unstable
     }
 
     /// <summary>
-    /// **UNSTABLE**
-    ///
-    /// This capability is not part of the spec yet, and may be removed or changed at any point.
-    ///
     /// Context window and cost update for a session.
     /// </summary>
     public class UsageUpdate : SessionUpdate
@@ -7848,7 +8320,7 @@ namespace dotacp.protocol.unstable
         /// The ID of the terminal to wait for.
         /// </summary>
         [JsonProperty("terminalId")]
-        public string TerminalId { get; set; } = null!;
+        public TerminalId TerminalId { get; set; } = null!;
     }
 
     /// <summary>
@@ -7884,6 +8356,16 @@ namespace dotacp.protocol.unstable
     /// </summary>
     public class WorkspaceFolder
     {
+        /// <summary>
+        /// The _meta property is reserved by ACP to allow clients and agents to attach additional
+        /// metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        /// these keys.
+        ///
+        /// See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/extensibility)
+        /// </summary>
+        [JsonProperty("_meta")]
+        public Dictionary<string, object> Meta { get; set; }
+
         /// <summary>
         /// The display name of the folder.
         /// </summary>

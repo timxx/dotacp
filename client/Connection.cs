@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.13.3
+// Schema ref: refs/tags/schema-v1.19.0
 
 using dotacp.protocol;
 using dotacp.shared;
@@ -142,6 +142,20 @@ namespace dotacp.client
         {
             return SendRequestAsync<CloseSessionRequest, CloseSessionResponse>(
                 AgentMethods.SessionClose, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Calls the agent <c>session/delete</c> method.
+        /// </summary>
+        /// <param name="request">The request payload.</param>
+        /// <param name="cancellationToken">A token that cancels the operation.</param>
+        /// <returns>The response.</returns>
+        public Task<DeleteSessionResponse> DeleteAsync(
+            DeleteSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return SendRequestAsync<DeleteSessionRequest, DeleteSessionResponse>(
+                AgentMethods.SessionDelete, request, cancellationToken);
         }
 
         /// <summary>

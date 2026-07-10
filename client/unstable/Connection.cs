@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.13.3
+// Schema ref: refs/tags/schema-v1.19.0
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -443,20 +443,6 @@ namespace dotacp.client.unstable
         {
             return SendRequestAsync<SetSessionModeRequest, SetSessionModeResponse>(
                 AgentMethods.SessionSetMode, request, cancellationToken);
-        }
-
-        /// <summary>
-        /// Calls the agent <c>session/set_model</c> method.
-        /// </summary>
-        /// <param name="request">The request payload.</param>
-        /// <param name="cancellationToken">A token that cancels the operation.</param>
-        /// <returns>The response.</returns>
-        public Task<SetSessionModelResponse> SetSessionModelAsync(
-            SetSessionModelRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return SendRequestAsync<SetSessionModelRequest, SetSessionModelResponse>(
-                AgentMethods.SessionSetModel, request, cancellationToken);
         }
 
         /// <summary>

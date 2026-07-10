@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.13.3
+// Schema ref: refs/tags/schema-v1.19.0
 
 using dotacp.protocol;
 using dotacp.shared;
@@ -56,6 +56,14 @@ namespace dotacp.agent
             CancellationToken cancellationToken = default)
         {
             return _agent.CloseAsync(request, cancellationToken);
+        }
+
+        [JsonRpcMethod(AgentMethods.SessionDelete, UseSingleObjectParameterDeserialization = true)]
+        public Task<DeleteSessionResponse> DeleteAsync(
+            DeleteSessionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return _agent.DeleteAsync(request, cancellationToken);
         }
 
         [JsonRpcMethod(AgentMethods.SessionList, UseSingleObjectParameterDeserialization = true)]

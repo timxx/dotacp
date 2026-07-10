@@ -1,5 +1,5 @@
 // Generated from schema/meta.json and schema/schema.json. Do not edit by hand.
-// Schema ref: refs/tags/v0.13.3
+// Schema ref: refs/tags/schema-v1.19.0
 
 using dotacp.protocol.unstable;
 using dotacp.shared;
@@ -232,14 +232,6 @@ namespace dotacp.agent.unstable
             CancellationToken cancellationToken = default)
         {
             return _agent.SetSessionModeAsync(request, cancellationToken);
-        }
-
-        [JsonRpcMethod(AgentMethods.SessionSetModel, UseSingleObjectParameterDeserialization = true)]
-        public Task<SetSessionModelResponse> SetSessionModelAsync(
-            SetSessionModelRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return _agent.SetSessionModelAsync(request, cancellationToken);
         }
 
         [JsonRpcMethod("__acp_ext_method__", UseSingleObjectParameterDeserialization = true)]
