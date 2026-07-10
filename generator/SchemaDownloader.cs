@@ -39,9 +39,9 @@ namespace dotacp.generator
             }
 
             // Check if it's a version number (with or without 'v' prefix)
-            if (Regex.IsMatch(version, @"^v?\d+\.\d+\.\d+$"))
+            if (Regex.IsMatch(version, @"^(schema-)?v?\d+\.\d+\.\d+$"))
             {
-                if (!version.StartsWith("v"))
+                if (!version.StartsWith("schema-") && !version.StartsWith("v"))
                 {
                     version = "v" + version;
                 }
@@ -89,7 +89,7 @@ namespace dotacp.generator
             var variant = unstable ? "unstable" : "stable";
             Console.WriteLine($"  Fetching {variant} schema from: {repository}@{refDisplay}");
 
-            var baseUrl = $"https://raw.githubusercontent.com/{repository}/{gitRef}/schema";
+            var baseUrl = $"https://raw.githubusercontent.com/{repository}/{gitRef}/schema/v1";
             var schemaUrl = unstable ? $"{baseUrl}/schema.unstable.json" : $"{baseUrl}/schema.json";
             var metaUrl = unstable ? $"{baseUrl}/meta.unstable.json" : $"{baseUrl}/meta.json";
 
