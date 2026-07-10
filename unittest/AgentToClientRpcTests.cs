@@ -492,7 +492,7 @@ namespace dotacp.unittest
                 Assert.AreEqual((ulong)1024, pair.Client.LastCreateTerminalRequest.OutputByteLimit);
 
                 Assert.IsNotNull(response);
-                Assert.AreEqual("term-abc-123", response.TerminalId);
+                Assert.AreEqual("term-abc-123", response.TerminalId.ToString());
                 Assert.AreEqual("True", response.Meta["created"].ToString());
             }
         }
@@ -518,7 +518,7 @@ namespace dotacp.unittest
 
                 Assert.IsNotNull(pair.Client.LastKillTerminalRequest);
                 Assert.AreEqual("session-1", (string)pair.Client.LastKillTerminalRequest!.SessionId);
-                Assert.AreEqual("term-1", pair.Client.LastKillTerminalRequest.TerminalId);
+                Assert.AreEqual("term-1", pair.Client.LastKillTerminalRequest.TerminalId.ToString());
                 Assert.AreEqual("kill-1", pair.Client.LastKillTerminalRequest.Meta["traceId"].ToString());
 
                 Assert.IsNotNull(response);
@@ -550,7 +550,7 @@ namespace dotacp.unittest
 
                 Assert.IsNotNull(pair.Client.LastTerminalOutputRequest);
                 Assert.AreEqual("session-1", (string)pair.Client.LastTerminalOutputRequest!.SessionId);
-                Assert.AreEqual("term-1", pair.Client.LastTerminalOutputRequest.TerminalId);
+                Assert.AreEqual("term-1", pair.Client.LastTerminalOutputRequest.TerminalId.ToString());
                 Assert.AreEqual("term-out-1", pair.Client.LastTerminalOutputRequest.Meta["traceId"].ToString());
 
                 Assert.IsNotNull(response);
@@ -580,7 +580,7 @@ namespace dotacp.unittest
 
                 Assert.IsNotNull(pair.Client.LastReleaseTerminalRequest);
                 Assert.AreEqual("session-1", (string)pair.Client.LastReleaseTerminalRequest!.SessionId);
-                Assert.AreEqual("term-1", pair.Client.LastReleaseTerminalRequest.TerminalId);
+                Assert.AreEqual("term-1", pair.Client.LastReleaseTerminalRequest.TerminalId.ToString());
                 Assert.AreEqual("release-1", pair.Client.LastReleaseTerminalRequest.Meta["traceId"].ToString());
 
                 Assert.IsNotNull(response);
@@ -610,7 +610,7 @@ namespace dotacp.unittest
 
                 Assert.IsNotNull(pair.Client.LastWaitForTerminalExitRequest);
                 Assert.AreEqual("session-1", (string)pair.Client.LastWaitForTerminalExitRequest!.SessionId);
-                Assert.AreEqual("term-1", pair.Client.LastWaitForTerminalExitRequest.TerminalId);
+                Assert.AreEqual("term-1", pair.Client.LastWaitForTerminalExitRequest.TerminalId.ToString());
                 Assert.AreEqual("wait-exit-1", pair.Client.LastWaitForTerminalExitRequest.Meta["traceId"].ToString());
 
                 Assert.IsNotNull(response);

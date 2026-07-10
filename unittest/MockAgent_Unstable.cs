@@ -39,7 +39,6 @@ namespace dotacp.unittest
         public ResumeSessionRequest? LastResumeSessionRequest { get; private set; }
         public SetSessionConfigOptionRequest? LastSetSessionConfigOptionRequest { get; private set; }
         public SetSessionModeRequest? LastSetSessionModeRequest { get; private set; }
-        public SetSessionModelRequest? LastSetSessionModelRequest { get; private set; }
         public CloseSessionRequest? LastCloseSessionRequest { get; private set; }
         public string? LastExtMethodName { get; private set; }
         public object? LastExtMethodRequest { get; private set; }
@@ -64,7 +63,6 @@ namespace dotacp.unittest
         public ResumeSessionResponse ResumeSessionResponseToReturn { get; set; } = new ResumeSessionResponse();
         public SetSessionConfigOptionResponse SetSessionConfigOptionResponseToReturn { get; set; } = new SetSessionConfigOptionResponse { ConfigOptions = new SessionConfigOption[0] };
         public SetSessionModeResponse SetSessionModeResponseToReturn { get; set; } = new SetSessionModeResponse();
-        public SetSessionModelResponse SetSessionModelResponseToReturn { get; set; } = new SetSessionModelResponse();
         public CloseSessionResponse CloseSessionResponseToReturn { get; set; } = new CloseSessionResponse();
         public object ExtMethodResponseToReturn { get; set; } = new object();
 
@@ -237,12 +235,6 @@ namespace dotacp.unittest
         {
             LastSetSessionModeRequest = request;
             return Task.FromResult(SetSessionModeResponseToReturn);
-        }
-
-        public Task<SetSessionModelResponse> SetSessionModelAsync(SetSessionModelRequest request, CancellationToken cancellationToken = default)
-        {
-            LastSetSessionModelRequest = request;
-            return Task.FromResult(SetSessionModelResponseToReturn);
         }
 
         public Task<CloseSessionResponse> CloseAsync(CloseSessionRequest request, CancellationToken cancellationToken = default)

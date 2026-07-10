@@ -272,17 +272,6 @@ namespace agentcli
             return Task.FromResult(new ResumeSessionResponse());
         }
 
-        public Task<SetSessionModelResponse> SetSessionModelAsync(SetSessionModelRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            if (!_sessions.TryGetValue(request.SessionId, out var session))
-            {
-                throw new InvalidOperationException($"Session {request.SessionId} not found.");
-            }
-
-            return Task.FromResult(new SetSessionModelResponse());
-        }
-
         public Task<object> ExtMethodAsync(string method, object request,
             CancellationToken cancellationToken = default)
         {

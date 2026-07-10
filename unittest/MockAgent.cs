@@ -152,5 +152,10 @@ namespace dotacp.unittest
         {
             throw new System.NotImplementedException();
         }
+
+        public Task<DeleteSessionResponse> DeleteAsync(DeleteSessionRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

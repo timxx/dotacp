@@ -28,7 +28,7 @@ namespace dotacp.unittest
                 });
 
                 Assert.IsNotNull(pair.Agent.LastAuthenticateRequest);
-                Assert.AreEqual("oauth2", pair.Agent.LastAuthenticateRequest!.MethodId);
+                Assert.AreEqual("oauth2", pair.Agent.LastAuthenticateRequest!.MethodId.ToString());
                 Assert.IsNotNull(response);
                 Assert.AreEqual("abc123", response.Meta["token"].ToString());
             }

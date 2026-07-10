@@ -76,6 +76,9 @@ namespace clientcli
             Console.WriteLine($"Session: {session.SessionId}");
 
             bool hasModels = false;
+            bool hasModes = false;
+#if false
+            // TODO: update to config
             if (session.Models != null)
             {
                 Console.WriteLine("Available models:");
@@ -85,7 +88,6 @@ namespace clientcli
                 Console.WriteLine("Current model: " + session.Models.CurrentModelId);
             }
 
-            bool hasModes = false;
             if (session.Modes != null)
             {
                 Console.WriteLine("Available modes:");
@@ -96,6 +98,7 @@ namespace clientcli
                 Console.WriteLine($"Current mode: {session.Modes.CurrentModeId}");
                 hasModes = session.Modes.AvailableModes.Length > 0;
             }
+#endif
 
             try
             {
@@ -162,6 +165,8 @@ namespace clientcli
                     continue;
                 }
 
+#if false
+                // TODO
                 if (hasModels && input.StartsWith("/switchmodel "))
                 {
                     var modelId = input.Split(' ')[1].Trim();
@@ -172,6 +177,7 @@ namespace clientcli
                     });
                     continue;
                 }
+#endif
 
                 if (capabilities.LoadSession && input.StartsWith("/loadsession "))
                 {

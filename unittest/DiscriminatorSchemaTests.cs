@@ -198,7 +198,7 @@ namespace dotacp.unittest
             Assert.IsNotNull(method);
             Assert.IsInstanceOfType(method, typeof(AuthMethodAgent));
             var agent = (AuthMethodAgent)method;
-            Assert.AreEqual("oauth", agent.Id);
+            Assert.AreEqual("oauth", agent.Id.ToString());
             Assert.AreEqual("OAuth 2.0", agent.Name);
             Assert.AreEqual("Browser-based OAuth flow", agent.Description);
             Assert.AreEqual("agent", agent.Type);

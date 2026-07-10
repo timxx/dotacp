@@ -1,5 +1,6 @@
 using dotacp.client.unstable;
 using dotacp.protocol.unstable;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ namespace dotacp.unittest
         public object? LastExtNotificationPayload { get; private set; }
 
         // Responses to return
-        public CreateElicitationResponse CreateElicitationResponseToReturn { get; set; } = new CreateElicitationResponseCancel();
+        public CreateElicitationResponse CreateElicitationResponseToReturn { get; set; } = new CreateElicitationResponse() { Action = "cancel" };
         public ReadTextFileResponse ReadTextFileResponseToReturn { get; set; } = new ReadTextFileResponse { Content = "" };
         public WriteTextFileResponse WriteTextFileResponseToReturn { get; set; } = new WriteTextFileResponse();
         public RequestPermissionResponse RequestPermissionResponseToReturn { get; set; } = new RequestPermissionResponse { Outcome = new RequestPermissionOutcomeCancelled() };

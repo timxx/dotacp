@@ -61,22 +61,22 @@ namespace dotacp.unittest
                             }
                         }
                     },
-                    Models = new SessionModelState
-                    {
-                        CurrentModelId = "gpt-5",
-                        AvailableModels = new[]
-                        {
-                            new ModelInfo { ModelId = "gpt-5", Name = "GPT-5", Description = "Primary" }
-                        }
-                    },
-                    Modes = new SessionModeState
-                    {
-                        CurrentModeId = "plan-mode",
-                        AvailableModes = new[]
-                        {
-                            new SessionMode { Id = "plan-mode", Name = "Plan", Description = "Plan mode" }
-                        }
-                    }
+                    //Models = new SessionModelState
+                    //{
+                    //    CurrentModelId = "gpt-5",
+                    //    AvailableModels = new[]
+                    //    {
+                    //        new ModelInfo { ModelId = "gpt-5", Name = "GPT-5", Description = "Primary" }
+                    //    }
+                    //},
+                    //Modes = new SessionModeState
+                    //{
+                    //    CurrentModeId = "plan-mode",
+                    //    AvailableModes = new[]
+                    //    {
+                    //        new SessionMode { Id = "plan-mode", Name = "Plan", Description = "Plan mode" }
+                    //    }
+                    //}
                 };
 
                 var response = await pair.ClientConn.NewSessionAsync(new NewSessionRequest
@@ -90,8 +90,8 @@ namespace dotacp.unittest
                 Assert.IsNotNull(response);
                 Assert.AreEqual("new-1", (string)response.SessionId);
                 Assert.IsNotNull(response.ConfigOptions);
-                Assert.IsNotNull(response.Models);
-                Assert.AreEqual("gpt-5", (string)response.Models.CurrentModelId);
+                //Assert.IsNotNull(response.Models);
+                //Assert.AreEqual("gpt-5", (string)response.Models.CurrentModelId);
                 Assert.IsNotNull(response.Modes);
             }
         }
@@ -118,22 +118,22 @@ namespace dotacp.unittest
                             }
                         }
                     },
-                    Models = new SessionModelState
-                    {
-                        CurrentModelId = "gpt-5",
-                        AvailableModels = new[]
-                        {
-                            new ModelInfo { ModelId = "gpt-5", Name = "GPT-5", Description = "Primary model" }
-                        }
-                    },
-                    Modes = new SessionModeState
-                    {
-                        CurrentModeId = "plan-mode",
-                        AvailableModes = new[]
-                        {
-                            new SessionMode { Id = "plan-mode", Name = "Plan", Description = "Plan-first responses" }
-                        }
-                    }
+                    //Models = new SessionModelState
+                    //{
+                    //    CurrentModelId = "gpt-5",
+                    //    AvailableModels = new[]
+                    //    {
+                    //        new ModelInfo { ModelId = "gpt-5", Name = "GPT-5", Description = "Primary model" }
+                    //    }
+                    //},
+                    //Modes = new SessionModeState
+                    //{
+                    //    CurrentModeId = "plan-mode",
+                    //    AvailableModes = new[]
+                    //    {
+                    //        new SessionMode { Id = "plan-mode", Name = "Plan", Description = "Plan-first responses" }
+                    //    }
+                    //}
                 };
 
                 var response = await pair.ClientConn.LoadSessionAsync(new LoadSessionRequest
@@ -145,8 +145,8 @@ namespace dotacp.unittest
 
                 Assert.IsNotNull(pair.Agent.LastLoadSessionRequest);
                 Assert.AreEqual("session-1", (string)pair.Agent.LastLoadSessionRequest!.SessionId);
-                Assert.IsNotNull(response.Models);
-                Assert.AreEqual("gpt-5", (string)response.Models.CurrentModelId);
+                //Assert.IsNotNull(response.Models);
+                //Assert.AreEqual("gpt-5", (string)response.Models.CurrentModelId);
                 Assert.IsNotNull(response.Modes);
                 Assert.AreEqual("plan-mode", (string)response.Modes.CurrentModeId);
             }
@@ -272,23 +272,6 @@ namespace dotacp.unittest
 
                 Assert.IsNotNull(pair.Agent.LastSetSessionModeRequest);
                 Assert.AreEqual("plan", (string)pair.Agent.LastSetSessionModeRequest!.ModeId);
-                Assert.IsNotNull(response);
-            }
-        }
-
-        [TestMethod]
-        public async Task SetSessionModelAsync()
-        {
-            using (var pair = ConnectionPair_Unstable.Create())
-            {
-                var response = await pair.ClientConn.SetSessionModelAsync(new SetSessionModelRequest
-                {
-                    SessionId = "session-1",
-                    ModelId = "gpt-5"
-                });
-
-                Assert.IsNotNull(pair.Agent.LastSetSessionModelRequest);
-                Assert.AreEqual("gpt-5", (string)pair.Agent.LastSetSessionModelRequest!.ModelId);
                 Assert.IsNotNull(response);
             }
         }

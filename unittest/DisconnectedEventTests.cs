@@ -246,6 +246,11 @@ namespace dotacp.unittest
         {
             throw new NotImplementedException();
         }
+
+        public Task<DeleteSessionResponse> DeleteAsync(DeleteSessionRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     /// <summary>
@@ -370,6 +375,11 @@ namespace dotacp.unittest
             Task.CompletedTask;
 
         public Task<LogoutResponse> LogoutAsync(LogoutRequest request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DeleteSessionResponse> DeleteAsync(DeleteSessionRequest request, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
