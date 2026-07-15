@@ -77,28 +77,56 @@ namespace clientcli
 
             bool hasModels = false;
             bool hasModes = false;
-#if false
-            // TODO: update to config
-            if (session.Models != null)
-            {
-                Console.WriteLine("Available models:");
-                foreach (var model in session.Models.AvailableModels)
-                    Console.WriteLine($"  - {model.ModelId}: {model.Name} - {model.Description}");
-                hasModels = session.Models.AvailableModels.Length > 0;
-                Console.WriteLine("Current model: " + session.Models.CurrentModelId);
-            }
 
-            if (session.Modes != null)
+            if (session.ConfigOptions?.Length > 0)
             {
-                Console.WriteLine("Available modes:");
-                foreach (var mode in session.Modes.AvailableModes)
+                foreach (var config in session.ConfigOptions)
                 {
-                    Console.WriteLine($"  - {mode.Id}: {mode.Name} - {mode.Description}");
+                    if (config.Category == SessionConfigOptionCategory.Model)
+                    {
+                        if (config is SessionConfigSelect configSelect)
+                        {
+                            if (configSelect.Options.TryGetSessionConfigSelectOption(out SessionConfigSelectOption[] options))
+                            {
+                                Console.WriteLine("Available models:");
+                                foreach (var model in options)
+                                    Console.WriteLine($"  - {model.Value}: {model.Name} - {model.Description}");
+                                hasModels = options.Length > 0;
+                                Console.WriteLine($"Current model: {configSelect.CurrentValue}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Unhandled SessionConfigSelectGroup");
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    if (config.Category == SessionConfigOptionCategory.Mode)
+                    {
+                        if (config is SessionConfigSelect configSelect)
+                        {
+                            if (configSelect.Options.TryGetSessionConfigSelectOption(out SessionConfigSelectOption[] options))
+                            {
+                                Console.WriteLine("Available models:");
+                                foreach (var mode in options)
+                                    Console.WriteLine($"  - {mode.Value}: {mode.Name} - {mode.Description}");
+                                hasModes = options.Length > 0;
+                                Console.WriteLine($"Current mode: {configSelect.CurrentValue}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Unhandled SessionConfigSelectGroup");
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    Console.WriteLine($"Unknown config category: {config.Category}");
                 }
-                Console.WriteLine($"Current mode: {session.Modes.CurrentModeId}");
-                hasModes = session.Modes.AvailableModes.Length > 0;
             }
-#endif
 
             try
             {
@@ -165,19 +193,17 @@ namespace clientcli
                     continue;
                 }
 
-#if false
-                // TODO
                 if (hasModels && input.StartsWith("/switchmodel "))
                 {
                     var modelId = input.Split(' ')[1].Trim();
-                    await connection.SetSessionModelAsync(new SetSessionModelRequest()
+                    await connection.SetSessionConfigOptionAsync(new SetSessionConfigOptionRequest()
                     {
                         SessionId = session.SessionId,
-                        ModelId = modelId
+                        ConfigId = (string)SessionConfigOptionCategory.Model,
+                        Value = new SetSessionConfigOptionRequestValue(modelId)
                     });
                     continue;
                 }
-#endif
 
                 if (capabilities.LoadSession && input.StartsWith("/loadsession "))
                 {
