@@ -41,6 +41,18 @@ namespace dotacp.unittest
                     {
                         new SessionConfigSelect
                         {
+                            Id = "model-selector",
+                            Name = "Model",
+                            Description = "Choose the active model",
+                            Category = SessionConfigOptionCategory.Model,
+                            CurrentValue = "gpt-5",
+                            Options = new SessionConfigSelectOption[]
+                            {
+                                new SessionConfigSelectOption { Name = "GPT-5", Value = "gpt-5", Description = "Primary" }
+                            }
+                        },
+                        new SessionConfigSelect
+                        {
                             Id = "mode-selector",
                             Name = "Mode",
                             Description = "Choose session mode",
@@ -61,22 +73,14 @@ namespace dotacp.unittest
                             }
                         }
                     },
-                    //Models = new SessionModelState
-                    //{
-                    //    CurrentModelId = "gpt-5",
-                    //    AvailableModels = new[]
-                    //    {
-                    //        new ModelInfo { ModelId = "gpt-5", Name = "GPT-5", Description = "Primary" }
-                    //    }
-                    //},
-                    //Modes = new SessionModeState
-                    //{
-                    //    CurrentModeId = "plan-mode",
-                    //    AvailableModes = new[]
-                    //    {
-                    //        new SessionMode { Id = "plan-mode", Name = "Plan", Description = "Plan mode" }
-                    //    }
-                    //}
+                    Modes = new SessionModeState
+                    {
+                        CurrentModeId = "plan-mode",
+                        AvailableModes = new[]
+                        {
+                            new SessionMode { Id = "plan-mode", Name = "Plan", Description = "Plan mode" }
+                        }
+                    }
                 };
 
                 var response = await pair.ClientConn.NewSessionAsync(new NewSessionRequest
@@ -90,9 +94,23 @@ namespace dotacp.unittest
                 Assert.IsNotNull(response);
                 Assert.AreEqual("new-1", (string)response.SessionId);
                 Assert.IsNotNull(response.ConfigOptions);
-                //Assert.IsNotNull(response.Models);
-                //Assert.AreEqual("gpt-5", (string)response.Models.CurrentModelId);
                 Assert.IsNotNull(response.Modes);
+
+                // Verify model config via ConfigOptions
+                bool foundModelConfig = false;
+                foreach (var config in response.ConfigOptions)
+                {
+                    if (config.Category == SessionConfigOptionCategory.Model && config is SessionConfigSelect modelSelect)
+                    {
+                        Assert.AreEqual("gpt-5", (string)modelSelect.CurrentValue);
+                        Assert.IsTrue(modelSelect.Options.TryGetSessionConfigSelectOption(out SessionConfigSelectOption[] models));
+                        Assert.HasCount(1, models);
+                        Assert.AreEqual("gpt-5", (string)models[0].Value);
+                        Assert.AreEqual("GPT-5", models[0].Name);
+                        foundModelConfig = true;
+                    }
+                }
+                Assert.IsTrue(foundModelConfig, "Model config option not found in response");
             }
         }
 
@@ -118,22 +136,14 @@ namespace dotacp.unittest
                             }
                         }
                     },
-                    //Models = new SessionModelState
-                    //{
-                    //    CurrentModelId = "gpt-5",
-                    //    AvailableModels = new[]
-                    //    {
-                    //        new ModelInfo { ModelId = "gpt-5", Name = "GPT-5", Description = "Primary model" }
-                    //    }
-                    //},
-                    //Modes = new SessionModeState
-                    //{
-                    //    CurrentModeId = "plan-mode",
-                    //    AvailableModes = new[]
-                    //    {
-                    //        new SessionMode { Id = "plan-mode", Name = "Plan", Description = "Plan-first responses" }
-                    //    }
-                    //}
+                    Modes = new SessionModeState
+                    {
+                        CurrentModeId = "plan-mode",
+                        AvailableModes = new[]
+                        {
+                            new SessionMode { Id = "plan-mode", Name = "Plan", Description = "Plan-first responses" }
+                        }
+                    }
                 };
 
                 var response = await pair.ClientConn.LoadSessionAsync(new LoadSessionRequest
@@ -145,10 +155,25 @@ namespace dotacp.unittest
 
                 Assert.IsNotNull(pair.Agent.LastLoadSessionRequest);
                 Assert.AreEqual("session-1", (string)pair.Agent.LastLoadSessionRequest!.SessionId);
-                //Assert.IsNotNull(response.Models);
-                //Assert.AreEqual("gpt-5", (string)response.Models.CurrentModelId);
+                Assert.IsNotNull(response.ConfigOptions);
                 Assert.IsNotNull(response.Modes);
                 Assert.AreEqual("plan-mode", (string)response.Modes.CurrentModeId);
+
+                // Verify model config via ConfigOptions
+                bool foundModelConfig2 = false;
+                foreach (var config in response.ConfigOptions)
+                {
+                    if (config.Category == SessionConfigOptionCategory.Model && config is SessionConfigSelect modelSelect)
+                    {
+                        Assert.AreEqual("gpt-5", (string)modelSelect.CurrentValue);
+                        Assert.IsTrue(modelSelect.Options.TryGetSessionConfigSelectOption(out SessionConfigSelectOption[] models));
+                        Assert.HasCount(1, models);
+                        Assert.AreEqual("gpt-5", (string)models[0].Value);
+                        Assert.AreEqual("GPT-5", models[0].Name);
+                        foundModelConfig2 = true;
+                    }
+                }
+                Assert.IsTrue(foundModelConfig2, "Model config option not found in response");
             }
         }
 
