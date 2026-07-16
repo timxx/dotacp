@@ -109,7 +109,7 @@ namespace clientcli
                         {
                             if (configSelect.Options.TryGetSessionConfigSelectOption(out SessionConfigSelectOption[] options))
                             {
-                                Console.WriteLine("Available models:");
+                                Console.WriteLine("Available modes:");
                                 foreach (var mode in options)
                                     Console.WriteLine($"  - {mode.Value}: {mode.Name} - {mode.Description}");
                                 hasModes = options.Length > 0;
