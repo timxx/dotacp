@@ -1833,8 +1833,14 @@ namespace dotacp.protocol.unstable
     /// <summary>
     /// The input specification for a command.
     /// </summary>
+    [JsonConverter(typeof(ObjectUnionConverter<AvailableCommandInput>))]
     public abstract class AvailableCommandInput
     {
+        /// <summary>Variant types for union deserialization (no discriminator in JSON).</summary>
+        internal static readonly Type[] UnionVariantTypes = new Type[]
+        {
+            typeof(UnstructuredCommandInput),
+        };
     }
 
     /// <summary>

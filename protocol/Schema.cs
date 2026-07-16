@@ -980,8 +980,14 @@ namespace dotacp.protocol
     /// The `type` field acts as the discriminator in the serialized JSON form.
     /// When no `type` is present, the method is treated as `agent`.
     /// </summary>
+    [JsonConverter(typeof(ObjectUnionConverter<AuthMethod>))]
     public abstract class AuthMethod
     {
+        /// <summary>Variant types for union deserialization (no discriminator in JSON).</summary>
+        internal static readonly Type[] UnionVariantTypes = new Type[]
+        {
+            typeof(AuthMethodAgent),
+        };
     }
 
     /// <summary>
@@ -1057,8 +1063,14 @@ namespace dotacp.protocol
     /// <summary>
     /// The input specification for a command.
     /// </summary>
+    [JsonConverter(typeof(ObjectUnionConverter<AvailableCommandInput>))]
     public abstract class AvailableCommandInput
     {
+        /// <summary>Variant types for union deserialization (no discriminator in JSON).</summary>
+        internal static readonly Type[] UnionVariantTypes = new Type[]
+        {
+            typeof(UnstructuredCommandInput),
+        };
     }
 
     /// <summary>

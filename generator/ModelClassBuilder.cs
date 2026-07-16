@@ -701,9 +701,34 @@ namespace dotacp.generator
             // XML documentation
             AppendXmlDocs(sb, definition["description"]?.ToString());
 
+            // Find all child types that inherit from this abstract base
+            var childClassNames = discriminatorAnalyzer.ChildToAbstractBase
+                .Where(kv => kv.Value == name)
+                .Select(kv => NamingHelper.ConvertNameToClass(kv.Key))
+                .ToList();
+
+            // Emit ObjectUnionConverter so the abstract base can be deserialized from any variant
+            if (childClassNames.Count > 0)
+            {
+                sb.AppendLineLf($"[JsonConverter(typeof(ObjectUnionConverter<{className}>))]");
+            }
+
             // Generate abstract base class
             sb.AppendLineLf($"public abstract class {className}");
             sb.AppendLineLf("{");
+
+            if (childClassNames.Count > 0)
+            {
+                sb.AppendLineLf("    /// <summary>Variant types for union deserialization (no discriminator in JSON).</summary>");
+                sb.AppendLineLf("    internal static readonly Type[] UnionVariantTypes = new Type[]");
+                sb.AppendLineLf("    {");
+                foreach (var child in childClassNames)
+                {
+                    sb.AppendLineLf($"        typeof({child}),");
+                }
+                sb.AppendLineLf("    };");
+            }
+
             sb.Append("}");
 
             return sb.ToString();

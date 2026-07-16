@@ -249,5 +249,29 @@ namespace dotacp.unittest
             Assert.AreEqual("base64data", ((BlobResourceContents)blobResource).Blob);
             Assert.AreEqual("file:///img.png", ((BlobResourceContents)blobResource).Uri);
         }
+
+        /// <summary>
+        /// AvailableCommandInput is abstract and should deserialize via ObjectUnionConverter
+        /// from its concrete variant UnstructuredCommandInput (hint-only).
+        /// Reproduces: "Could not create an instance of type AvailableCommandInput. Type is an interface or abstract class."
+        /// </summary>
+        [TestMethod]
+        public void AvailableCommandInput_DeserializesWithoutDiscriminator_ByHintProperty()
+        {
+            string json = @"{
+                ""name"": ""add-dir"",
+                ""description"": ""Add a directory to the allowed list for file access"",
+                ""input"": {
+                    ""hint"": ""directory""
+                }
+            }";
+
+            var command = JsonConvert.DeserializeObject<AvailableCommand>(json);
+            Assert.IsNotNull(command);
+            Assert.AreEqual("add-dir", command.Name);
+            Assert.IsNotNull(command.Input);
+            Assert.IsInstanceOfType(command.Input, typeof(UnstructuredCommandInput));
+            Assert.AreEqual("directory", ((UnstructuredCommandInput)command.Input).Hint);
+        }
     }
 }
